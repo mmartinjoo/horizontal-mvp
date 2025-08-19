@@ -1,4 +1,57 @@
 <script setup>
+import { ref } from 'vue'
+
+const email = ref('')
+const isSubmitting = ref(false)
+const showSuccess = ref(false)
+const showError = ref(false)
+
+// Replace these with your actual Google Form details
+// Instructions:
+// 1. Create a Google Form with one email field
+// 2. Get the form URL and replace 'viewform' with 'formResponse'
+// 3. Inspect the email field to find the entry number (e.g., entry.123456789)
+const GOOGLE_FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLScvh4EpaNhkV5fabMGkxOxJeVg6guD3b3X1jKgBJN1tiERsaA/formResponse'
+const EMAIL_FIELD_NAME = 'entry.161718733' // e.g., 'entry.123456789'
+
+const submitToGoogleForms = async () => {
+  if (!email.value) return
+  
+  isSubmitting.value = true
+  showError.value = false
+  showSuccess.value = false
+  
+  try {
+    // Create form data
+    const formData = new FormData()
+    formData.append(EMAIL_FIELD_NAME, email.value)
+    
+    // Submit to Google Forms using no-cors mode
+    await fetch(GOOGLE_FORM_ACTION, {
+      method: 'POST',
+      mode: 'no-cors', // This is key for Google Forms
+      body: formData
+    })
+    
+    // Since no-cors doesn't return response, we assume success
+    showSuccess.value = true
+    email.value = ''
+    
+    // Track the conversion (optional)
+    console.log('Waitlist signup successful')
+    
+  } catch (error) {
+    console.error('Error submitting to Google Forms:', error)
+    showError.value = true
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+const handleSubmit = (e) => {
+  e.preventDefault()
+  submitToGoogleForms()
+}
 </script>
 
 <template>
@@ -29,9 +82,9 @@
           
           <!-- CTA Button -->
           <div class="flex-shrink-0">
-            <button class="bg-gray-900 text-white px-6 py-2.5 rounded-lg text-base font-medium hover:bg-gray-800 transition-colors">
+            <a href="#waitlist" class="bg-gray-900 text-white px-6 py-2.5 rounded-lg text-base font-medium hover:bg-gray-800 transition-colors inline-block">
               Join Waitlist
-            </button>
+            </a>
           </div>
         </div>
       </div>
@@ -319,7 +372,7 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="py-24 bg-white">
+    <section id="waitlist" class="py-24 bg-white">
       <div class="max-w-6xl mx-auto px-6 lg:px-8">
         <!-- Main CTA -->
         <div class="text-center mb-16">
@@ -333,7 +386,7 @@
           <!-- Signup Form -->
           <div class="max-w-2xl mx-auto mb-12">
             <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100">
-              <div class="flex flex-col sm:flex-row gap-4">
+              <form @submit="handleSubmit" class="flex flex-col sm:flex-row gap-4">
                 <div class="flex-1">
                   <div class="relative">
                     <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -341,14 +394,35 @@
                     </svg>
                     <input 
                       type="email" 
+                      v-model="email"
                       placeholder="your.email@company.com"
-                      class="w-full pl-12 pr-4 py-4 bg-white border border-gray-200 rounded-xl text-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                      required
+                      :disabled="isSubmitting"
+                      class="w-full pl-12 pr-4 py-4 bg-white border border-gray-200 rounded-xl text-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all disabled:opacity-50"
                     >
                   </div>
                 </div>
-                <button class="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-purple-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 whitespace-nowrap">
-                  Join Waitlist
+                <button 
+                  type="submit"
+                  :disabled="isSubmitting || !email"
+                  class="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-purple-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                  {{ isSubmitting ? 'Joining...' : 'Join Waitlist' }}
                 </button>
+              </form>
+              
+              <!-- Success Message -->
+              <div v-if="showSuccess" class="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
+                <p class="text-green-800 text-center font-medium">
+                  🎉 Thanks for joining the waitlist! We'll be in touch soon.
+                </p>
+              </div>
+              
+              <!-- Error Message -->
+              <div v-if="showError" class="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
+                <p class="text-red-800 text-center font-medium">
+                  ❌ Something went wrong. Please try again or contact us directly.
+                </p>
               </div>
             </div>
           </div>
