@@ -95,7 +95,15 @@ const goToWaitlist = () => {
     </nav>
 
     <!-- Hero Section -->
-    <main class="max-w-6xl mx-auto px-6 lg:px-8 pt-24 pb-16">
+    <section class="relative overflow-hidden bg-gradient-to-br from-purple-50 via-blue-50 to-white">
+      <!-- Decorative background elements -->
+      <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-200/30 to-blue-200/30 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-blue-200/20 to-purple-200/20 rounded-full blur-3xl"></div>
+        <div class="absolute top-20 left-1/4 w-32 h-32 bg-gradient-to-br from-purple-300/20 to-blue-300/20 rounded-full blur-2xl"></div>
+      </div>
+      
+      <main class="max-w-6xl mx-auto px-6 lg:px-8 pt-24 pb-16 relative z-10">
       <div class="text-center">
         <!-- Main Headline -->
         <h1 class="text-6xl lg:text-7xl font-bold text-black mb-8 leading-tight">
@@ -137,7 +145,8 @@ const goToWaitlist = () => {
           />
         </div>
       </div>
-    </main>
+      </main>
+    </section>
 
     <!-- Problem Section -->
     <section class="py-24 bg-gray-50" id="problem">
