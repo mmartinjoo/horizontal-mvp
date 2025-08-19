@@ -177,7 +177,7 @@ const handleSubmit = (e) => {
         <!-- Section Header -->
         <div class="text-center mb-20">
           <h2 class="text-5xl lg:text-6xl font-bold text-black mb-6">
-            The <span class="text-red-500">problem</span> with modern teams
+            The <span class="text-red-500">problem</span> with too many tools
           </h2>
           <p class="text-xl lg:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
             Your team's knowledge is scattered across dozens of apps. Finding information is like searching for a needle in a haystack.
@@ -222,6 +222,200 @@ const handleSubmit = (e) => {
             <h3 class="text-2xl lg:text-3xl font-bold text-black mb-6">Knowledge Silos</h3>
             <p class="text-lg lg:text-xl text-gray-600 leading-relaxed">
               Team knowledge lives in isolated apps, making collaboration inefficient
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Data Visualization Section -->
+    <section class="py-24 bg-white">
+      <div class="max-w-7xl mx-auto px-6 lg:px-8">
+        <!-- Section Header -->
+        <div class="text-center mb-20">
+          <h2 class="text-5xl lg:text-6xl font-bold text-black mb-6">
+            The <span class="text-red-500">hidden cost</span> of scattered tools
+          </h2>
+          <p class="text-xl lg:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed mb-4">
+            Based on the 2024 StackOverflow Developer Survey
+          </p>
+          <p class="text-lg text-gray-500">
+            Over 90,000 developers worldwide shared their daily struggles
+          </p>
+        </div>
+
+        <!-- Charts Container -->
+        <div class="grid lg:grid-cols-2 gap-16 lg:gap-20 max-w-6xl mx-auto">
+          <!-- Searching Chart -->
+          <div class="text-center">
+            <div class="mb-8">
+              <svg viewBox="0 0 200 200" class="w-64 h-64 mx-auto drop-shadow-lg">
+                <!-- Background circle -->
+                <circle cx="100" cy="100" r="80" fill="none" stroke="#f3f4f6" stroke-width="12"/>
+                
+                <!-- Data segments -->
+                <!-- 15-30 min: 27% -->
+                <circle cx="100" cy="100" r="80" fill="none" stroke="#fbbf24" stroke-width="12"
+                        stroke-dasharray="135.1 366.5" stroke-dashoffset="0"
+                        transform="rotate(-90 100 100)" class="animate-draw-1"/>
+                
+                <!-- 30-60 min: 37.9% -->
+                <circle cx="100" cy="100" r="80" fill="none" stroke="#f59e0b" stroke-width="12"
+                        stroke-dasharray="190.3 311.3" stroke-dashoffset="-135.1"
+                        transform="rotate(-90 100 100)" class="animate-draw-2"/>
+                
+                <!-- 60-120 min: 18.3% -->
+                <circle cx="100" cy="100" r="80" fill="none" stroke="#dc2626" stroke-width="12"
+                        stroke-dasharray="91.9 409.7" stroke-dashoffset="-325.4"
+                        transform="rotate(-90 100 100)" class="animate-draw-3"/>
+                
+                <!-- 120+ min: 7.6% -->
+                <circle cx="100" cy="100" r="80" fill="none" stroke="#991b1b" stroke-width="12"
+                        stroke-dasharray="38.2 463.4" stroke-dashoffset="-417.3"
+                        transform="rotate(-90 100 100)" class="animate-draw-4"/>
+                
+                <!-- Center text -->
+                <text x="100" y="95" text-anchor="middle" class="text-2xl font-bold fill-gray-800">65%</text>
+                <text x="100" y="115" text-anchor="middle" class="text-sm fill-gray-600">spend 30+</text>
+                <text x="100" y="130" text-anchor="middle" class="text-sm fill-gray-600">minutes</text>
+              </svg>
+            </div>
+            
+            <h3 class="text-2xl lg:text-3xl font-bold text-black mb-6">
+              Time Spent <span class="text-red-500">Searching</span>
+            </h3>
+            <p class="text-lg text-gray-600 mb-8">Daily time developers spend searching for answers</p>
+            
+            <!-- Legend -->
+            <div class="space-y-3">            
+              <div class="flex items-center justify-between text-sm">
+                <div class="flex items-center space-x-3">
+                  <div class="w-4 h-4 bg-yellow-400 rounded-full"></div>
+                  <span>15-30 minutes</span>
+                </div>
+                <span class="font-semibold">27%</span>
+              </div>
+              <div class="flex items-center justify-between text-sm">
+                <div class="flex items-center space-x-3">
+                  <div class="w-4 h-4 bg-yellow-500 rounded-full"></div>
+                  <span>30-60 minutes</span>
+                </div>
+                <span class="font-semibold">38%</span>
+              </div>
+              <div class="flex items-center justify-between text-sm">
+                <div class="flex items-center space-x-3">
+                  <div class="w-4 h-4 bg-red-600 rounded-full"></div>
+                  <span>60-120 minutes</span>
+                </div>
+                <span class="font-semibold">18%</span>
+              </div>
+              <div class="flex items-center justify-between text-sm">
+                <div class="flex items-center space-x-3">
+                  <div class="w-4 h-4 bg-red-800 rounded-full"></div>
+                  <span>120+ minutes</span>
+                </div>
+                <span class="font-semibold">8%</span>
+              </div>
+              <div class="flex items-center justify-between text-sm">
+                <div class="flex items-center space-x-3">
+                  <div class="w-4 h-4 bg-white rounded-full"></div>
+                  <span>less then 15 minutes</span>
+                </div>
+                <span class="font-semibold">9%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Answering Chart -->
+          <div class="text-center">
+            <div class="mb-8">
+              <svg viewBox="0 0 200 200" class="w-64 h-64 mx-auto drop-shadow-lg">
+                <!-- Background circle -->
+                <circle cx="100" cy="100" r="80" fill="none" stroke="#f3f4f6" stroke-width="12"/>
+                
+                <!-- Data segments -->
+                <!-- 15-30 min: 32.4% -->
+                <circle cx="100" cy="100" r="80" fill="none" stroke="#a855f7" stroke-width="12"
+                        stroke-dasharray="162.9 339.8" stroke-dashoffset="0"
+                        transform="rotate(-90 100 100)" class="animate-draw-a1"/>
+                
+                <!-- 30-60 min: 30% -->
+                <circle cx="100" cy="100" r="80" fill="none" stroke="#7c3aed" stroke-width="12"
+                        stroke-dasharray="150.8 351.9" stroke-dashoffset="-162.9"
+                        transform="rotate(-90 100 100)" class="animate-draw-a2"/>
+                
+                <!-- 60-120 min: 12.8% -->
+                <circle cx="100" cy="100" r="80" fill="none" stroke="#5b21b6" stroke-width="12"
+                        stroke-dasharray="64.3 438.4" stroke-dashoffset="-313.7"
+                        transform="rotate(-90 100 100)" class="animate-draw-a3"/>
+                
+                <!-- 120+ min: 4.3% -->
+                <circle cx="100" cy="100" r="80" fill="none" stroke="#3730a3" stroke-width="12"
+                        stroke-dasharray="21.6 481.1" stroke-dashoffset="-378.0"
+                        transform="rotate(-90 100 100)" class="animate-draw-a4"/>
+                
+                <!-- Center text -->
+                <text x="100" y="95" text-anchor="middle" class="text-2xl font-bold fill-gray-800">47%</text>
+                <text x="100" y="115" text-anchor="middle" class="text-sm fill-gray-600">spend 30+</text>
+                <text x="100" y="130" text-anchor="middle" class="text-sm fill-gray-600">minutes</text>
+              </svg>
+            </div>
+            
+            <h3 class="text-2xl lg:text-3xl font-bold text-black mb-6">
+              Time Spent <span class="text-purple-500">Answering</span>
+            </h3>
+            <p class="text-lg text-gray-600 mb-8">Daily time developers spend answering questions</p>
+            
+            <!-- Legend -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between text-sm">
+                <div class="flex items-center space-x-3">
+                  <div class="w-4 h-4 bg-purple-400 rounded-full"></div>
+                  <span>15-30 minutes</span>
+                </div>
+                <span class="font-semibold">32%</span>
+              </div>
+              <div class="flex items-center justify-between text-sm">
+                <div class="flex items-center space-x-3">
+                  <div class="w-4 h-4 bg-purple-600 rounded-full"></div>
+                  <span>30-60 minutes</span>
+                </div>
+                <span class="font-semibold">30%</span>
+              </div>
+              <div class="flex items-center justify-between text-sm">
+                <div class="flex items-center space-x-3">
+                  <div class="w-4 h-4 bg-purple-800 rounded-full"></div>
+                  <span>60-120 minutes</span>
+                </div>
+                <span class="font-semibold">13%</span>
+              </div>
+              <div class="flex items-center justify-between text-sm">
+                <div class="flex items-center space-x-3">
+                  <div class="w-4 h-4 bg-indigo-800 rounded-full"></div>
+                  <span>120+ minutes</span>
+                </div>
+                <span class="font-semibold">4%</span>
+              </div>
+              <div class="flex items-center justify-between text-sm">
+                <div class="flex items-center space-x-3">
+                  <div class="w-4 h-4 bg-white rounded-full"></div>
+                  <span>Less than 15 minutes</span>
+                </div>
+                <span class="font-semibold">20%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Key Insight -->
+        <div class="mt-20 text-center">
+          <div class="bg-gradient-to-r from-red-50 to-purple-50 rounded-3xl p-12 border border-red-100">
+            <h3 class="text-3xl lg:text-4xl font-bold text-black mb-6">
+              That's <span class="text-red-500">1-2 hours</span> of productivity lost every day
+            </h3>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Developers are spending up to <strong>25% of their workday</strong> just searching for information and answering repetitive questions. 
+              <span class="text-purple-600 font-semibold">Horizontal eliminates this waste.</span>
             </p>
           </div>
         </div>
@@ -548,5 +742,107 @@ button {
 /* Fix border-3 class */
 .border-3 {
   border-width: 3px;
+}
+
+/* Chart animations */
+.animate-draw-1 {
+  stroke-dasharray: 0 501.6;
+  animation: draw-1 2s ease-out 0.5s forwards;
+}
+
+.animate-draw-2 {
+  stroke-dasharray: 0 501.6;
+  animation: draw-2 2s ease-out 1s forwards;
+}
+
+.animate-draw-3 {
+  stroke-dasharray: 0 501.6;
+  animation: draw-3 2s ease-out 1.5s forwards;
+}
+
+.animate-draw-4 {
+  stroke-dasharray: 0 501.6;
+  animation: draw-4 2s ease-out 2s forwards;
+}
+
+@keyframes draw-1 {
+  to {
+    stroke-dasharray: 135.1 366.5; /* 27% */
+  }
+}
+
+@keyframes draw-2 {
+  to {
+    stroke-dasharray: 190.3 311.3; /* 37.9% */
+  }
+}
+
+@keyframes draw-3 {
+  to {
+    stroke-dasharray: 91.9 409.7; /* 18.3% */
+  }
+}
+
+@keyframes draw-4 {
+  to {
+    stroke-dasharray: 38.2 463.4; /* 7.6% */
+  }
+}
+
+/* Chart hover effects */
+svg circle:hover {
+  stroke-width: 14;
+  transition: stroke-width 0.3s ease;
+}
+
+/* Drop shadow for charts */
+.drop-shadow-lg {
+  filter: drop-shadow(0 10px 15px -3px rgb(0 0 0 / 0.1)) drop-shadow(0 4px 6px -4px rgb(0 0 0 / 0.1));
+}
+
+
+/* Answering chart animations */
+.animate-draw-a1 {
+  stroke-dasharray: 0 502.7;
+  animation: draw-a1 2s ease-out 0.5s forwards;
+}
+
+.animate-draw-a2 {
+  stroke-dasharray: 0 502.7;
+  animation: draw-a2 2s ease-out 1s forwards;
+}
+
+.animate-draw-a3 {
+  stroke-dasharray: 0 502.7;
+  animation: draw-a3 2s ease-out 1.5s forwards;
+}
+
+.animate-draw-a4 {
+  stroke-dasharray: 0 502.7;
+  animation: draw-a4 2s ease-out 2s forwards;
+}
+
+@keyframes draw-a1 {
+  to {
+    stroke-dasharray: 162.9 339.8; /* 32.4% */
+  }
+}
+
+@keyframes draw-a2 {
+  to {
+    stroke-dasharray: 150.8 351.9; /* 30% */
+  }
+}
+
+@keyframes draw-a3 {
+  to {
+    stroke-dasharray: 64.3 438.4; /* 12.8% */
+  }
+}
+
+@keyframes draw-a4 {
+  to {
+    stroke-dasharray: 21.6 481.1; /* 4.3% */
+  }
 }
 </style>
