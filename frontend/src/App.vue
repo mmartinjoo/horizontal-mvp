@@ -16,30 +16,30 @@ const EMAIL_FIELD_NAME = 'entry.161718733' // e.g., 'entry.123456789'
 
 const submitToGoogleForms = async () => {
   if (!email.value) return
-  
+
   isSubmitting.value = true
   showError.value = false
   showSuccess.value = false
-  
+
   try {
     // Create form data
     const formData = new FormData()
     formData.append(EMAIL_FIELD_NAME, email.value)
-    
+
     // Submit to Google Forms using no-cors mode
     await fetch(GOOGLE_FORM_ACTION, {
       method: 'POST',
       mode: 'no-cors', // This is key for Google Forms
       body: formData
     })
-    
+
     // Since no-cors doesn't return response, we assume success
     showSuccess.value = true
     email.value = ''
-    
+
     // Track the conversion (optional)
     console.log('Waitlist signup successful')
-    
+
   } catch (error) {
     console.error('Error submitting to Google Forms:', error)
     showError.value = true
@@ -64,7 +64,7 @@ const handleSubmit = (e) => {
           <div class="flex-shrink-0">
             <h1 class="text-2xl font-bold text-black">Horizontal</h1>
           </div>
-          
+
           <!-- Navigation Links -->
           <div class="hidden md:block">
             <div class="ml-10 flex items-center space-x-12">
@@ -79,7 +79,7 @@ const handleSubmit = (e) => {
               </a>
             </div>
           </div>
-          
+
           <!-- CTA Button -->
           <div class="flex-shrink-0">
             <a href="#waitlist" class="bg-gray-900 text-white px-6 py-2.5 rounded-lg text-base font-medium hover:bg-gray-800 transition-colors inline-block">
@@ -99,7 +99,7 @@ const handleSubmit = (e) => {
           <br>
           for your entire team
         </h1>
-        
+
         <!-- Subheading -->
         <div class="max-w-4xl mx-auto mb-16 space-y-2">
           <p class="text-xl lg:text-2xl text-gray-600">
@@ -109,14 +109,14 @@ const handleSubmit = (e) => {
             Connect all your tools and <span class="bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent font-semibold">search everything</span> in one place.
           </p>
         </div>
-        
+
         <!-- CTA Button -->
         <div class="mb-16">
           <button class="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-10 py-4 rounded-2xl text-xl font-semibold hover:from-purple-600 hover:to-purple-700 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
             Join the Waitlist →
           </button>
         </div>
-        
+
         <!-- Social Proof -->
         <div class="flex items-center justify-center space-x-4 text-gray-500 mb-20">
           <div class="flex -space-x-2">
@@ -128,7 +128,7 @@ const handleSubmit = (e) => {
           <span class="text-base font-medium">Join 200+ developers waiting</span>
         </div>
       </div>
-      
+
       <!-- Problem Illustration -->
       <div class="max-w-5xl mx-auto">
         <div class="bg-gray-50 rounded-3xl p-12 border border-gray-100">
@@ -137,7 +137,7 @@ const handleSubmit = (e) => {
               Too many apps! 😫
             </span>
           </div>
-          
+
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-12">
             <div class="text-center">
               <div class="w-20 h-20 bg-white rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-sm border border-gray-100">
@@ -145,21 +145,21 @@ const handleSubmit = (e) => {
               </div>
               <p class="text-lg font-medium text-gray-700">Gmail</p>
             </div>
-            
+
             <div class="text-center">
               <div class="w-20 h-20 bg-white rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-sm border border-gray-100">
                 <span class="text-3xl">💬</span>
               </div>
               <p class="text-lg font-medium text-gray-700">Slack</p>
             </div>
-            
+
             <div class="text-center">
               <div class="w-20 h-20 bg-white rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-sm border border-gray-100">
                 <span class="text-3xl">📊</span>
               </div>
               <p class="text-lg font-medium text-gray-700">Linear</p>
             </div>
-            
+
             <div class="text-center">
               <div class="w-20 h-20 bg-white rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-sm border border-gray-100">
                 <span class="text-3xl">💾</span>
@@ -172,7 +172,7 @@ const handleSubmit = (e) => {
     </main>
 
     <!-- Problem Section -->
-    <section class="py-24 bg-gray-50">
+    <section class="py-24 bg-gray-50" id="problem">
       <div class="max-w-7xl mx-auto px-6 lg:px-8">
         <!-- Section Header -->
         <div class="text-center mb-20">
@@ -229,7 +229,7 @@ const handleSubmit = (e) => {
     </section>
 
     <!-- Story Section -->
-    <section class="py-24 bg-white">
+    <section class="py-24 bg-white" id="solution">
       <div class="max-w-5xl mx-auto px-6 lg:px-8">
         <!-- Section Header -->
         <div class="text-center mb-20">
@@ -342,7 +342,7 @@ const handleSubmit = (e) => {
                   <p class="text-lg text-gray-800 mb-6">
                     Based on your team's history, this workaround was added because of a Stripe API limitation discussed in:
                   </p>
-                  
+
                   <!-- Source Links -->
                   <div class="space-y-4">
                     <!-- GitHub PR -->
@@ -392,8 +392,8 @@ const handleSubmit = (e) => {
                     <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
                     </svg>
-                    <input 
-                      type="email" 
+                    <input
+                      type="email"
                       v-model="email"
                       placeholder="your.email@company.com"
                       required
@@ -402,7 +402,7 @@ const handleSubmit = (e) => {
                     >
                   </div>
                 </div>
-                <button 
+                <button
                   type="submit"
                   :disabled="isSubmitting || !email"
                   class="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-purple-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
@@ -410,14 +410,14 @@ const handleSubmit = (e) => {
                   {{ isSubmitting ? 'Joining...' : 'Join Waitlist' }}
                 </button>
               </form>
-              
+
               <!-- Success Message -->
               <div v-if="showSuccess" class="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
                 <p class="text-green-800 text-center font-medium">
                   🎉 Thanks for joining the waitlist! We'll be in touch soon.
                 </p>
               </div>
-              
+
               <!-- Error Message -->
               <div v-if="showError" class="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
                 <p class="text-red-800 text-center font-medium">
@@ -484,12 +484,12 @@ const handleSubmit = (e) => {
         <div class="text-center mb-12">
           <!-- Company Name -->
           <h3 class="text-3xl font-bold mb-6">Horizontal</h3>
-          
+
           <!-- Company Description -->
           <p class="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-12">
             The everything app for development teams. Connect all your tools, search everything, work faster.
           </p>
-          
+
           <!-- Footer Links -->
           <div class="flex items-center justify-center space-x-12 mb-12">
             <a href="#privacy" class="text-gray-300 hover:text-white text-lg font-medium transition-colors">
@@ -503,7 +503,7 @@ const handleSubmit = (e) => {
             </a>
           </div>
         </div>
-        
+
         <!-- Copyright -->
         <div class="border-t border-slate-700 pt-8">
           <p class="text-center text-gray-400 text-base">
