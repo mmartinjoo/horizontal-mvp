@@ -52,6 +52,10 @@ const handleSubmit = (e) => {
   e.preventDefault()
   submitToGoogleForms()
 }
+
+const goToWaitlist = () => {
+  window.location.hash = 'waitlist'
+}
 </script>
 
 <template>
@@ -112,61 +116,25 @@ const handleSubmit = (e) => {
 
         <!-- CTA Button -->
         <div class="mb-16">
-          <button class="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-10 py-4 rounded-2xl text-xl font-semibold hover:from-purple-600 hover:to-purple-700 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
+          <button @click="goToWaitlist" class="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-10 py-4 rounded-2xl text-xl font-semibold hover:from-purple-600 hover:to-purple-700 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
             Join the Waitlist →
           </button>
         </div>
 
         <!-- Social Proof -->
         <div class="flex items-center justify-center space-x-4 text-gray-500 mb-20">
-          <div class="flex -space-x-2">
-            <div class="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full border-3 border-white"></div>
-            <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full border-3 border-white"></div>
-            <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full border-3 border-white"></div>
-            <div class="w-10 h-10 bg-gradient-to-br from-purple-300 to-purple-500 rounded-full border-3 border-white"></div>
-          </div>
           <span class="text-base font-medium">Join 200+ developers waiting</span>
         </div>
       </div>
 
       <!-- Problem Illustration -->
-      <div class="max-w-5xl mx-auto">
-        <div class="bg-gray-50 rounded-3xl p-12 border border-gray-100">
-          <div class="text-center mb-12">
-            <span class="inline-block bg-red-50 text-red-600 px-6 py-3 rounded-2xl text-lg font-semibold border border-red-100">
-              Too many apps! 😫
-            </span>
-          </div>
-
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-12">
-            <div class="text-center">
-              <div class="w-20 h-20 bg-white rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-sm border border-gray-100">
-                <span class="text-3xl">📧</span>
-              </div>
-              <p class="text-lg font-medium text-gray-700">Gmail</p>
-            </div>
-
-            <div class="text-center">
-              <div class="w-20 h-20 bg-white rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-sm border border-gray-100">
-                <span class="text-3xl">💬</span>
-              </div>
-              <p class="text-lg font-medium text-gray-700">Slack</p>
-            </div>
-
-            <div class="text-center">
-              <div class="w-20 h-20 bg-white rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-sm border border-gray-100">
-                <span class="text-3xl">📊</span>
-              </div>
-              <p class="text-lg font-medium text-gray-700">Linear</p>
-            </div>
-
-            <div class="text-center">
-              <div class="w-20 h-20 bg-white rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-sm border border-gray-100">
-                <span class="text-3xl">💾</span>
-              </div>
-              <p class="text-lg font-medium text-gray-700">Drive</p>
-            </div>
-          </div>
+      <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
+          <img 
+            src="/images/lots_of_shitty_apps_in_one_place.png" 
+            alt="Too many scattered apps and tools" 
+            class="w-3/4 h-auto rounded-2xl mx-auto"
+          />
         </div>
       </div>
     </main>
@@ -654,7 +622,7 @@ const handleSubmit = (e) => {
               Special Pricing
             </h3>
             <p class="text-lg lg:text-xl text-gray-600 leading-relaxed">
-              50% off your first year subscription
+              30% off your first 3 months
             </p>
           </div>
 
