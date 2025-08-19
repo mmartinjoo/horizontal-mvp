@@ -512,7 +512,7 @@ const goToWaitlist = () => {
               </div>
               <div class="flex-1">
                 <div class="bg-purple-500 text-white rounded-2xl rounded-tl-md px-6 py-4 inline-block max-w-4xl">
-                  <p class="text-lg">"What was the root cause of the previous 'mysql server has gone away' error in prod?"</p>
+                  <p class="text-lg">What was the root cause of the previous 'mysql server has gone away' error in prod?</p>
                 </div>
               </div>
             </div>
