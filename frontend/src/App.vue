@@ -61,8 +61,13 @@ const goToWaitlist = () => {
 <template>
   <div class="min-h-screen bg-white">
     <!-- Navigation Bar -->
-    <nav class="bg-white border-b border-gray-100">
-      <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <nav class="relative bg-gradient-to-r from-purple-50 via-white to-blue-50 border-b border-purple-200/60 backdrop-blur-sm">
+      <!-- Enhanced decorative elements for nav -->
+      <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute top-0 right-1/4 w-40 h-40 bg-gradient-to-br from-purple-300/20 to-blue-300/20 rounded-full blur-3xl"></div>
+        <div class="absolute top-0 left-1/3 w-32 h-32 bg-gradient-to-br from-blue-300/15 to-purple-300/15 rounded-full blur-2xl"></div>
+      </div>
+      <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
         <div class="flex justify-between items-center h-20">
           <!-- Logo -->
           <div class="flex-shrink-0">
@@ -109,7 +114,7 @@ const goToWaitlist = () => {
         <h1 class="text-6xl lg:text-7xl font-bold text-black mb-8 leading-tight">
           The <span class="bg-gradient-to-r from-purple-500 via-purple-600 to-blue-500 bg-clip-text text-transparent">everything app</span>
           <br>
-          for your entire team
+          for developer teams
         </h1>
 
         <!-- Subheading -->
@@ -702,25 +707,12 @@ const goToWaitlist = () => {
           <p class="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-12">
             The everything app for development teams. Connect all your tools, search everything, work faster.
           </p>
-
-          <!-- Footer Links -->
-          <div class="flex items-center justify-center space-x-12 mb-12">
-            <a href="#privacy" class="text-gray-300 hover:text-white text-lg font-medium transition-colors">
-              Privacy
-            </a>
-            <a href="#terms" class="text-gray-300 hover:text-white text-lg font-medium transition-colors">
-              Terms
-            </a>
-            <a href="#contact" class="text-gray-300 hover:text-white text-lg font-medium transition-colors">
-              Contact
-            </a>
-          </div>
         </div>
 
         <!-- Copyright -->
         <div class="border-t border-slate-700 pt-8">
           <p class="text-center text-gray-400 text-base">
-            © 2024 Horizontal. All rights reserved.
+            © 2025 Horizontal. All rights reserved.
           </p>
         </div>
       </div>
