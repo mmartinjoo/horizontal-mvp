@@ -18,6 +18,7 @@ I'm talking about apps like:
 - Jira
 - Slack
 - AWS S3
+- etc
 
 The problem is that it's really hard to get information and knowlegde because it's spread across so many different applications.
 
@@ -51,6 +52,31 @@ And the app will show:
 Where they discussed why the workaround was necessary.
 
 So I want to target developer teams at first. The best customer would be a smaller, fast-moving startup where things are not that organized yet.
+
+Another great use case is something like this:
+- A critical bug appears in production
+- You need to find similar issues from the past
+- You dig through Jira tickets, GitHub issues, and Slack conversations
+- You spend an hour recreating context that already existed
+
+Users would be able to ask a simple question like: "What was the root cause of the previous 'mysql server has gone away' error in prod?"
+
+And Horizontal would answer like this:
+"""
+Your team had this issue on the 15th of April. The `max_allowed_packet` value was exceeded bacause of a very large `INSERT` in the bulk create API.
+
+Participants:
+
+Ben created the issues
+Tom contributed the fixes
+Peter merged the pull request
+
+
+GitHub PR #247 - "Refactor bulk create API" [Link to PR]
+Slack #engineering - Thread from April 15 [Link to Slack conversation]
+Linear ticket DEV-238 - Refactor bulk creation INSERT query [Link to Linear issue]
+Linear ticket DEV-240 - Increase MySQL `max_allowed_packet` [Link to Linear issue]
+"""
 
 ## The feedback
 
