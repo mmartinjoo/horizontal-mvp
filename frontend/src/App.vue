@@ -107,7 +107,7 @@ const goToWaitlist = () => {
         <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-blue-200/20 to-purple-200/20 rounded-full blur-3xl"></div>
         <div class="absolute top-20 left-1/4 w-32 h-32 bg-gradient-to-br from-purple-300/20 to-blue-300/20 rounded-full blur-2xl"></div>
       </div>
-      
+
       <main class="max-w-6xl mx-auto px-6 lg:px-8 pt-24 pb-16 relative z-10">
       <div class="text-center">
         <!-- Main Headline -->
@@ -143,9 +143,9 @@ const goToWaitlist = () => {
       <!-- Problem Illustration -->
       <div class="max-w-4xl mx-auto">
         <div class="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
-          <img 
-            src="/images/lots_of_shitty_apps_in_one_place.png" 
-            alt="Too many scattered apps and tools" 
+          <img
+            src="/images/lots_of_shitty_apps_in_one_place.png"
+            alt="Too many scattered apps and tools"
             class="w-3/4 h-auto rounded-2xl mx-auto"
           />
         </div>
@@ -234,42 +234,42 @@ const goToWaitlist = () => {
               <svg viewBox="0 0 200 200" class="w-64 h-64 mx-auto drop-shadow-lg">
                 <!-- Background circle -->
                 <circle cx="100" cy="100" r="80" fill="none" stroke="#f3f4f6" stroke-width="12"/>
-                
+
                 <!-- Data segments -->
                 <!-- 15-30 min: 27% -->
                 <circle cx="100" cy="100" r="80" fill="none" stroke="#fbbf24" stroke-width="12"
                         stroke-dasharray="135.1 366.5" stroke-dashoffset="0"
                         transform="rotate(-90 100 100)" class="animate-draw-1"/>
-                
+
                 <!-- 30-60 min: 37.9% -->
                 <circle cx="100" cy="100" r="80" fill="none" stroke="#f59e0b" stroke-width="12"
                         stroke-dasharray="190.3 311.3" stroke-dashoffset="-135.1"
                         transform="rotate(-90 100 100)" class="animate-draw-2"/>
-                
+
                 <!-- 60-120 min: 18.3% -->
                 <circle cx="100" cy="100" r="80" fill="none" stroke="#dc2626" stroke-width="12"
                         stroke-dasharray="91.9 409.7" stroke-dashoffset="-325.4"
                         transform="rotate(-90 100 100)" class="animate-draw-3"/>
-                
+
                 <!-- 120+ min: 7.6% -->
                 <circle cx="100" cy="100" r="80" fill="none" stroke="#991b1b" stroke-width="12"
                         stroke-dasharray="38.2 463.4" stroke-dashoffset="-417.3"
                         transform="rotate(-90 100 100)" class="animate-draw-4"/>
-                
+
                 <!-- Center text -->
                 <text x="100" y="95" text-anchor="middle" class="text-2xl font-bold fill-gray-800">65%</text>
                 <text x="100" y="115" text-anchor="middle" class="text-sm fill-gray-600">spend 30+</text>
                 <text x="100" y="130" text-anchor="middle" class="text-sm fill-gray-600">minutes</text>
               </svg>
             </div>
-            
+
             <h3 class="text-2xl lg:text-3xl font-bold text-black mb-6">
               Time Spent <span class="text-red-500">Searching</span>
             </h3>
             <p class="text-lg text-gray-600 mb-8">Daily time developers spend searching for answers</p>
-            
+
             <!-- Legend -->
-            <div class="space-y-3">            
+            <div class="space-y-3">
               <div class="flex items-center justify-between text-sm">
                 <div class="flex items-center space-x-3">
                   <div class="w-4 h-4 bg-yellow-400 rounded-full"></div>
@@ -314,40 +314,40 @@ const goToWaitlist = () => {
               <svg viewBox="0 0 200 200" class="w-64 h-64 mx-auto drop-shadow-lg">
                 <!-- Background circle -->
                 <circle cx="100" cy="100" r="80" fill="none" stroke="#f3f4f6" stroke-width="12"/>
-                
+
                 <!-- Data segments -->
                 <!-- 15-30 min: 32.4% -->
                 <circle cx="100" cy="100" r="80" fill="none" stroke="#a855f7" stroke-width="12"
                         stroke-dasharray="162.9 339.8" stroke-dashoffset="0"
                         transform="rotate(-90 100 100)" class="animate-draw-a1"/>
-                
+
                 <!-- 30-60 min: 30% -->
                 <circle cx="100" cy="100" r="80" fill="none" stroke="#7c3aed" stroke-width="12"
                         stroke-dasharray="150.8 351.9" stroke-dashoffset="-162.9"
                         transform="rotate(-90 100 100)" class="animate-draw-a2"/>
-                
+
                 <!-- 60-120 min: 12.8% -->
                 <circle cx="100" cy="100" r="80" fill="none" stroke="#5b21b6" stroke-width="12"
                         stroke-dasharray="64.3 438.4" stroke-dashoffset="-313.7"
                         transform="rotate(-90 100 100)" class="animate-draw-a3"/>
-                
+
                 <!-- 120+ min: 4.3% -->
                 <circle cx="100" cy="100" r="80" fill="none" stroke="#3730a3" stroke-width="12"
                         stroke-dasharray="21.6 481.1" stroke-dashoffset="-378.0"
                         transform="rotate(-90 100 100)" class="animate-draw-a4"/>
-                
+
                 <!-- Center text -->
                 <text x="100" y="95" text-anchor="middle" class="text-2xl font-bold fill-gray-800">47%</text>
                 <text x="100" y="115" text-anchor="middle" class="text-sm fill-gray-600">spend 30+</text>
                 <text x="100" y="130" text-anchor="middle" class="text-sm fill-gray-600">minutes</text>
               </svg>
             </div>
-            
+
             <h3 class="text-2xl lg:text-3xl font-bold text-black mb-6">
               Time Spent <span class="text-purple-500">Answering</span>
             </h3>
             <p class="text-lg text-gray-600 mb-8">Daily time developers spend answering questions</p>
-            
+
             <!-- Legend -->
             <div class="space-y-3">
               <div class="flex items-center justify-between text-sm">
@@ -396,7 +396,7 @@ const goToWaitlist = () => {
               That's <span class="text-red-500">1-2 hours</span> of productivity lost every day
             </h3>
             <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Developers are spending up to <strong>25% of their workday</strong> just searching for information and answering repetitive questions. 
+              Developers are spending up to <strong>25% of their workday</strong> just searching for information and answering repetitive questions.
               <span class="text-purple-600 font-semibold">Horizontal eliminates this waste.</span>
             </p>
           </div>
@@ -424,25 +424,25 @@ const goToWaitlist = () => {
                   <!-- Custom Bug SVG -->
                   <!-- Bug body -->
                   <ellipse cx="12" cy="13" rx="6" ry="7" fill="currentColor" opacity="0.9"/>
-                  
+
                   <!-- Bug head -->
                   <circle cx="12" cy="7" r="3" fill="currentColor"/>
-                  
+
                   <!-- Bug eyes -->
                   <circle cx="10.5" cy="6.5" r="0.8" fill="white"/>
                   <circle cx="13.5" cy="6.5" r="0.8" fill="white"/>
                   <circle cx="10.5" cy="6.5" r="0.4" fill="black"/>
                   <circle cx="13.5" cy="6.5" r="0.4" fill="black"/>
-                  
+
                   <!-- Bug antennae -->
                   <path d="M9 4.5 L8 2.5 M15 4.5 L16 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                   <circle cx="8" cy="2.5" r="0.8" fill="currentColor"/>
                   <circle cx="16" cy="2.5" r="0.8" fill="currentColor"/>
-                  
+
                   <!-- Bug legs -->
                   <path d="M6 10 L3 9 M6 13 L3 13 M6 16 L3 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                   <path d="M18 10 L21 9 M18 13 L21 13 M18 16 L21 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                  
+
                   <!-- Bug spots -->
                   <circle cx="10" cy="12" r="0.8" fill="white" opacity="0.7"/>
                   <circle cx="14" cy="14" r="0.6" fill="white" opacity="0.7"/>
@@ -543,7 +543,7 @@ const goToWaitlist = () => {
                   <p class="text-lg text-gray-800 mb-6">
                     Your team had this issue on the 15th of April. The `max_allowed_packet` value was exceeded bacause of a very large `INSERT` in the bulk create API.
                   </p>
-                  <p class="text-lg text-gray-800 mb-1">              
+                  <p class="text-lg text-gray-800 mb-1">
                     Participants:
                   </p>
                   <ul class="list-disc mb-6">
@@ -551,7 +551,7 @@ const goToWaitlist = () => {
                     <li class="ml-4">Tom contributed the fixes</li>
                     <li class="ml-4">Peter merged the pull request</li>
                   </ul>
-                  
+
 
                   <!-- Source Links -->
                   <div class="space-y-4">
@@ -700,8 +700,10 @@ const goToWaitlist = () => {
       <div class="max-w-6xl mx-auto px-6 lg:px-8">
         <!-- Main Footer Content -->
         <div class="text-center mb-12">
-          <!-- Company Name -->
-          <h3 class="text-3xl font-bold mb-6">Horizontal</h3>
+          <!-- Company Logo -->
+          <div class="flex justify-center mb-6">
+            <img src="/images/logo_light.png" alt="Horizontal" class="h-32 w-auto">
+          </div>
 
           <!-- Company Description -->
           <p class="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-12">
