@@ -21,7 +21,6 @@ class GoogleDrive
         'application/vnd.google-apps.document',     // Google Docs
         'application/vnd.google-apps.spreadsheet', // Google Sheets
         'application/vnd.google-apps.presentation',// Google Slides
-        'application/vnd.google-apps.drawing',     // Google Drawings
         'application/vnd.google-apps.form',        // Google Forms
     ];
 
@@ -29,7 +28,6 @@ class GoogleDrive
         'application/vnd.google-apps.document' => 'text/plain',     // Export Docs as plain text
         'application/vnd.google-apps.spreadsheet' => 'text/csv',   // Export Sheets as CSV
         'application/vnd.google-apps.presentation' => 'text/plain', // Export Slides as plain text
-        'application/vnd.google-apps.drawing' => 'image/png',      // Export Drawings as PNG
         'application/vnd.google-apps.form' => 'text/plain',        // Export Forms as plain text
     ];
 
@@ -60,15 +58,14 @@ class GoogleDrive
             } else {
                 $content = $this->fs->read($file->path());
             }
-            Storage::put($file->path(), $content);
+
+            $result = Storage::put($file->path(), $content);
+            if (!$result) {
+                throw new FileDownloadException("Failed to write file to storage: " . json_encode($file));
+            }
         } catch (Exception $e) {
             throw FileDownloadException::wrap($e);
         }
-    }
-
-    public function export(FileAttributes $file)
-    {
-        $this->drive->files->export($file->extraMetadata()['id'], $file->mimeType());
     }
 
     private function isGoogleNativeFile(FileAttributes $file): bool

@@ -3,6 +3,7 @@
 namespace App\Services\Indexing;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use League\Flysystem\DirectoryListing;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\StorageAttributes;
@@ -22,6 +23,10 @@ class FilePrioritizer
         /** @var StorageAttributes $file */
         foreach ($listing as $file) {
             if (!$file instanceof FileAttributes || !$file->isFile()) {
+                continue;
+            }
+
+            if ($this->isMediaFile($file) || $this->isZipFile($file)) {
                 continue;
             }
 
@@ -54,5 +59,17 @@ class FilePrioritizer
             'medium' => collect($mediumQueue)->sortByDesc('last_modified'),
             'low' => collect($lowQueue)->sortByDesc('last_modified'),
         ];
+    }
+
+    private function isMediaFile(FileAttributes $file): bool
+    {
+        return Str::startsWith($file->mimeType(), 'image')
+            || Str::startsWith($file->mimeType(), 'audio')
+            || Str::startsWith($file->mimeType(), 'video');
+    }
+
+    private function isZipFile(FileAttributes $file): bool
+    {
+        return Str::contains($file->mimeType(), 'zip');
     }
 }
