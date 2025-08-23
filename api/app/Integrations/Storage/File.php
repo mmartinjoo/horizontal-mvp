@@ -1,0 +1,105 @@
+<?php
+
+namespace App\Integrations\Storage;
+
+use Carbon\Carbon;
+use Generator;
+use Illuminate\Support\Str;
+use League\Flysystem\DirectoryListing;
+use League\Flysystem\FileAttributes;
+
+class File
+{
+    protected Carbon $createdAt;
+    protected Carbon $updatedAt;
+    protected Carbon $viewedAt;
+    protected Carbon $lastUsedAt;
+
+    public function __construct(private FileAttributes $file)
+    {
+        $this->createdAt = now()->addCenturies(-1);
+        $this->updatedAt = now()->addCenturies(-1);
+        $this->viewedAt = now()->addCenturies(-1);
+        $this->lastUsedAt = now()->addCenturies(-1);
+    }
+
+    public function setCreatedAt(string|null $createdAt): void
+    {
+        $this->createdAt = Carbon::parse($createdAt ?? "1900-01-01 00:00:00");
+        $this->updateLastUsedAt();
+    }
+
+    public function setUpdatedAt(string|null $updatedAt): void
+    {
+        $this->$updatedAt = Carbon::parse($updatedAt ?? "1900-01-01 00:00:00");
+        $this->updateLastUsedAt();
+    }
+
+    public function setViewedAt(string|null $viewedAt): void
+    {
+        $this->$viewedAt = Carbon::parse($viewedAt ?? "1900-01-01 00:00:00");
+        $this->updateLastUsedAt();
+    }
+
+    public function updateLastUsedAt()
+    {
+        $this->lastUsedAt = $this->viewedAt->max($this->createdAt)->max($this->updatedAt);
+    }
+
+    public static function fromDirectoryListing(DirectoryListing $listing): Generator
+    {
+        foreach ($listing as $file) {
+            if (!$file instanceof FileAttributes) {
+                continue;
+            }
+            yield new self($file);
+        }
+    }
+
+    public function extraMetadata(): array
+    {
+        return $this->file->extraMetadata();
+    }
+
+    public function isFile(): bool
+    {
+        return $this->file->isFile();
+    }
+
+    public function fileSize(): int|null
+    {
+        return $this->file->fileSize();
+    }
+
+    public function path(): string
+    {
+        return $this->file->path();
+    }
+
+    public function mimeType(): string
+    {
+        return $this->file->mimeType();
+    }
+
+    public function isMediaFile(): bool
+    {
+        return Str::startsWith($this->file->mimeType(), 'image')
+            || Str::startsWith($this->file->mimeType(), 'audio')
+            || Str::startsWith($this->file->mimeType(), 'video');
+    }
+
+    public function isZipFile(): bool
+    {
+        return Str::contains($this->file->mimeType(), 'zip');
+    }
+
+    public function wasUsedIn(int $days): bool
+    {
+        return $this->lastUsedAt->gt(now()->subDays($days));
+    }
+
+    public function isSmallerThan(int $sizeMB): bool
+    {
+        return $this->file->fileSize() < $sizeMB * 1024 * 1024;
+    }
+}

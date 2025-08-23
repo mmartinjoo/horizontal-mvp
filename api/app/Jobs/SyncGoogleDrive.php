@@ -3,8 +3,8 @@
 namespace App\Jobs;
 
 use App\Integrations\Storage\GoogleDrive;
-use App\Jobs\Storage\DownloadFile;
 use App\Models\User;
+use App\Services\Indexing\FilePrioritizer;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -17,22 +17,22 @@ class SyncGoogleDrive implements ShouldQueue
     ) {
     }
 
-    public function handle(GoogleDrive $drive): void
+    public function handle(GoogleDrive $drive, FilePrioritizer $prioritizer): void
     {
-        $contents = $drive->listDirectoryContents('deQenQ');
+        $files = $drive->listDirectoryContents('deQenQ');
+        $contents = $prioritizer->prioritize2($files);
         foreach ($contents['high'] as $file) {
             IndexFile::dispatch($this->user, $file, 'high');
-//            DownloadFile::dispatch($file);
         }
 
-//        foreach ($contents['medium'] as $file) {
-//            DownloadFile::dispatch($file)
+        foreach ($contents['medium'] as $file) {
+            IndexFile::dispatch($this->user, $file, 'medium');
 //                ->delay(now()->addHours(1));
-//        }
-//
-//        foreach ($contents['low'] as $file) {
-//            DownloadFile::dispatch($file)
+        }
+
+        foreach ($contents['low'] as $file) {
+            IndexFile::dispatch($this->user, $file, 'low');
 //                ->delay(now()->addHours(4));
-//        }
+        }
     }
 }

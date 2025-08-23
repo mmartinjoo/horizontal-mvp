@@ -2,6 +2,8 @@
 
 namespace App\Services\Indexing;
 
+use App\Integrations\Storage\File;
+use Generator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use League\Flysystem\DirectoryListing;
@@ -10,6 +12,45 @@ use League\Flysystem\StorageAttributes;
 
 class FilePrioritizer
 {
+    public function prioritize2(Generator $files): array
+    {
+        $highQueue = [];
+        $mediumQueue = [];
+        $lowQueue = [];
+
+        /** @var File $file */
+        foreach ($files as $file) {
+            if (!$file->isFile()) {
+                continue;
+            }
+
+            if ($file->isMediaFile() || $file->isZipFile()) {
+                continue;
+            }
+
+            if ($file->isSmallerThan(10) && $file->wasUsedIn(30)) {
+                $highQueue[] = $file;
+                continue;
+            }
+
+            if ($file->isSmallerThan(10) && $file->wasUsedIn(90)) {
+                $mediumQueue[] = $file;
+                continue;
+            }
+
+            if ($file->isSmallerThan(100) && $file->wasUsedIn(30)) {
+                $lowQueue[] = $file;
+                continue;
+            }
+        }
+
+        return [
+            'high' => collect($highQueue)->sortByDesc('lastUsedAt'),
+            'medium' => collect($mediumQueue)->sortByDesc('lastUsedAt'),
+            'low' => collect($lowQueue)->sortByDesc('lastUsedAt'),
+        ];
+    }
+
     /**
      * @param DirectoryListing<FileAttributes> $listing
      * @returns array<string, Collection<FileAttributes>>

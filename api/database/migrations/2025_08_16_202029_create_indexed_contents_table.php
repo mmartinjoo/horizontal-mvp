@@ -23,10 +23,14 @@ return new class extends Migration
             $table->string('source_url')->nullable();
 
             $table->mediumText('title');
-            $table->text('body');
+            $table->longText('body')->nullable();
+            $table->text('preview')->nullable();;
+
+            $table->string('priority')->nullable();;
 
             $table->jsonb('metadata')->nullable();
 
+            $table->dateTime('indexed_at')->nullable();
             $table->timestamps();
         });
 

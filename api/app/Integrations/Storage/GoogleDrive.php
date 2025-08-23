@@ -5,10 +5,11 @@ namespace App\Integrations\Storage;
 use App\Exceptions\Storage\FileDownloadException;
 use App\Services\Indexing\FilePrioritizer;
 use Exception;
+use Generator;
 use Google\Client;
 use Google\Service\Drive;
+use Google\Service\Drive\DriveFile;
 use Illuminate\Support\Facades\Storage;
-use League\Flysystem\FileAttributes;
 use League\Flysystem\Filesystem;
 use Masbug\Flysystem\GoogleDriveAdapter;
 
@@ -44,13 +45,21 @@ class GoogleDrive
         $this->fs = new Filesystem($adapter);
     }
 
-    public function listDirectoryContents(string $directory = ''): array
+    public function listDirectoryContents(string $directory = ''): Generator
     {
-        $contents = $this->fs->listContents($directory, true);
-        return $this->prioritizer->prioritize($contents);
+        $listing = $this->fs->listContents($directory, true);
+        $files = File::fromDirectoryListing($listing);
+        foreach ($files as $file) {
+            $dates = $this->getDates($file);
+            $file->setCreatedAt($dates->createdTime);
+            $file->setUpdatedAt($dates->modifiedTime);
+            $file->setViewedAt($dates->viewedByMeTime);
+
+            yield $file;
+        }
     }
 
-    public function downloadFile(FileAttributes $file)
+    public function downloadFile(File $file)
     {
         try {
             if ($this->isGoogleNativeFile($file)) {
@@ -68,12 +77,12 @@ class GoogleDrive
         }
     }
 
-    private function isGoogleNativeFile(FileAttributes $file): bool
+    private function isGoogleNativeFile(File $file): bool
     {
         return in_array($file->mimeType(), self::GOOGLE_NATIVE_TYPES);
     }
 
-    private function exportGoogleNativeFile(FileAttributes $file): string
+    private function exportGoogleNativeFile(File $file): string
     {
         if (!isset(self::EXPORT_FORMATS[$file->mimeType()])) {
             throw new FileDownloadException("Unsupported Google native file type: {$file->mimeType()}");
@@ -91,5 +100,11 @@ class GoogleDrive
         } catch (Exception $e) {
             throw FileDownloadException::wrap($e);
         }
+    }
+
+    private function getDates(File $file): DriveFile
+    {
+        $fields = 'modifiedTime,createdTime,viewedByMeTime';
+        return $this->drive->files->get($file->extraMetadata()['id'], ['fields' => $fields]);
     }
 }
