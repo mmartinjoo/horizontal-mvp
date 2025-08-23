@@ -2,34 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\CreateEmbeddingJob;
-use App\Models\Content;
-use App\Services\LLM\Embedder;
-use App\Services\VectorStore\VectorStore;
+use App\Integrations\Storage\GoogleDrive;
+use App\Services\Indexing\Synchronizer;
 use Illuminate\Http\Request;
 
 class TestController extends Controller
 {
-    public function ask(Request $request, Embedder $embedder)
+    public function index(Request $request, GoogleDrive $drive, Synchronizer $synchronizer)
     {
-        $questionEmbedding = $embedder->createEmbedding($request->input('question'));
-        $contents = Content::selectRaw('*, (embedding <=> ?) as distance', [
-                json_encode($questionEmbedding),
-            ])
-            ->whereRaw('embedding <=> ? < ?', [
-                json_encode($questionEmbedding),
-                0.3,
-            ])
-            ->orderBy('distance')
-            ->limit(10)
-            ->get();
+        $contents = $drive->listDirectoryContents('deQenQ');
+        $synchronizer->syncStorage($contents);
 
-        return $contents;
-    }
-
-    public function index(Request $request, VectorStore $vectorStore)
-    {
-        $content = Content::find($request->input('content_id'));;
-        CreateEmbeddingJob::dispatch($content, $vectorStore);
+        return response('syncing ' . count($contents['high']) . ' files');
     }
 }
