@@ -5,10 +5,11 @@ namespace App\Integrations\Storage;
 use Carbon\Carbon;
 use Generator;
 use Illuminate\Support\Str;
+use JsonSerializable;
 use League\Flysystem\DirectoryListing;
 use League\Flysystem\FileAttributes;
 
-class File
+class File implements JsonSerializable
 {
     protected Carbon $createdAt;
     protected Carbon $updatedAt;
@@ -17,10 +18,10 @@ class File
 
     public function __construct(private FileAttributes $file)
     {
-        $this->createdAt = now()->addCenturies(-1);
-        $this->updatedAt = now()->addCenturies(-1);
-        $this->viewedAt = now()->addCenturies(-1);
-        $this->lastUsedAt = now()->addCenturies(-1);
+        $this->createdAt = Carbon::parse("1900-01-01 00:00:00");
+        $this->updatedAt = Carbon::parse("1900-01-01 00:00:00");
+        $this->viewedAt = Carbon::parse("1900-01-01 00:00:00");
+        $this->lastUsedAt = Carbon::parse("1900-01-01 00:00:00");
     }
 
     public function setCreatedAt(string|null $createdAt): void
@@ -101,5 +102,16 @@ class File
     public function isSmallerThan(int $sizeMB): bool
     {
         return $this->file->fileSize() < $sizeMB * 1024 * 1024;
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'created_at' => $this->createdAt->toIso8601String(),
+            'updated_at' => $this->updatedAt->toIso8601String(),
+            'viewed_at' => $this->viewedAt->toIso8601String(),
+            'last_used_at' => $this->lastUsedAt->toIso8601String(),
+            'file' => $this->file,
+        ];
     }
 }

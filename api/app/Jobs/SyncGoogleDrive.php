@@ -19,7 +19,7 @@ class SyncGoogleDrive implements ShouldQueue
 
     public function handle(GoogleDrive $drive, FilePrioritizer $prioritizer): void
     {
-        $files = $drive->listDirectoryContents('deQenQ');
+        $files = $drive->listDirectoryContents('deQenQ/test');
         $contents = $prioritizer->prioritize2($files);
         foreach ($contents['high'] as $file) {
             IndexFile::dispatch($this->user, $file, 'high');
