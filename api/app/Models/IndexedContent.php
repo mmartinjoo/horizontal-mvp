@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Content extends Model implements Embeddable
+class IndexedContent extends Model implements Embeddable
 {
     use HasFactory;
     use HasEmbedding;

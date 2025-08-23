@@ -13,7 +13,7 @@ return new class extends Migration
     {
         DB::statement('CREATE EXTENSION IF NOT EXISTS vector');
 
-        Schema::create('contents', function (Blueprint $table) {
+        Schema::create('indexed_contents', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Team::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(User::class)->nullable()->constrained()->cascadeOnDelete();
@@ -30,10 +30,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        DB::statement("ALTER TABLE contents ADD COLUMN embedding vector(1536)");
+        DB::statement("ALTER TABLE indexed_contents ADD COLUMN embedding vector(1536)");
 
         DB::statement("
-          ALTER TABLE contents
+          ALTER TABLE indexed_contents
           ADD COLUMN search_vector tsvector
           GENERATED ALWAYS AS (
               setweight(to_tsvector('english', COALESCE(title, '')), 'A') ||
@@ -41,12 +41,12 @@ return new class extends Migration
           ) STORED
       ");
 
-        DB::statement("CREATE INDEX contents_search_vector_idx ON contents USING GIN(search_vector)");
-        DB::statement("CREATE INDEX contents_embedding_idx ON contents USING hnsw (embedding vector_cosine_ops)");
+        DB::statement("CREATE INDEX indexed_contents_search_vector_idx ON indexed_contents USING GIN(search_vector)");
+        DB::statement("CREATE INDEX indexed_contents_embedding_idx ON indexed_contents USING hnsw (embedding vector_cosine_ops)");
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('contents');
+        Schema::dropIfExists('indexed_contents');
     }
 };

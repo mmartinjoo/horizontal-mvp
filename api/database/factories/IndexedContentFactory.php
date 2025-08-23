@@ -7,9 +7,9 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Content>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\IndexedContent>
  */
-class ContentFactory extends Factory
+class IndexedContentFactory extends Factory
 {
     /**
      * Define the model's default state.
