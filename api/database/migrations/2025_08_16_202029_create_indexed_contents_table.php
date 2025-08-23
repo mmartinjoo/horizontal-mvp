@@ -24,7 +24,7 @@ return new class extends Migration
 
             $table->mediumText('title');
             $table->longText('body')->nullable();
-            $table->text('preview')->nullable();;
+            $table->longText('preview')->nullable();;
 
             $table->string('priority')->nullable();;
 

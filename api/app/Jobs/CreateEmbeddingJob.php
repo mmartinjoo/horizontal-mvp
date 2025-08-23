@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\IndexedContent;
+use App\Models\Embeddable;
 use App\Services\LLM\Embedder;
 use App\Services\VectorStore\VectorStore;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -13,17 +13,14 @@ class CreateEmbeddingJob implements ShouldQueue
     use Queueable;
 
     public function __construct(
-        private readonly IndexedContent $content,
-        private readonly VectorStore    $vectorStore,
+        private readonly Embeddable  $content,
+        private readonly VectorStore $vectorStore,
     ) {
     }
 
     public function handle(Embedder $embedder): void
     {
-        $embedding = $embedder->createEmbedding($this->content->body);
+        $embedding = $embedder->createEmbedding($this->content->getEmbeddableContent());
         $this->vectorStore->upsert($this->content, $embedding);
-//        $this->content->update([
-//            'embedding' => $embedding,
-//        ]);
     }
 }

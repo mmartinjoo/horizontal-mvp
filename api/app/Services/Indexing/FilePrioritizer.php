@@ -28,17 +28,17 @@ class FilePrioritizer
                 continue;
             }
 
-            if ($file->isSmallerThan(10) && $file->wasUsedIn(30)) {
+            if ($file->isSmallerThan(1) && $file->wasUsedIn(60)) {
                 $highQueue[] = $file;
                 continue;
             }
 
-            if ($file->isSmallerThan(10) && $file->wasUsedIn(90)) {
+            if ($file->isSmallerThan(5) && $file->wasUsedIn(120)) {
                 $mediumQueue[] = $file;
                 continue;
             }
 
-            if ($file->isSmallerThan(100) && $file->wasUsedIn(30)) {
+            if ($file->isSmallerThan(10) && $file->wasUsedIn(180)) {
                 $lowQueue[] = $file;
                 continue;
             }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\NoEmbeddingsException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,4 +22,15 @@ class IndexedContent extends Model implements Embeddable
         'metadata' => 'array',
         'embedding' => 'array',
     ];
+
+    public function getEmbeddableContent(): string
+    {
+        if (!$this->body && !$this->preview) {
+            throw new NoEmbeddingsException("No content to embed: " . json_encode($this->attributes));
+        }
+        if (!$this->body) {
+            return $this->preview;
+        }
+        return $this->body;
+    }
 }

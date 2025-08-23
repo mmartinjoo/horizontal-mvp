@@ -7,8 +7,9 @@ use App\Models\User;
 use App\Services\Indexing\FilePrioritizer;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Bus;
 
-class SyncGoogleDrive implements ShouldQueue
+class IndexGoogleDrive implements ShouldQueue
 {
     use Queueable;
 

@@ -30,6 +30,7 @@ class IndexFile implements ShouldQueue
     {
         try {
             $drive->downloadFile($this->file);
+
             if ($this->priority === 'high') {
                 if ($this->file->mimeType() === 'application/pdf') {
                     $content = $this->parsePDF(Storage::read($this->file->path()));
@@ -52,7 +53,7 @@ class IndexFile implements ShouldQueue
             }
 
             if ($this->priority === 'medium' || $this->priority === 'low') {
-                $preview = $this->readNBytes();
+                $preview = $this->readFirstMB();
                 if ($this->file->mimeType() === 'application/pdf') {
                     $preview = $this->parsePDF($preview);
                 }
@@ -84,7 +85,7 @@ class IndexFile implements ShouldQueue
         return $pdf->getText();
     }
 
-    private function readNBytes(int $n = 10 * 1024 * 1024): string
+    private function readFirstMB(): string
     {
         $stream = null;
 
@@ -93,9 +94,9 @@ class IndexFile implements ShouldQueue
             if ($stream === false) {
                 throw new FileDownloadException("Failed to open stream for file: " . json_encode($this->file));
             }
-            $content = fread($stream, $n);
+            $content = fread($stream, 1*1024*1024);
             if ($content === false) {
-                throw new FileDownloadException("Failed to read first {$n} bytes of file: " . json_encode($this->file));
+                throw new FileDownloadException("Failed to read first MB of file: " . json_encode($this->file));
             }
             return $content;
         } finally {
