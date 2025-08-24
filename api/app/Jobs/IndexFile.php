@@ -57,15 +57,29 @@ class IndexFile implements ShouldQueue
                     $content = Storage::read($this->file->path());
                 }
 
+                // TODO: update status of indexing item
                 if (strlen($content) === 0) {
+                    $this->indexingItem->update([
+                        'status' => 'warning',
+                    ]);
+                    if ($this->file->mimeType() === 'application/pdf') {
+                        throw new NoContentToIndexException('Unable to parse PDF: ' . json_encode($this->file));
+                    }
+
                     throw new NoContentToIndexException('File is empty: ' . json_encode($this->file));
                 }
 
                 $chunks = $textChunker->chunk($content);
                 if (count($chunks) === 0) {
+                    $this->indexingItem->update([
+                        'status' => 'warning',
+                    ]);
                     throw new NoContentToIndexException('Chunk is empty: ' . json_encode($this->file) . '; content: ' . $content);
                 }
                 if (count($chunks) === 1 && strlen(trim($chunks->first())) === 0) {
+                    $this->indexingItem->update([
+                        'status' => 'warning',
+                    ]);
                     throw new NoContentToIndexException('Chunk contains one empty item: ' . json_encode($this->file) . '; content: ' . $content);
                 }
 

@@ -17,12 +17,18 @@ class EmbedContentChunkJob implements ShouldQueue
 
     public function __construct(
         private IndexedContentChunk $chunk,
+        private int $workflowItemId,
     ) {
     }
 
     public function handle(Embedder $embedder, VectorStore $vectorStore): void
     {
+        $workflowItem = IndexingWorkflowItem::find($this->workflowItemId);
+        if ($workflowItem && $workflowItem->status === 'prepared') {
+            $workflowItem->update(['status' => 'vectorizing']);
+        }
+        
         $embedding = $embedder->createEmbedding($this->chunk->getEmbeddableContent());
-        $vectorStore->upsert($this->chunk, $embedding);
+        $vectorStore->upsert($this->chunk, $embedding);        
     }
 }

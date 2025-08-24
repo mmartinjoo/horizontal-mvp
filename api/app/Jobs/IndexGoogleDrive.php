@@ -40,6 +40,10 @@ class IndexGoogleDrive implements ShouldQueue
             'status' => 'in_progress',
             'overall_items' => count($contents['high']) + count($contents['medium']) + count($contents['low']),
         ]);
+
+        $allJobs = [];
+        $workflowItems = [];
+
         foreach ($contents['high'] as $file) {
             $content = IndexedContent::create([
                 'user_id' => $this->user->id,
@@ -56,33 +60,54 @@ class IndexGoogleDrive implements ShouldQueue
                 'status' => 'queued',
                 'indexed_content_id' => $content->id,
             ]);
-
-            Bus::batch([
-                new IndexFile($indexingItem, $file, 'high'),
-                new EmbedContentJob($indexingItem),
-            ])
-                ->then(function () use ($indexingItem) {
-                    $indexingItem->update([
-                        'status' => 'completed',
-                    ]);
-                })
-                ->catch(function (Batch $batch, Throwable $e) use ($indexingItem) {
-                    $indexingItem->update([
-                        'status' => 'warning',
-                        'error_message' => $e->getMessage(),
-                    ]);
-                })
-                ->dispatch();
+            $workflowItems[] = $indexingItem;
+            $allJobs[] = new IndexFile($indexingItem, $file, 'high');
+            $allJobs[] = new PrepareContentChunks($indexingItem);
         }
 
-//        foreach ($contents['medium'] as $file) {
-//            IndexFile::dispatch($this->user, $file, 'medium')
-//                ->delay(now()->addHours(1));
-//        }
-//
-//        foreach ($contents['low'] as $file) {
-//            IndexFile::dispatch($this->user, $file, 'low')
-//                ->delay(now()->addHours(4));
-//        }
+        $dispatchEmbeddingJobs = function () use ($indexing, $workflowItems) {
+            $embeddingJobs = [];
+            foreach ($workflowItems as $item) {
+                $item->refresh();
+                if ($item->status === 'prepared') {
+                    foreach ($item->indexed_content->chunks as $chunk) {
+                        $embeddingJobs[] = new EmbedContentChunkJob($chunk, $item->id);
+                    }
+                }
+            }
+
+            if (!empty($embeddingJobs)) {
+                Bus::batch($embeddingJobs)
+                    ->name("embedding_workflow_{$indexing->id}")
+                    ->then(function (Batch $batch) use ($indexing, $workflowItems) {
+                        // Mark all items as completed and workflow as finished
+                        foreach ($workflowItems as $item) {
+                            if ($item->status === 'prepared') {
+                                $item->update(['status' => 'completed']);
+                            }
+                        }
+                        $indexing->update(['status' => 'finished']);
+                    })
+                    ->catch(function (Batch $batch, Throwable $e) use ($indexing, $workflowItems) {
+                        $indexing->update(['status' => 'finished']);
+                    })
+                    ->dispatch();
+            } else {
+                $indexing->update(['status' => 'finished']);
+            }
+        };
+
+        Bus::batch($allJobs)
+            ->name("indexing_workflow_{$indexing->id}")
+            ->then(function (Batch $batch) use ($dispatchEmbeddingJobs, $indexing) {
+                $dispatchEmbeddingJobs();
+            })
+            ->catch(function (Batch $batch, Throwable $e) use ($indexing, $workflowItems) {
+                $indexing->update(['status' => 'warning']);
+            })
+            ->finally(function () use ($dispatchEmbeddingJobs) {
+                $dispatchEmbeddingJobs();
+            })
+            ->dispatch();
     }
 }
