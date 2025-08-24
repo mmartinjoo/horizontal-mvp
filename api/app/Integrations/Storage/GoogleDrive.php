@@ -64,11 +64,12 @@ class GoogleDrive
         try {
             if ($this->isGoogleNativeFile($file)) {
                 $content = $this->exportGoogleNativeFile($file);
+                $result = Storage::put($file->path(), $content);
             } else {
-                $content = $this->fs->read($file->path());
+                $stream = $this->fs->readStream($file->path());
+                $result = Storage::writeStream($file->path(), $stream);
             }
 
-            $result = Storage::put($file->path(), $content);
             if (!$result) {
                 throw new FileDownloadException("Failed to write file to storage: " . json_encode($file));
             }
@@ -96,7 +97,6 @@ class GoogleDrive
             ]);
 
             return $response->getBody()->getContents();
-
         } catch (Exception $e) {
             throw FileDownloadException::wrap($e);
         }
