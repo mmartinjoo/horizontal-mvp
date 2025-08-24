@@ -66,14 +66,9 @@ class IndexGoogleDrive implements ShouldQueue
                         'status' => 'completed',
                     ]);
                 })
-                ->finally(function () use ($indexingItem) {
-                    $indexingItem->update([
-                        'status' => 'completed',
-                    ]);
-                })
                 ->catch(function (Batch $batch, Throwable $e) use ($indexingItem) {
                     $indexingItem->update([
-                        'status' => 'failed',
+                        'status' => 'warning',
                         'error_message' => $e->getMessage(),
                     ]);
                 })
