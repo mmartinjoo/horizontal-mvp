@@ -3,8 +3,6 @@
 namespace App\Jobs;
 
 use App\Models\IndexingWorkflowItem;
-use App\Services\LLM\Embedder;
-use App\Services\VectorStore\VectorStore;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -18,29 +16,30 @@ class EmbedContentJob implements ShouldQueue
     use Batchable;
 
     public function __construct(
-        private IndexingWorkflowItem $indexingItem,
+        private int $indexingWorkflowItemId,
     ) {
     }
 
     public function handle(): void
     {
-        $this->indexingItem->update([
+        $indexingWorkflowItem = IndexingWorkflowItem::findOrFail($this->indexingWorkflowItemId);
+        $indexingWorkflowItem->update([
             'status' => 'vectorizing',
         ]);
 
         $jobs = [];
-        foreach ($this->indexingItem->indexed_content->chunks as $chunk) {
-            $jobs[] = new EmbedContentChunkJob($chunk);
+        foreach ($indexingWorkflowItem->indexed_content->chunks as $chunk) {
+            $jobs[] = new EmbedContentChunkJob($chunk, $indexingWorkflowItem->id);
         }
 
         Bus::batch($jobs)
-            ->then(function () {
-                $this->indexingItem->update([
+            ->then(function () use ($indexingWorkflowItem) {
+                $indexingWorkflowItem->update([
                     'status' => 'completed',
                 ]);
             })
-            ->catch(function (Batch $batch, Throwable $e) {
-                $this->indexingItem->update([
+            ->catch(function (Batch $batch, Throwable $e) use ($indexingWorkflowItem) {
+                $indexingWorkflowItem->update([
                     'status' => 'warning',
                     'error_message' => $e->getMessage(),
                 ]);

@@ -8,6 +8,7 @@ use App\Integrations\Storage\GoogleDrive;
 use App\Models\IndexedContentChunk;
 use App\Models\IndexingWorkflowItem;
 use App\Services\Indexing\TextChunker;
+use App\Services\PdfParser;
 use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -19,55 +20,53 @@ class IndexFile implements ShouldQueue
     use Batchable;
 
     public function __construct(
-        private IndexingWorkflowItem $indexingItem,
+        private int $indexingWorkflowItemId,
         private File $file,
         private string $priority,
     ) {
     }
 
-    public function handle(GoogleDrive $drive, TextChunker $textChunker, \App\Services\PdfParser $pdfParser): void
+    public function handle(GoogleDrive $drive, TextChunker $textChunker, PdfParser $pdfParser): void
     {
         try {
-            $jobIds = $this->indexingItem->job_ids;
+            $indexingWorkflowItem = IndexingWorkflowItem::find($this->indexingWorkflowItemId);
+            $jobIds = $indexingWorkflowItem->job_ids;
             $jobIds[] = $this->job->payload()['uuid'];
 
-            $this->indexingItem->update([
+            $indexingWorkflowItem->update([
                 'status' => 'downloading',
                 'job_ids' => $jobIds,
             ]);
 
             $drive->downloadFile($this->file);
-            $this->indexingItem->update([
+            $indexingWorkflowItem->update([
                 'status' => 'downloaded',
             ]);
 
             if ($this->file->mimeType() === 'application/pdf') {
-                $this->indexPDF($pdfParser, $textChunker);
+                $this->indexPDF($pdfParser, $textChunker, $indexingWorkflowItem);
+                EmbedContentJob::dispatch($indexingWorkflowItem->id);
                 return;
             } else {
                 $content = Storage::read($this->file->path());
             }
 
             if (strlen($content) === 0) {
-                $this->indexingItem->update([
+                $indexingWorkflowItem->update([
                     'status' => 'warning',
                 ]);
-                if ($this->file->mimeType() === 'application/pdf') {
-                    throw new NoContentToIndexException('Unable to parse PDF: ' . json_encode($this->file));
-                }
-
                 throw new NoContentToIndexException('File is empty: ' . json_encode($this->file));
             }
 
             $chunks = $textChunker->chunk($content);
             if (count($chunks) === 0) {
-                $this->indexingItem->update([
+                $indexingWorkflowItem->update([
                     'status' => 'warning',
                 ]);
                 throw new NoContentToIndexException('Chunk is empty: ' . json_encode($this->file) . '; content: ' . $content);
             }
             if (count($chunks) === 1 && strlen(trim($chunks->first())) === 0) {
-                $this->indexingItem->update([
+                $indexingWorkflowItem->update([
                     'status' => 'warning',
                 ]);
                 throw new NoContentToIndexException('Chunk contains one empty item: ' . json_encode($this->file) . '; content: ' . $content);
@@ -75,36 +74,36 @@ class IndexFile implements ShouldQueue
 
             foreach ($chunks as $i => $chunk) {
                 IndexedContentChunk::create([
-                    'indexed_content_id' => $this->indexingItem->indexed_content->id,
+                    'indexed_content_id' => $indexingWorkflowItem->indexed_content->id,
                     'body' => $chunk,
                     'position' => $i+1,
                 ]);
             }
 
-            $this->indexingItem->indexed_content()->update([
+            $indexingWorkflowItem->indexed_content()->update([
                 'preview' => $chunks->first(),
                 'indexed_at' => now(),
                 'priority' => $this->priority,
             ]);
-            $this->indexingItem->update([
+            $indexingWorkflowItem->update([
                 'status' => 'prepared',
             ]);
-            return;
+            EmbedContentJob::dispatch($indexingWorkflowItem->id);
         } finally {
             Storage::delete($this->file->path());
         }
     }
 
-    private function indexPDF(\App\Services\PdfParser $pdfParser, TextChunker $textChunker)
+    private function indexPDF(PdfParser $pdfParser, TextChunker $textChunker, IndexingWorkflowItem $indexingWorkflowItem)
     {
-        $this->indexingItem->update([
+        $indexingWorkflowItem->update([
             'status' => 'parsing',
         ]);
 
         $blocks = $pdfParser->stream($this->file->path());
         $firstChunk = '';
 
-        $this->indexingItem->update([
+        $indexingWorkflowItem->update([
             'status' => 'parsed',
         ]);
 
@@ -116,19 +115,19 @@ class IndexFile implements ShouldQueue
                     $firstChunk = $chunk;
                 }
                 IndexedContentChunk::create([
-                    'indexed_content_id' => $this->indexingItem->indexed_content->id,
+                    'indexed_content_id' => $indexingWorkflowItem->indexed_content->id,
                     'body' => $chunk,
                     'position' => $i+1,
                 ]);
             }
         }
 
-        $this->indexingItem->indexed_content()->update([
+        $indexingWorkflowItem->indexed_content()->update([
             'preview' => $firstChunk,
             'indexed_at' => now(),
             'priority' => $this->priority,
         ]);
-        $this->indexingItem->update([
+        $indexingWorkflowItem->update([
             'status' => 'prepared',
         ]);
     }

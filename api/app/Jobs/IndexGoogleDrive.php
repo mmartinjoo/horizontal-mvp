@@ -9,11 +9,8 @@ use App\Models\IndexingWorkflowItem;
 use App\Models\User;
 use App\Services\Indexing\EmbeddingDispatcher;
 use App\Services\Indexing\FilePrioritizer;
-use Illuminate\Bus\Batch;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Bus;
-use Throwable;
 
 class IndexGoogleDrive implements ShouldQueue
 {
@@ -32,14 +29,13 @@ class IndexGoogleDrive implements ShouldQueue
             'user_id' => $this->user->id,
             'job_id' => $this->job->getJobId(),
         ]);
-        $files = $drive->listDirectoryContents();
+        $files = $drive->listDirectoryContents('deQenQ');
         $contents = $prioritizer->prioritize2($files);
         $indexing->update([
             'status' => 'downloaded',
             'overall_items' => count($contents['high']) + count($contents['medium']) + count($contents['low']),
         ]);
 
-        $allJobs = [];
         foreach ($contents['high'] as $file) {
             $content = IndexedContent::create([
                 'user_id' => $this->user->id,
@@ -56,21 +52,7 @@ class IndexGoogleDrive implements ShouldQueue
                 'status' => 'queued',
                 'indexed_content_id' => $content->id,
             ]);
-            $allJobs[] = new IndexFile($indexingItem, $file, 'high');
-            $allJobs[] = new PrepareContentChunks($indexingItem);
+            IndexFile::dispatch($indexingItem->id, $file, 'high');
         }
-
-        Bus::batch($allJobs)
-            ->name("indexing_workflow_{$indexing->id}")
-            ->then(function (Batch $batch) use ($indexing, $embeddingDispatcher) {
-                $embeddingDispatcher->dispatch($indexing->id);
-            })
-            ->catch(function (Batch $batch, Throwable $e) use ($indexing) {
-                $indexing->update(['status' => 'warning']);
-            })
-            ->finally(function () use ($indexing, $embeddingDispatcher) {
-                $embeddingDispatcher->dispatch($indexing->id);
-            })
-            ->dispatch();
     }
 }
