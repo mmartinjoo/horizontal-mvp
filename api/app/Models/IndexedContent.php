@@ -23,6 +23,11 @@ class IndexedContent extends Model implements Embeddable
         'embedding' => 'array',
     ];
 
+    public function chunks()
+    {
+        return $this->hasMany(IndexedContentChunk::class);
+    }
+
     public function getEmbeddableContent(): string
     {
         if (!$this->body && !$this->preview) {
