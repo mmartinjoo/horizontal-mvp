@@ -28,12 +28,12 @@ class FilePrioritizer
                 continue;
             }
 
-            if ($file->isSmallerThan(1) && $file->wasUsedIn(60)) {
+            if ($file->isSmallerThan(5) && $file->wasUsedIn(60)) {
                 $highQueue[] = $file;
                 continue;
             }
 
-            if ($file->isSmallerThan(5) && $file->wasUsedIn(120)) {
+            if ($file->isSmallerThan(10) && $file->wasUsedIn(120)) {
                 $mediumQueue[] = $file;
                 continue;
             }

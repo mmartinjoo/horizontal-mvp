@@ -3,12 +3,13 @@
 namespace App\Jobs;
 
 use App\Exceptions\IndexingException;
+use App\Exceptions\NoContentToIndexException;
 use App\Exceptions\Storage\FileDownloadException;
 use App\Integrations\Storage\File;
 use App\Integrations\Storage\GoogleDrive;
-use App\Models\IndexedContent;
+use App\Models\IndexedContentChunk;
 use App\Models\IndexingWorkflowItem;
-use Exception;
+use App\Services\Indexing\TextChunker;
 use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -27,7 +28,7 @@ class IndexFile implements ShouldQueue
     ) {
     }
 
-    public function handle(GoogleDrive $drive): void
+    public function handle(GoogleDrive $drive, TextChunker $textChunker): void
     {
         try {
             $jobIds = $this->indexingItem->job_ids;
@@ -56,45 +57,37 @@ class IndexFile implements ShouldQueue
                     $content = Storage::read($this->file->path());
                 }
 
-                $this->indexingItem->indexed_content()->update([
-                    'body' => $content,
-                    'indexed_at' => now(),
-                    'priority' => 'high',
-                ]);
-                $this->indexingItem->update([
-                    'status' => 'prepared',
-                ]);
-                return;
-            }
-
-            if ($this->priority === 'medium' || $this->priority === 'low') {
-                $this->indexingItem->update([
-                    'status' => 'parsing_preview',
-                ]);
-                $preview = $this->readFirstMB();
-                if ($this->file->mimeType() === 'application/pdf') {
-                    $preview = $this->parsePDF($preview);
+                if (strlen($content) === 0) {
+                    throw new NoContentToIndexException('File is empty: ' . json_encode($this->file));
                 }
-                $this->indexingItem->update([
-                    'status' => 'preview_parsed',
-                ]);
+
+                $chunks = $textChunker->chunk($content);
+                if (count($chunks) === 0) {
+                    throw new NoContentToIndexException('Chunk is empty: ' . json_encode($this->file) . '; content: ' . $content);
+                }
+                if (count($chunks) === 1 && strlen(trim($chunks->first())) === 0) {
+                    throw new NoContentToIndexException('Chunk contains one empty item: ' . json_encode($this->file) . '; content: ' . $content);
+                }
+
+                foreach ($chunks as $i => $chunk) {
+                    IndexedContentChunk::create([
+                        'indexed_content_id' => $this->indexingItem->indexed_content->id,
+                        'body' => $chunk,
+                        'position' => $i+1,
+                    ]);
+                }
 
                 $this->indexingItem->indexed_content()->update([
-                    'preview' => $preview,
+                    'preview' => $chunks->first(),
                     'indexed_at' => now(),
+                    'priority' => $this->priority,
                 ]);
                 $this->indexingItem->update([
                     'status' => 'prepared',
                 ]);
                 return;
             }
-        } /*catch (Exception $ex) {
-            $this->indexingItem->update([
-                'status' => 'failed',
-                'error_message' => $ex->getMessage(),
-            ]);
-            throw new IndexingException('Failed to index file: ' . json_encode($this->file), 0, $ex);*/
-        finally {
+        } finally {
             Storage::delete($this->file->path());
         }
     }

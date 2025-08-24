@@ -2,6 +2,8 @@
 
 namespace App\Services\Indexing;
 
+use Illuminate\Support\Collection;
+
 class TextChunker
 {
     // 1 token ≈ ~4 characters
@@ -11,12 +13,15 @@ class TextChunker
     {
     }
 
-    public function chunk(string $text): array
+    /**
+     * @return Collection<string>
+     */
+    public function chunk(string $text): Collection
     {
         $maxChars = $this->maxTokens * self::TOKEN_TO_CHAR_RATIO;
         $overlapChars = $this->overlapTokens * self::TOKEN_TO_CHAR_RATIO;
         if (strlen($text) <= $maxChars) {
-            return [$text];
+            return collect([$text]);
         }
 
         $chunks = [];
@@ -34,7 +39,7 @@ class TextChunker
                 break;
             }
         }
-        return $chunks;
+        return collect($chunks);
     }
 
     private function findNaturalBreakpoint(string $text, int $preferredEnd, int $minEnd): int
