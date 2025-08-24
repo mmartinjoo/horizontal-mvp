@@ -6,13 +6,17 @@ use App\Exceptions\NoContentToIndexException;
 use App\Integrations\Storage\File;
 use App\Integrations\Storage\GoogleDrive;
 use App\Models\IndexedContentChunk;
+use App\Models\IndexingWorkflow;
 use App\Models\IndexingWorkflowItem;
 use App\Services\Indexing\TextChunker;
+use App\Services\LLM\Embedder;
 use App\Services\PdfParser;
+use App\Services\VectorStore\VectorStore;
 use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class IndexFile implements ShouldQueue
 {
@@ -26,8 +30,13 @@ class IndexFile implements ShouldQueue
     ) {
     }
 
-    public function handle(GoogleDrive $drive, TextChunker $textChunker, PdfParser $pdfParser): void
-    {
+    public function handle(
+        GoogleDrive $drive,
+        TextChunker $textChunker,
+        PdfParser $pdfParser,
+        Embedder $embedder,
+        VectorStore $vectorStore,
+    ): void {
         try {
             $indexingWorkflowItem = IndexingWorkflowItem::find($this->indexingWorkflowItemId);
             $jobIds = $indexingWorkflowItem->job_ids;
@@ -45,7 +54,8 @@ class IndexFile implements ShouldQueue
 
             if ($this->file->mimeType() === 'application/pdf') {
                 $this->indexPDF($pdfParser, $textChunker, $indexingWorkflowItem);
-                EmbedContentJob::dispatch($indexingWorkflowItem->id);
+                $this->createEmbedding($indexingWorkflowItem, $embedder, $vectorStore);;
+                $this->updateWorkflowStatus($indexingWorkflowItem);
                 return;
             } else {
                 $content = Storage::read($this->file->path());
@@ -88,7 +98,8 @@ class IndexFile implements ShouldQueue
             $indexingWorkflowItem->update([
                 'status' => 'prepared',
             ]);
-            EmbedContentJob::dispatch($indexingWorkflowItem->id);
+            $this->createEmbedding($indexingWorkflowItem, $embedder, $vectorStore);
+            $this->updateWorkflowStatus($indexingWorkflowItem);
         } finally {
             Storage::delete($this->file->path());
         }
@@ -130,5 +141,44 @@ class IndexFile implements ShouldQueue
         $indexingWorkflowItem->update([
             'status' => 'prepared',
         ]);
+    }
+
+    private function createEmbedding(IndexingWorkflowItem $indexingWorkflowItem, Embedder $embedder, VectorStore $vectorStore)
+    {
+        try {
+            $indexingWorkflowItem->update([
+                'status' => 'vectorizing',
+            ]);
+
+            foreach ($indexingWorkflowItem->indexed_content->chunks as $chunk) {
+                $embedding = $embedder->createEmbedding($chunk->getEmbeddableContent());
+                $vectorStore->upsert($chunk, $embedding);
+            }
+
+            $indexingWorkflowItem->update([
+                'status' => 'completed',
+            ]);
+        } catch (Throwable $e) {
+            $indexingWorkflowItem->update([
+                'status' => 'warning',
+                'error_message' => $e->getMessage(),
+            ]);
+            throw $e;
+        }
+    }
+
+    private function updateWorkflowStatus(IndexingWorkflowItem $indexingWorkflowItem)
+    {
+        /** @var IndexingWorkflow $workflow */
+        $workflow = $indexingWorkflowItem->indexing_workflow;
+        $hasQueuedItems = $workflow->items()
+            ->where('status', 'queued')
+            ->exists();
+
+        if (!$hasQueuedItems) {
+            $workflow->update([
+                'status' => 'completed',
+            ]);
+        }
     }
 }
