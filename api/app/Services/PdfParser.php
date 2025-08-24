@@ -16,9 +16,23 @@ class PdfParser
 
     public function stream(string $path): Generator
     {
-        $document = $this->parser->parseFile(storage_path('app/private/' . $path));
-        foreach ($document->getPages() as $page) {
-            yield $page->getText();
+        $document = $this->parser->parseFile(
+            filePath: storage_path('app/private/' . $path),
+            useInMemoryStream: false,
+        );
+        $pages = $document->getPages();
+        foreach ($pages as $page) {
+            $text = $page->getText();
+            // It cannot properly parse certain PDFs and this loop goes into an infinite loop. This is the hotfix.
+            // However, there are PDFs that start with an image as a cover. We don't `break` in those cases.
+            if (trim($text) === '') {
+                $images = $page->getImages();
+                if (count($images) > 0) {
+                    continue;
+                }
+                break;
+            }
+            yield $text;
         }
     }
 }

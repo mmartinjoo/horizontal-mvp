@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Exceptions\NoContentToIndexException;
-use App\Exceptions\Storage\FileDownloadException;
 use App\Integrations\Storage\File;
 use App\Integrations\Storage\GoogleDrive;
 use App\Models\IndexedContentChunk;
@@ -13,7 +12,6 @@ use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Storage;
-use PrinsFrank\PdfParser\PdfParser;
 
 class IndexFile implements ShouldQueue
 {
@@ -31,7 +29,7 @@ class IndexFile implements ShouldQueue
     {
         try {
             $jobIds = $this->indexingItem->job_ids;
-            $jobIds[] = $this->job->getJobId();
+            $jobIds[] = $this->job->payload()['uuid'];
 
             $this->indexingItem->update([
                 'status' => 'downloading',
@@ -133,40 +131,5 @@ class IndexFile implements ShouldQueue
         $this->indexingItem->update([
             'status' => 'prepared',
         ]);
-    }
-
-    private function parsePDF(): string
-    {
-        try {
-            $parser = new PdfParser();
-            $document = $parser->parseFile(storage_path('app/private/' . $this->file->path()), true);
-            $text = $document->getText();
-
-            return $text;
-        } finally {
-            unset($document, $parser);
-            gc_collect_cycles();
-        }
-    }
-
-    private function readFirstMB(): string
-    {
-        $stream = null;
-
-        try {
-            $stream = Storage::readStream($this->file->path());
-            if ($stream === false) {
-                throw new FileDownloadException("Failed to open stream for file: " . json_encode($this->file));
-            }
-            $content = fread($stream, 1*1024*1024);
-            if ($content === false) {
-                throw new FileDownloadException("Failed to read first MB of file: " . json_encode($this->file));
-            }
-            return $content;
-        } finally {
-            if (is_resource($stream)) {
-                fclose($stream);
-            }
-        }
     }
 }

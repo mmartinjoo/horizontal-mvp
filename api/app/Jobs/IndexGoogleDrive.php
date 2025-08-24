@@ -32,18 +32,14 @@ class IndexGoogleDrive implements ShouldQueue
             'job_id' => $this->job->getJobId(),
         ]);
         $files = $drive->listDirectoryContents('deQenQ/test');
-        $indexing->update([
-            'status' => 'downloaded',
-        ]);
         $contents = $prioritizer->prioritize2($files);
         $indexing->update([
-            'status' => 'in_progress',
+            'status' => 'downloaded',
             'overall_items' => count($contents['high']) + count($contents['medium']) + count($contents['low']),
         ]);
 
         $allJobs = [];
         $workflowItems = [];
-
         foreach ($contents['high'] as $file) {
             $content = IndexedContent::create([
                 'user_id' => $this->user->id,
