@@ -23,7 +23,6 @@ return new class extends Migration
             $table->string('source_url')->nullable();
 
             $table->mediumText('title');
-            $table->longText('body')->nullable();
             $table->longText('preview')->nullable();
 
             $table->string('priority')->nullable();
@@ -33,20 +32,6 @@ return new class extends Migration
             $table->dateTime('indexed_at')->nullable();
             $table->timestamps();
         });
-
-        DB::statement("ALTER TABLE indexed_contents ADD COLUMN embedding vector(1536)");
-
-        DB::statement("
-          ALTER TABLE indexed_contents
-          ADD COLUMN search_vector tsvector
-          GENERATED ALWAYS AS (
-              setweight(to_tsvector('english', COALESCE(title, '')), 'A') ||
-              setweight(to_tsvector('english', body), 'B')
-          ) STORED
-      ");
-
-        DB::statement("CREATE INDEX indexed_contents_search_vector_idx ON indexed_contents USING GIN(search_vector)");
-        DB::statement("CREATE INDEX indexed_contents_embedding_idx ON indexed_contents USING hnsw (embedding vector_cosine_ops)");
     }
 
     public function down(): void

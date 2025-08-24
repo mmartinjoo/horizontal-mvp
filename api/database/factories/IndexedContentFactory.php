@@ -27,7 +27,6 @@ class IndexedContentFactory extends Factory
             'source_id' => fake()->uuid(),
             'source_url' => fake()->boolean(80) ? fake()->url() : null,
             'title' => fake()->sentence(6, true),
-            'body' => fake()->paragraphs(3, true),
             'metadata' => fake()->boolean(60) ? [
                 'tags' => fake()->words(3),
                 'priority' => fake()->randomElement(['low', 'medium', 'high']),
