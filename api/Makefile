@@ -1,2 +1,2 @@
-worker-dev:
-	php artisan queue:work --timeout=120 --max-jobs=100
+worker:
+	php artisan queue:work --timeout=300 --max-jobs=100 --max-time=1800

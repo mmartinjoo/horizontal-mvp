@@ -6,8 +6,10 @@ use Illuminate\Support\Collection;
 
 class TextChunker
 {
-    // 1 token ≈ ~4 characters
-    const TOKEN_TO_CHAR_RATIO = 3;
+    // Normally, 1 token is ~4 characters
+    // However, there are special situations such as e-mail addresses, sales data with numbers, etc, when the ratio is much lower (2-3)
+    // We don't know what kind of data users will synchronize, so we apply some margin of safety
+    const TOKEN_TO_CHAR_RATIO = 1;
 
     public function __construct(private int $maxTokens = 8000, private int $overlapTokens = 200)
     {
