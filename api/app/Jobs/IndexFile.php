@@ -26,7 +26,6 @@ class IndexFile implements ShouldQueue
     public function __construct(
         private int $indexingWorkflowItemId,
         private File $file,
-        private string $priority,
     ) {
     }
 
@@ -93,7 +92,6 @@ class IndexFile implements ShouldQueue
             $indexingWorkflowItem->indexed_content()->update([
                 'preview' => $chunks->first(),
                 'indexed_at' => now(),
-                'priority' => $this->priority,
             ]);
             $indexingWorkflowItem->update([
                 'status' => 'prepared',
@@ -136,7 +134,6 @@ class IndexFile implements ShouldQueue
         $indexingWorkflowItem->indexed_content()->update([
             'preview' => $firstChunk,
             'indexed_at' => now(),
-            'priority' => $this->priority,
         ]);
         $indexingWorkflowItem->update([
             'status' => 'prepared',
