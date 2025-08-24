@@ -26,6 +26,6 @@ class IndexedContentChunk extends Model implements Embeddable
 
     public function getEmbeddableContent(): string
     {
-        return $this->content;
+        return $this->body;
     }
 }

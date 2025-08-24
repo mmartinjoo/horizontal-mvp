@@ -8,8 +8,9 @@ use App\Services\VectorStore\VectorStore;
 use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Bus;
 
-class CreateEmbeddingJob implements ShouldQueue
+class EmbedContentJob implements ShouldQueue
 {
     use Queueable;
     use Batchable;
@@ -24,10 +25,13 @@ class CreateEmbeddingJob implements ShouldQueue
         $this->indexingItem->update([
             'status' => 'vectorizing',
         ]);
-        $embedding = $embedder->createEmbedding($this->indexingItem->indexed_content->getEmbeddableContent());
-        $vectorStore->upsert($this->indexingItem->indexed_content, $embedding);
-        $this->indexingItem->update([
-            'status' => 'vectorized',
-        ]);
+
+        $jobs = [];
+        foreach ($this->indexingItem->indexed_content->chunks as $chunk) {
+            $jobs[] = new EmbedContentChunkJob($chunk);
+        }
+
+        Bus::batch($jobs)
+            ->dispatch();
     }
 }

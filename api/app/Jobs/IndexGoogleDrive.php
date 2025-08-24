@@ -59,7 +59,7 @@ class IndexGoogleDrive implements ShouldQueue
 
             Bus::batch([
                 new IndexFile($indexingItem, $file, 'high'),
-                new CreateEmbeddingJob($indexingItem),
+                new EmbedContentJob($indexingItem),
             ])
                 ->then(function () use ($indexingItem) {
                     $indexingItem->update([
