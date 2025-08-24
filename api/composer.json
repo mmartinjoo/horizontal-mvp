@@ -13,7 +13,7 @@
         "masbug/flysystem-google-drive-ext": "^2.4",
         "openai-php/client": "^0.15.0",
         "predis/predis": "^3.2",
-        "smalot/pdfparser": "^2.12"
+        "prinsfrank/pdfparser": "^2.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

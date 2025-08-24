@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Exceptions\IndexingException;
 use App\Exceptions\NoContentToIndexException;
 use App\Exceptions\Storage\FileDownloadException;
 use App\Integrations\Storage\File;
@@ -14,7 +13,7 @@ use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Storage;
-use Smalot\PdfParser\Parser;
+use PrinsFrank\PdfParser\PdfParser;
 
 class IndexFile implements ShouldQueue
 {
@@ -28,7 +27,7 @@ class IndexFile implements ShouldQueue
     ) {
     }
 
-    public function handle(GoogleDrive $drive, TextChunker $textChunker): void
+    public function handle(GoogleDrive $drive, TextChunker $textChunker, \App\Services\PdfParser $pdfParser): void
     {
         try {
             $jobIds = $this->indexingItem->job_ids;
@@ -44,73 +43,110 @@ class IndexFile implements ShouldQueue
                 'status' => 'downloaded',
             ]);
 
-            if ($this->priority === 'high') {
-                if ($this->file->mimeType() === 'application/pdf') {
-                    $this->indexingItem->update([
-                        'status' => 'parsing',
-                    ]);
-                    $content = $this->parsePDF(Storage::read($this->file->path()));
-                    $this->indexingItem->update([
-                        'status' => 'parsed',
-                    ]);
-                } else {
-                    $content = Storage::read($this->file->path());
-                }
-
-                // TODO: update status of indexing item
-                if (strlen($content) === 0) {
-                    $this->indexingItem->update([
-                        'status' => 'warning',
-                    ]);
-                    if ($this->file->mimeType() === 'application/pdf') {
-                        throw new NoContentToIndexException('Unable to parse PDF: ' . json_encode($this->file));
-                    }
-
-                    throw new NoContentToIndexException('File is empty: ' . json_encode($this->file));
-                }
-
-                $chunks = $textChunker->chunk($content);
-                if (count($chunks) === 0) {
-                    $this->indexingItem->update([
-                        'status' => 'warning',
-                    ]);
-                    throw new NoContentToIndexException('Chunk is empty: ' . json_encode($this->file) . '; content: ' . $content);
-                }
-                if (count($chunks) === 1 && strlen(trim($chunks->first())) === 0) {
-                    $this->indexingItem->update([
-                        'status' => 'warning',
-                    ]);
-                    throw new NoContentToIndexException('Chunk contains one empty item: ' . json_encode($this->file) . '; content: ' . $content);
-                }
-
-                foreach ($chunks as $i => $chunk) {
-                    IndexedContentChunk::create([
-                        'indexed_content_id' => $this->indexingItem->indexed_content->id,
-                        'body' => $chunk,
-                        'position' => $i+1,
-                    ]);
-                }
-
-                $this->indexingItem->indexed_content()->update([
-                    'preview' => $chunks->first(),
-                    'indexed_at' => now(),
-                    'priority' => $this->priority,
-                ]);
-                $this->indexingItem->update([
-                    'status' => 'prepared',
-                ]);
+            if ($this->file->mimeType() === 'application/pdf') {
+                $this->indexPDF($pdfParser, $textChunker);
                 return;
+            } else {
+                $content = Storage::read($this->file->path());
             }
+
+            if (strlen($content) === 0) {
+                $this->indexingItem->update([
+                    'status' => 'warning',
+                ]);
+                if ($this->file->mimeType() === 'application/pdf') {
+                    throw new NoContentToIndexException('Unable to parse PDF: ' . json_encode($this->file));
+                }
+
+                throw new NoContentToIndexException('File is empty: ' . json_encode($this->file));
+            }
+
+            $chunks = $textChunker->chunk($content);
+            if (count($chunks) === 0) {
+                $this->indexingItem->update([
+                    'status' => 'warning',
+                ]);
+                throw new NoContentToIndexException('Chunk is empty: ' . json_encode($this->file) . '; content: ' . $content);
+            }
+            if (count($chunks) === 1 && strlen(trim($chunks->first())) === 0) {
+                $this->indexingItem->update([
+                    'status' => 'warning',
+                ]);
+                throw new NoContentToIndexException('Chunk contains one empty item: ' . json_encode($this->file) . '; content: ' . $content);
+            }
+
+            foreach ($chunks as $i => $chunk) {
+                IndexedContentChunk::create([
+                    'indexed_content_id' => $this->indexingItem->indexed_content->id,
+                    'body' => $chunk,
+                    'position' => $i+1,
+                ]);
+            }
+
+            $this->indexingItem->indexed_content()->update([
+                'preview' => $chunks->first(),
+                'indexed_at' => now(),
+                'priority' => $this->priority,
+            ]);
+            $this->indexingItem->update([
+                'status' => 'prepared',
+            ]);
+            return;
         } finally {
             Storage::delete($this->file->path());
         }
     }
 
-    private function parsePDF(string $raw): string
+    private function indexPDF(\App\Services\PdfParser $pdfParser, TextChunker $textChunker)
     {
-        $parser = new Parser;
-        $pdf = $parser->parseContent($raw);
-        return $pdf->getText();
+        $this->indexingItem->update([
+            'status' => 'parsing',
+        ]);
+
+        $blocks = $pdfParser->stream($this->file->path());
+        $firstChunk = '';
+
+        $this->indexingItem->update([
+            'status' => 'parsed',
+        ]);
+
+        /** @var string $block */
+        foreach ($blocks as $block) {
+            $chunks = $textChunker->chunk($block);
+            foreach ($chunks as $i => $chunk) {
+                if ($i === 0) {
+                    $firstChunk = $chunk;
+                }
+                IndexedContentChunk::create([
+                    'indexed_content_id' => $this->indexingItem->indexed_content->id,
+                    'body' => $chunk,
+                    'position' => $i+1,
+                ]);
+            }
+        }
+
+        $this->indexingItem->indexed_content()->update([
+            'preview' => $firstChunk,
+            'indexed_at' => now(),
+            'priority' => $this->priority,
+        ]);
+        $this->indexingItem->update([
+            'status' => 'prepared',
+        ]);
+    }
+
+    private function parsePDF(): string
+    {
+        try {
+            $parser = new PdfParser();
+            $document = $parser->parseFile(storage_path('app/private/' . $this->file->path()), true);
+            $text = $document->getText();
+
+            return $text;
+        } finally {
+            unset($document, $parser);
+            gc_collect_cycles();
+        }
     }
 
     private function readFirstMB(): string

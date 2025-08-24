@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 class TextChunker
 {
     // 1 token ≈ ~4 characters
-    const TOKEN_TO_CHAR_RATIO = 4;
+    const TOKEN_TO_CHAR_RATIO = 3;
 
     public function __construct(private int $maxTokens = 8000, private int $overlapTokens = 200)
     {

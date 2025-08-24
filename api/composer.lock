@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e6d07196003fbff55e719d22f516bcaf",
+    "content-hash": "1c14f19a38bed2eaad1b2a6fce9bae62",
     "packages": [
         {
             "name": "brick/math",
@@ -3470,6 +3470,56 @@
             "time": "2025-08-06T06:41:24+00:00"
         },
         {
+            "name": "prinsfrank/pdfparser",
+            "version": "v2.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PrinsFrank/pdfparser.git",
+                "reference": "4133a51fd40d9b7b71abe344f8731943140c48d1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PrinsFrank/pdfparser/zipball/4133a51fd40d9b7b71abe344f8731943140c48d1",
+                "reference": "4133a51fd40d9b7b71abe344f8731943140c48d1",
+                "shasum": ""
+            },
+            "require": {
+                "ext-gd": "*",
+                "ext-iconv": "*",
+                "ext-zlib": "*",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.65",
+                "phpstan/phpstan": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2",
+                "phpunit/phpunit": "^11.5",
+                "prinsfrank/pdf-samples": "0.0.9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PrinsFrank\\PdfParser\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "maintainable, fast & low-memory; built from scratch ",
+            "support": {
+                "issues": "https://github.com/PrinsFrank/pdfparser/issues",
+                "source": "https://github.com/PrinsFrank/pdfparser/tree/v2.3.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/PrinsFrank",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-08-10T18:49:17+00:00"
+        },
+        {
             "name": "psr/cache",
             "version": "3.0.0",
             "source": {
@@ -4205,57 +4255,6 @@
                 "source": "https://github.com/ramsey/uuid/tree/4.9.0"
             },
             "time": "2025-06-25T14:20:11+00:00"
-        },
-        {
-            "name": "smalot/pdfparser",
-            "version": "v2.12.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/smalot/pdfparser.git",
-                "reference": "98d31ba34ef5b5a98897ef4b6c3925d502ea53b1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/smalot/pdfparser/zipball/98d31ba34ef5b5a98897ef4b6c3925d502ea53b1",
-                "reference": "98d31ba34ef5b5a98897ef4b6c3925d502ea53b1",
-                "shasum": ""
-            },
-            "require": {
-                "ext-iconv": "*",
-                "ext-zlib": "*",
-                "php": ">=7.1",
-                "symfony/polyfill-mbstring": "^1.18"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Smalot\\PdfParser\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL-3.0"
-            ],
-            "authors": [
-                {
-                    "name": "Sebastien MALOT",
-                    "email": "sebastien@malot.fr"
-                }
-            ],
-            "description": "Pdf parser library. Can read and extract information from pdf file.",
-            "homepage": "https://www.pdfparser.org",
-            "keywords": [
-                "extract",
-                "parse",
-                "parser",
-                "pdf",
-                "text"
-            ],
-            "support": {
-                "issues": "https://github.com/smalot/pdfparser/issues",
-                "source": "https://github.com/smalot/pdfparser/tree/v2.12.1"
-            },
-            "time": "2025-07-31T06:19:56+00:00"
         },
         {
             "name": "symfony/clock",
