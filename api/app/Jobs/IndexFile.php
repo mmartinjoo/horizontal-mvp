@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Exceptions\EmbeddingException;
 use App\Exceptions\NoContentToIndexException;
 use App\Integrations\Storage\File;
 use App\Integrations\Storage\GoogleDrive;
@@ -160,7 +161,7 @@ class IndexFile implements ShouldQueue
                 'status' => 'warning',
                 'error_message' => $e->getMessage(),
             ]);
-            throw $e;
+            throw EmbeddingException::wrap($e);
         }
     }
 
