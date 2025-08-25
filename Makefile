@@ -1,5 +1,5 @@
 api:
-	php api/artisan serve
+	php api/artisan serve --port=9999
 
 frontend:
 	npm --prefix ./frontend run dev

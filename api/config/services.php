@@ -50,4 +50,13 @@ return [
     'pinecone' => [
         'api_key' => env('PINECONE_API_KEY'),
     ],
+
+    'google_drive' => [
+        'client_id' => env('GOOGLE_DRIVE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_DRIVE_CLIENT_SECRET'),
+        'refresh_token' => env('GOOGLE_DRIVE_REFRESH_TOKEN'),
+        'access_token' => env('GOOGLE_DRIVE_ACCESS_TOKEN'),
+        'webhook_url' => env('GOOGLE_DRIVE_WEBHOOK_URL'),
+        'webhook_id' => env('GOOGLE_DRIVE_WEBHOOK_ID'),
+    ],
 ];
