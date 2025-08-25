@@ -35,9 +35,9 @@ class GoogleDrive
     public function __construct(private FilePrioritizer $prioritizer)
     {
         $client = new Client();
-        $client->setClientId(config('services.client_id'));;
-        $client->setClientSecret(config('services.client_secret'));;
-        $client->refreshToken(config('services.refresh_token'));;
+        $client->setClientId(config('services.google_drive.client_id'));;
+        $client->setClientSecret(config('services.google_drive.client_secret'));;
+        $client->refreshToken(config('services.google_drive.refresh_token'));;
         $client->setApplicationName('Horizontal');
 
         $this->drive = new Drive($client);

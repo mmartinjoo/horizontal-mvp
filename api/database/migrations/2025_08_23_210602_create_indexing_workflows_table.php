@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('status');
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->string('job_id')->nullable();
+            $table->integer('deleted_items')->default(0);
+            $table->integer('skipped_items')->default(0);
             $table->timestamps();
         });
     }

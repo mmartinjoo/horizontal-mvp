@@ -21,6 +21,7 @@ class IndexedContent extends Model implements Embeddable
     protected $casts = [
         'metadata' => 'array',
         'embedding' => 'array',
+        'indexed_at' => 'datetime',
     ];
 
     public function chunks()

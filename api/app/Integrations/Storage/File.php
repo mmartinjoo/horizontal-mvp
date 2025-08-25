@@ -19,7 +19,7 @@ class File implements JsonSerializable
     public function __construct(private FileAttributes $file)
     {
         $this->createdAt = Carbon::parse("1900-01-01 00:00:00");
-        $this->updatedAt = Carbon::parse("1900-01-01 00:00:00");
+        $this->updatedAt = Carbon::createFromTimestamp($file->lastModified());
         $this->viewedAt = Carbon::parse("1900-01-01 00:00:00");
         $this->lastUsedAt = Carbon::parse("1900-01-01 00:00:00");
     }
@@ -40,6 +40,11 @@ class File implements JsonSerializable
     {
         $this->$viewedAt = Carbon::parse($viewedAt ?? "1900-01-01 00:00:00");
         $this->updateLastUsedAt();
+    }
+
+    public function getUpdatedAt(): Carbon
+    {
+        return $this->updatedAt;
     }
 
     public function updateLastUsedAt()

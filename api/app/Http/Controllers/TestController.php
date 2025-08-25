@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\IndexGoogleDrive;
+use App\Models\IndexedContent;
 use App\Models\User;
 
 class TestController extends Controller
@@ -11,7 +12,7 @@ class TestController extends Controller
     {
         $user = User::first();
         IndexGoogleDrive::dispatch($user);
-
+//
         return response('syncing ');
     }
 }
