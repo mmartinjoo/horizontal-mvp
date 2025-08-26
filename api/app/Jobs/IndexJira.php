@@ -34,13 +34,20 @@ class IndexJira implements ShouldQueue
         $jiraIntegration = JiraIntegration::where('team_id', $this->team->id)->firstOrFail();
         $projects = $jira->getProjects($this->team);
         foreach ($projects as $project) {
-            JiraProject::create([
-                'team_id' => $this->team->id,
-                'jira_integration_id' => $jiraIntegration->id,
-                'title' => $project['name'],
-                'key' => $project['key'],
-                'jira_id' => $project['id'],
-            ]);
+            $exists = JiraProject::query()
+                ->where('key', $project['key'])
+                ->where('team_id', $this->team->id)
+                ->exists();
+
+            if (!$exists) {
+                JiraProject::create([
+                    'team_id' => $this->team->id,
+                    'jira_integration_id' => $jiraIntegration->id,
+                    'title' => $project['name'],
+                    'key' => $project['key'],
+                    'jira_id' => $project['id'],
+                ]);
+            }
 
             $prios = ['high', 'medium', 'low'];
             foreach ($prios as $prio) {
@@ -50,9 +57,18 @@ class IndexJira implements ShouldQueue
                     'low' => ['from' => now()->subMonths(6), 'to' => now()->subMonths(3)],
                 };
                 $issues = $jira->getIssues($this->team, $project['key'], $dateRange['from'], $dateRange['to']);
-                foreach ($issues as $issueData) {
+                foreach ($issues as $i => $issueData) {
                     $description = $this->extractTextFromDescription($issueData['fields']['description']);
                     $issue = Issue::fromJira($issueData, $description);
+                    if (!$this->issueNeedsIndexing($issue)) {
+                        $indexing->increment('skipped_items', 1);
+                        if ($i === count($issues) - 1) {
+                            $indexing->update([
+                                'status' => 'completed',
+                            ]);
+                        }
+                        continue;
+                    }
                     $content = IndexedContent::create([
                         'team_id' => $this->team->id,
                         'user_id' => 1,
@@ -89,5 +105,18 @@ class IndexJira implements ShouldQueue
             }
         }
         return implode(' ', $textParts);
+    }
+
+    private function issueNeedsIndexing(Issue $issue): bool
+    {
+        $existingContent = IndexedContent::query()
+            ->where('source_id', $issue->id)
+            ->first();
+
+        if ($existingContent === null) {
+            return true;
+        }
+
+        return $issue->getLastUpdatedAt()->gt($existingContent->indexed_at);
     }
 }

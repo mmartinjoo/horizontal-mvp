@@ -66,7 +66,7 @@ class Jira
 
         $queryParams = [
             'jql' => $jql,
-            'maxResults' => 200,
+            'maxResults' => 1_000,
             'fields' => 'summary,status,assignee,created,updated,description',
         ];
 

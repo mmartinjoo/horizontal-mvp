@@ -18,6 +18,8 @@ return new class extends Migration
             $table->integer('jira_id');
             $table->foreignIdFor(JiraIntegration::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
+
+            $table->unique(['team_id', 'key']);
         });
     }
 

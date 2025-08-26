@@ -18,6 +18,12 @@ class Issue
     ) {
     }
 
+    public function getLastUpdatedAt(): Carbon
+    {
+        // If there were no updates, updatedAt is 1900-01-01
+        return $this->updatedAt->max($this->createdAt);
+    }
+
     public static function fromJira(array $data, string $description): self
     {
         return new static(

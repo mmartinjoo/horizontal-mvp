@@ -13,6 +13,7 @@ class TestController extends Controller
     {
         $user = User::where('email', 'jira@example.com')->firstOrFail();
         IndexJira::dispatch($user->team);
+//        IndexGoogleDrive::dispatch($user);
 
         return response('indexing...');
     }
