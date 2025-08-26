@@ -46,7 +46,7 @@ class IndexJira implements ShouldQueue
                         'source_type' => 'jira',
                         'source_id' => $issue['id'],
                         'source_url' => $issue['self'],
-                        'title' => $issue['key'],
+                        'title' => $issue['fields']['summary'],
                         'priority' => $prio,
                         'metadata' => $issue,
                     ]);

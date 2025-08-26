@@ -22,13 +22,15 @@ class Jira
         $integration = $this->getValidIntegration($team);
 
         $url = $this->buildApiUrl($integration, $endpoint);
-//        if (Str::contains($endpoint, 'jql')) {
-//            dd($url);
-//        }
 
+        if (Str::contains($endpoint, 'search')) {
+//            dd($url);
+        }
         $response = Http::withToken($integration->access_token)
             ->acceptJson()
-            ->{strtolower($method)}($url, $data);
+            ->throw()
+            ->get($url);
+//            ->{strtolower($method)}($url, $data);
 
         // If token is invalid, try to refresh and retry once
         if ($response->status() === 401) {
@@ -62,16 +64,15 @@ class Jira
 
     public function getIssues(Team $team, string $projectKey, Carbon $from, Carbon $to): array
     {
-        $jql = "project={$projectKey}";
+        $jql = "project={$projectKey} and created>=\"2025-08-26\"";
 
-        // and (created>=\"{$from->format('Y-m-d')}\" and created<=\"{$to->format('Y-m-d')}\")
         $queryParams = [
             'jql' => $jql,
-            'maxResults' => 50,
-            'fields' => 'summary,status,assignee,created,updated',
+            'maxResults' => 10,
+            'fields' => 'summary,status,assignee,created,updated,description',
         ];
 
-        $endpoint = '/rest/api/3/search?' . http_build_query($queryParams);
+        $endpoint = '/rest/api/3/search/jql?jql=project%3DCPG&fields=summary,status,assignee,created,updated';
         $response = $this->makeRequest($team, 'GET', $endpoint);
 
         if (!$response->successful()) {
