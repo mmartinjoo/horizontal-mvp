@@ -3,8 +3,10 @@
 namespace App\Jobs;
 
 use App\Integrations\Communication\Issue;
+use App\Integrations\Communication\IssueComment;
 use App\Integrations\Communication\Jira\Jira;
 use App\Models\IndexedContent;
+use App\Models\IndexedContentComment;
 use App\Models\IndexingWorkflow;
 use App\Models\IndexingWorkflowItem;
 use App\Models\JiraIntegration;
@@ -58,7 +60,7 @@ class IndexJira implements ShouldQueue
                 };
                 $issues = $jira->getIssues($this->team, $project['key'], $dateRange['from'], $dateRange['to']);
                 foreach ($issues as $i => $issueData) {
-                    $description = $this->extractTextFromDescription($issueData['fields']['description']);
+                    $description = $this->extractTextFromDocument($issueData['fields']['description']);
                     $issue = Issue::fromJira($issueData, $description);
                     if (!$this->issueNeedsIndexing($issue)) {
                         $indexing->increment('skipped_items', 1);
@@ -69,6 +71,8 @@ class IndexJira implements ShouldQueue
                         }
                         continue;
                     }
+                    $count = IndexedContent::where('source_id', $issue->id)->delete();
+                    $indexing->increment('deleted_items', $count);
                     $content = IndexedContent::create([
                         'team_id' => $this->team->id,
                         'user_id' => 1,
@@ -86,19 +90,37 @@ class IndexJira implements ShouldQueue
                         'indexed_content_id' => $content->id,
                     ]);
                     IndexIssue::dispatch($issue, $indexingItem->id);
+
+                    $commentsData = $jira->getIssueComments($this->team, $issue);
+                    $bodies = [];
+                    foreach ($commentsData as $commentData) {
+                        $bodies[] = $this->extractTextFromDocument($commentData['body']);
+                    }
+                    $comments = IssueComment::collectJira($commentsData, $bodies);
+                    foreach ($comments as $comment) {
+                        $indexedComment = IndexedContentComment::create([
+                            'indexed_content_id' => $content->id,
+                            'body' => $comment->body,
+                            'author' => $comment->author,
+                            'commented_at' => $comment->createdAt,
+                            'comment_id' => $comment->id,
+                            'metadata' => $comment,
+                        ]);
+                        IndexIssueComment::dispatch($issue, $indexedComment);
+                    }
                 }
             }
         }
     }
 
-    private function extractTextFromDescription(array $array): string
+    private function extractTextFromDocument(array $array): string
     {
         $textParts = [];
         foreach ($array as $key => $value) {
             if ($key === 'text' && is_string($value)) {
                 $textParts[] = $value;
             } elseif (is_array($value)) {
-                $nestedText = $this->extractTextFromDescription($value);
+                $nestedText = $this->extractTextFromDocument($value);
                 if (!empty($nestedText)) {
                     $textParts[] = $nestedText;
                 }

@@ -3,6 +3,7 @@
 namespace App\Integrations\Communication;
 
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class IssueComment
 {
@@ -14,13 +15,20 @@ class IssueComment
     ) {
     }
 
-    public function fromJira(array $data): self
+    /**
+     * @return Collection<IssueComment>
+     */
+    public static function collectJira(array $jiraComments, array $parsedBodies): Collection
     {
-        return new static(
-            id: $data['id'],
-            body: $data['body'],
-            author: $data['author']['displayName'],
-            createdAt: Carbon::parse($data['created']),
-        );
+        $comments = collect();
+        foreach ($jiraComments as $i => $comment) {
+            $comments[] = new static(
+                id: $comment['id'],
+                body: $parsedBodies[$i] ?? '',
+                author: $comment['author']['displayName'],
+                createdAt: Carbon::parse($comment['created']),
+            );
+        }
+        return $comments;
     }
 }

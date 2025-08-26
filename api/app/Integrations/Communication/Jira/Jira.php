@@ -89,7 +89,7 @@ class Jira
             throw new Exception('Failed to fetch issue comments: ' . $response->body());
         }
 
-        return $response->json();
+        return $response->json('comments');
     }
 
     private function getValidIntegration(Team $team): JiraIntegration

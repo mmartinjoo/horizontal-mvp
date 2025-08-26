@@ -29,6 +29,11 @@ class IndexedContent extends Model implements Embeddable
         return $this->hasMany(IndexedContentChunk::class);
     }
 
+    public function comments()
+    {
+        return $this->hasMany(IndexedContentComment::class);
+    }
+
     public function getEmbeddableContent(): string
     {
         if (!$this->body && !$this->preview) {
