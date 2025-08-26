@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Jira;
+namespace App\Integrations\Communication\Jira;
 
 use App\Models\JiraIntegration;
 use App\Models\Team;
@@ -8,7 +8,7 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class JiraApiClient
+class Jira
 {
     public function __construct(
         private JiraTokenManager $tokenManager
@@ -142,9 +142,9 @@ class JiraApiClient
         if (!$integration->cloud_id) {
             throw new \Exception('Cloud ID is required for Jira API calls');
         }
-        
+
         $endpoint = ltrim($endpoint, '/');
-        
+
         // Use Atlassian gateway API with cloud ID
         return 'https://api.atlassian.com/ex/jira/' . $integration->cloud_id . '/' . $endpoint;
     }

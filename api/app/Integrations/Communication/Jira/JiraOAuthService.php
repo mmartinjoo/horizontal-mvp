@@ -1,11 +1,8 @@
 <?php
 
-namespace App\Services\Jira;
+namespace App\Integrations\Communication\Jira;
 
-use App\Models\JiraIntegration;
-use App\Models\Team;
 use Exception;
-use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 

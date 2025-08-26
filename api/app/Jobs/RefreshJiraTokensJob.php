@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Services\Jira\JiraTokenManager;
+use App\Integrations\Communication\Jira\JiraTokenManager;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -21,7 +21,7 @@ class RefreshJiraTokensJob implements ShouldQueue
         try {
             // Refresh tokens expiring in the next 30 minutes
             $refreshedCount = $tokenManager->refreshTokensExpiringSoon(30);
-            
+
             Log::info('Scheduled Jira token refresh completed', [
                 'refreshed_count' => $refreshedCount,
             ]);
@@ -29,7 +29,7 @@ class RefreshJiraTokensJob implements ShouldQueue
             Log::error('Scheduled Jira token refresh failed', [
                 'error' => $e->getMessage(),
             ]);
-            
+
             throw $e; // Re-throw to mark job as failed
         }
     }

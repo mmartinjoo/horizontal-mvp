@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Integrations\Communication\Jira\JiraTokenManager;
 use App\Jobs\IndexGoogleDrive;
-use App\Models\IndexedContent;
 use App\Models\User;
-use App\Services\Jira\JiraTokenManager;
 
 class TestController extends Controller
 {
@@ -42,7 +41,7 @@ class TestController extends Controller
         }
 
         try {
-            $jiraClient = app(\App\Services\Jira\JiraApiClient::class);
+            $jiraClient = app(\App\Integrations\Communication\Jira\Jira::class);
 
             // Get current user info
             $user = $jiraClient->getCurrentUser($team);

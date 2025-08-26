@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Jira;
+namespace App\Integrations\Communication\Jira;
 
 use App\Models\JiraIntegration;
 use Illuminate\Support\Facades\Log;
@@ -127,7 +127,7 @@ class JiraTokenManager
                 return $this->refreshToken($integration);
             } catch (\Exception $e) {
                 $lastException = $e;
-                
+
                 Log::warning('Token refresh retry failed', [
                     'integration_id' => $integration->id,
                     'attempt' => $attempt,
@@ -212,7 +212,7 @@ class JiraTokenManager
     public function cleanupExpiredTokens(int $daysOld = 30): int
     {
         $cutoffDate = now()->subDays($daysOld);
-        
+
         $expiredIntegrations = JiraIntegration::where('expires_at', '<=', $cutoffDate)
             ->whereNull('refresh_token')
             ->get();

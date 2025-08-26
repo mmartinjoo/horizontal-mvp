@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Services\Jira\JiraOAuthService;
+use App\Integrations\Communication\Jira\JiraOAuthService;
 use App\Services\LLM\Anthropic;
 use App\Services\LLM\Embedder;
 use App\Services\LLM\Fireworks;
