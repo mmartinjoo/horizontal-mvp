@@ -14,9 +14,6 @@ class Jira
         private JiraTokenManager $tokenManager
     ) {}
 
-    /**
-     * Make an authenticated request to the Jira API
-     */
     public function makeRequest(Team $team, string $method, string $endpoint, array $data = []): Response
     {
         $integration = $this->getValidIntegration($team);
@@ -46,9 +43,6 @@ class Jira
         return $response;
     }
 
-    /**
-     * Get a list of projects for the team
-     */
     public function getProjects(Team $team): array
     {
         $response = $this->makeRequest($team, 'GET', '/rest/api/3/project');
@@ -60,9 +54,6 @@ class Jira
         return $response->json();
     }
 
-    /**
-     * Get issues from a specific project
-     */
     public function getIssues(Team $team, string $projectKey, array $options = []): array
     {
         $jql = "project = {$projectKey}";
@@ -87,9 +78,6 @@ class Jira
         return $response->json();
     }
 
-    /**
-     * Get current user information
-     */
     public function getCurrentUser(Team $team): array
     {
         $response = $this->makeRequest($team, 'GET', '/rest/api/3/myself');
@@ -101,9 +89,6 @@ class Jira
         return $response->json();
     }
 
-    /**
-     * Get issue comments
-     */
     public function getIssueComments(Team $team, string $issueKey): array
     {
         $response = $this->makeRequest($team, 'GET', "/rest/api/3/issue/{$issueKey}/comment");
@@ -115,9 +100,6 @@ class Jira
         return $response->json();
     }
 
-    /**
-     * Get a valid integration with fresh tokens
-     */
     private function getValidIntegration(Team $team): JiraIntegration
     {
         $integration = JiraIntegration::where('team_id', $team->id)->first();
@@ -134,9 +116,6 @@ class Jira
         return $integration->fresh(); // Reload in case token was refreshed
     }
 
-    /**
-     * Build the full API URL using Atlassian gateway
-     */
     private function buildApiUrl(JiraIntegration $integration, string $endpoint): string
     {
         if (!$integration->cloud_id) {
@@ -145,7 +124,6 @@ class Jira
 
         $endpoint = ltrim($endpoint, '/');
 
-        // Use Atlassian gateway API with cloud ID
         return 'https://api.atlassian.com/ex/jira/' . $integration->cloud_id . '/' . $endpoint;
     }
 }

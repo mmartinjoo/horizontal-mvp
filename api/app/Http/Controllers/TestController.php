@@ -4,16 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Integrations\Communication\Jira\JiraTokenManager;
 use App\Jobs\IndexGoogleDrive;
+use App\Jobs\IndexJira;
 use App\Models\User;
 
 class TestController extends Controller
 {
     public function index()
     {
-        $user = User::first();
-        IndexGoogleDrive::dispatch($user);
-//
-        return response('syncing ');
+        $user = User::where('email', 'jira@example.com')->firstOrFail();
+        IndexJira::dispatch($user->team);
+
+        return response('indexing...');
     }
 
     public function token()
