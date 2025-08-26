@@ -27,7 +27,8 @@ return new class extends Migration
           ALTER TABLE indexed_content_comments
           ADD COLUMN search_vector tsvector
           GENERATED ALWAYS AS (
-              setweight(to_tsvector('english', body), 'A')
+              setweight(to_tsvector('english', body), 'A') ||
+              setweight(to_tsvector('english', author), 'B')
           ) STORED
       ");
 

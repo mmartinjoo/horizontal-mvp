@@ -7,7 +7,7 @@ use App\Integrations\Storage\GoogleDrive;
 use App\Models\IndexedContent;
 use App\Models\IndexingWorkflow;
 use App\Models\IndexingWorkflowItem;
-use App\Models\User;
+use App\Models\Team;
 use App\Services\Indexing\FilePrioritizer;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -17,7 +17,7 @@ class IndexGoogleDrive implements ShouldQueue
     use Queueable;
 
     public function __construct(
-        private User $user,
+        private Team $team,
     ) {
     }
 
@@ -27,10 +27,10 @@ class IndexGoogleDrive implements ShouldQueue
         $indexing = IndexingWorkflow::create([
             'integration' => 'google_drive',
             'status' => 'downloading',
-            'user_id' => $this->user->id,
+            'team_id' => $this->team->id,
             'job_id' => $this->job->payload()['uuid'],
         ]);
-        $files = $drive->listDirectoryContents();
+        $files = $drive->listDirectoryContents('deQenQ/test');
         $contents = $prioritizer->prioritize($files);
         $indexing->update([
             'status' => 'downloaded',
@@ -48,11 +48,15 @@ class IndexGoogleDrive implements ShouldQueue
                     }
                     continue;
                 }
-                $count = IndexedContent::where('source_id', $file->extraMetadata()['id'])->delete();
+                $count = IndexedContent::query()
+                    ->where('team_id', $this->team->id)
+                    ->where('source_type', 'google_drive')
+                    ->where('source_id', $file->extraMetadata()['id'])
+                    ->delete();
+
                 $indexing->increment('deleted_items', $count);
                 $content = IndexedContent::create([
-                    'user_id' => $this->user->id,
-                    'team_id' => $this->user->team_id,
+                    'team_id' => $this->team->id,
                     'source_type' => 'google_drive',
                     'source_id' => $file->extraMetadata()['id'],
                     'title' => $file->path(),

@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('indexed_contents', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Team::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(User::class)->nullable()->constrained()->cascadeOnDelete();
 
             $table->string('source_type');
             $table->string('source_id');

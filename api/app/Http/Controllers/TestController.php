@@ -5,26 +5,22 @@ namespace App\Http\Controllers;
 use App\Integrations\Communication\Jira\JiraTokenManager;
 use App\Jobs\IndexGoogleDrive;
 use App\Jobs\IndexJira;
-use App\Models\IndexedContent;
-use App\Models\User;
+use App\Models\Team;
 
 class TestController extends Controller
 {
     public function index()
     {
-//        $user = User::where('email', 'jira@example.com')->firstOrFail();
-//        IndexJira::dispatch($user->team);
-//        IndexGoogleDrive::dispatch($user);
+        $team = Team::where('name', 'Test Company')->firstOrFail();
+        IndexJira::dispatch($team);
+//        IndexGoogleDrive::dispatch($team);
 
-        $content = IndexedContent::find(218);
-        return $content->getParticipants();
-
-//        return response('indexing...');
+        return response('indexing...');
     }
 
     public function token()
     {
-        $team = \App\Models\Team::create(['name' => 'Test Company']);
+        $team = \App\Models\Team::where(['name' => 'Test Company'])->firstOrFail();
 
         $user = \App\Models\User::create([
             'name' => 'Test User',

@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\Models\Team;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('integration');
             $table->integer('overall_items')->default(0);
             $table->string('status');
-            $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Team::class)->constrained()->cascadeOnDelete();
             $table->string('job_id')->nullable();
             $table->integer('deleted_items')->default(0);
             $table->integer('skipped_items')->default(0);

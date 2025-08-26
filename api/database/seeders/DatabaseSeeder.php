@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\IndexedContent;
+use App\Models\Team;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -18,7 +19,8 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
-
-        IndexedContent::factory()->count(5)->create();
+        Team::factory()->create([
+            'name' => 'Test Company',
+        ]);
     }
 }

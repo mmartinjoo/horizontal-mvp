@@ -29,7 +29,7 @@ class IndexJira implements ShouldQueue
         $indexing = IndexingWorkflow::create([
             'integration' => 'jira',
             'status' => 'syncing',
-            'user_id' => $this->team->users->first()->id,
+            'team_id' => $this->team->id,
             'job_id' => $this->job->payload()['uuid'],
         ]);
 
@@ -59,6 +59,7 @@ class IndexJira implements ShouldQueue
                     'low' => ['from' => now()->subMonths(6), 'to' => now()->subMonths(3)],
                 };
                 $issues = $jira->getIssues($this->team, $project['key'], $dateRange['from'], $dateRange['to']);
+                $indexing->increment('overall_items', count($issues));
                 foreach ($issues as $i => $issueData) {
                     $description = $this->extractTextFromDocument($issueData['fields']['description']);
                     $issue = Issue::fromJira($issueData, $description);
@@ -71,11 +72,15 @@ class IndexJira implements ShouldQueue
                         }
                         continue;
                     }
-                    $count = IndexedContent::where('source_id', $issue->id)->delete();
+                    $count = IndexedContent::query()
+                        ->where('team_id', $this->team->id)
+                        ->where('source_type', 'jira')
+                        ->where('source_id', $issue->id)
+                        ->delete();
+
                     $indexing->increment('deleted_items', $count);
                     $content = IndexedContent::create([
                         'team_id' => $this->team->id,
-                        'user_id' => 1,
                         'source_type' => 'jira',
                         'source_id' => $issue->id,
                         'source_url' => $issue->url,
