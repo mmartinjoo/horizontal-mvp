@@ -5,17 +5,21 @@ namespace App\Http\Controllers;
 use App\Integrations\Communication\Jira\JiraTokenManager;
 use App\Jobs\IndexGoogleDrive;
 use App\Jobs\IndexJira;
+use App\Models\IndexedContent;
 use App\Models\User;
 
 class TestController extends Controller
 {
     public function index()
     {
-        $user = User::where('email', 'jira@example.com')->firstOrFail();
-        IndexJira::dispatch($user->team);
+//        $user = User::where('email', 'jira@example.com')->firstOrFail();
+//        IndexJira::dispatch($user->team);
 //        IndexGoogleDrive::dispatch($user);
 
-        return response('indexing...');
+        $content = IndexedContent::find(218);
+        return $content->getParticipants();
+
+//        return response('indexing...');
     }
 
     public function token()

@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Exceptions\NoEmbeddingsException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 class IndexedContent extends Model implements Embeddable
 {
@@ -43,5 +45,18 @@ class IndexedContent extends Model implements Embeddable
             return $this->preview;
         }
         return $this->body;
+    }
+
+    public function getParticipants(): Collection
+    {
+        $participants = collect();
+        if ($this->source_type === 'jira') {
+            $participants[] = Arr::get($this->metadata, 'fields.assignee.displayName');
+
+            foreach ($this->comments as $comment) {
+                $participants[] = $comment->author;
+            }
+        }
+        return $participants->unique();
     }
 }
