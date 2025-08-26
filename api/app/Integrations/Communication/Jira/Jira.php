@@ -60,15 +60,17 @@ class Jira
 
     public function getIssues(Team $team, string $projectKey, Carbon $from, Carbon $to): array
     {
-        $jql = "project={$projectKey} and created>=\"2025-08-26\"";
+        $fromDate = $from->format('Y-m-d');
+        $toDate = $to->format('Y-m-d');
+        $jql = "project={$projectKey} and created>=\"$fromDate\" and created<=\"$toDate\" order by created desc";
 
         $queryParams = [
             'jql' => $jql,
-            'maxResults' => 10,
-            'fields' => 'summary,status,assignee,created,updated,description',
+            'maxResults' => 200,
+            'fields' => 'summary,status,assignee,created,updated',
         ];
 
-        $endpoint = '/rest/api/3/search/jql?jql=project%3DCPG&fields=summary,status,assignee,created,updated';
+        $endpoint = '/rest/api/3/search/jql?' . http_build_query($queryParams);
         $response = $this->makeRequest($team, $endpoint);
 
         if (!$response->successful()) {
