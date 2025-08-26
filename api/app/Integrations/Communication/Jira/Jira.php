@@ -4,9 +4,12 @@ namespace App\Integrations\Communication\Jira;
 
 use App\Models\JiraIntegration;
 use App\Models\Team;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class Jira
 {
@@ -19,6 +22,9 @@ class Jira
         $integration = $this->getValidIntegration($team);
 
         $url = $this->buildApiUrl($integration, $endpoint);
+//        if (Str::contains($endpoint, 'jql')) {
+//            dd($url);
+//        }
 
         $response = Http::withToken($integration->access_token)
             ->acceptJson()
@@ -48,34 +54,31 @@ class Jira
         $response = $this->makeRequest($team, 'GET', '/rest/api/3/project');
 
         if (!$response->successful()) {
-            throw new \Exception('Failed to fetch Jira projects: ' . $response->body());
+            throw new Exception('Failed to fetch Jira projects: ' . $response->body());
         }
 
         return $response->json();
     }
 
-    public function getIssues(Team $team, string $projectKey, array $options = []): array
+    public function getIssues(Team $team, string $projectKey, Carbon $from, Carbon $to): array
     {
-        $jql = "project = {$projectKey}";
+        $jql = "project={$projectKey}";
 
-        if (isset($options['status'])) {
-            $jql .= " AND status = '{$options['status']}'";
-        }
-
-        $queryParams = array_merge([
+        // and (created>=\"{$from->format('Y-m-d')}\" and created<=\"{$to->format('Y-m-d')}\")
+        $queryParams = [
             'jql' => $jql,
             'maxResults' => 50,
             'fields' => 'summary,status,assignee,created,updated',
-        ], $options);
+        ];
 
         $endpoint = '/rest/api/3/search?' . http_build_query($queryParams);
         $response = $this->makeRequest($team, 'GET', $endpoint);
 
         if (!$response->successful()) {
-            throw new \Exception('Failed to fetch Jira issues: ' . $response->body());
+            throw new Exception('Failed to fetch Jira issues: ' . $response->body());
         }
 
-        return $response->json();
+        return $response->json('issues');
     }
 
     public function getCurrentUser(Team $team): array
@@ -83,7 +86,7 @@ class Jira
         $response = $this->makeRequest($team, 'GET', '/rest/api/3/myself');
 
         if (!$response->successful()) {
-            throw new \Exception('Failed to fetch current user: ' . $response->body());
+            throw new Exception('Failed to fetch current user: ' . $response->body());
         }
 
         return $response->json();
@@ -94,7 +97,7 @@ class Jira
         $response = $this->makeRequest($team, 'GET', "/rest/api/3/issue/{$issueKey}/comment");
 
         if (!$response->successful()) {
-            throw new \Exception('Failed to fetch issue comments: ' . $response->body());
+            throw new Exception('Failed to fetch issue comments: ' . $response->body());
         }
 
         return $response->json();
@@ -105,12 +108,12 @@ class Jira
         $integration = JiraIntegration::where('team_id', $team->id)->first();
 
         if (!$integration) {
-            throw new \Exception('No Jira integration found for team');
+            throw new Exception('No Jira integration found for team');
         }
 
         // Ensure token is valid (refresh if needed)
         if (!$this->tokenManager->ensureValidToken($integration)) {
-            throw new \Exception('Unable to obtain valid Jira token');
+            throw new Exception('Unable to obtain valid Jira token');
         }
 
         return $integration->fresh(); // Reload in case token was refreshed
@@ -119,7 +122,7 @@ class Jira
     private function buildApiUrl(JiraIntegration $integration, string $endpoint): string
     {
         if (!$integration->cloud_id) {
-            throw new \Exception('Cloud ID is required for Jira API calls');
+            throw new Exception('Cloud ID is required for Jira API calls');
         }
 
         $endpoint = ltrim($endpoint, '/');
