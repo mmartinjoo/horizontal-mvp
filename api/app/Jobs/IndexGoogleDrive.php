@@ -65,7 +65,7 @@ class IndexGoogleDrive implements ShouldQueue
                     'status' => 'queued',
                     'indexed_content_id' => $content->id,
                 ]);
-                IndexFile::dispatch($indexingItem->id, $file, $prio);
+                IndexFile::dispatch($indexingItem->id, $file);
             }
         }
     }

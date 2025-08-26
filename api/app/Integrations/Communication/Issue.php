@@ -24,10 +24,19 @@ class Issue
             id: $data['key'],
             title: Arr::get($data, 'fields.summary', ''),
             description: $description,
-            assignee: Arr::get($data, 'fields.assignee.displayName'),
+            assignee: Arr::get($data, 'fields.assignee.displayName', ''),
             url: Arr::get($data, 'self'),
             createdAt: Carbon::parse(Arr::get($data, 'fields.created', '1900-01-01T00:00:00.000+0000')),
             updatedAt: Carbon::parse(Arr::get($data, 'fields.updated', '1900-01-01T00:00:00.000+0000')),
         );
+    }
+
+    public function toString(): string
+    {
+        $str = '';
+        foreach ($this as $key => $value) {
+            $str .= $key . ':' . $value . ' ';
+        }
+        return $str;
     }
 }

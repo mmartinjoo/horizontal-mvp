@@ -5,6 +5,8 @@ namespace App\Jobs;
 use App\Integrations\Communication\Issue;
 use App\Integrations\Communication\Jira\Jira;
 use App\Models\IndexedContent;
+use App\Models\IndexingWorkflow;
+use App\Models\IndexingWorkflowItem;
 use App\Models\JiraIntegration;
 use App\Models\JiraProject;
 use App\Models\Team;
@@ -21,6 +23,14 @@ class IndexJira implements ShouldQueue
 
     public function handle(Jira $jira): void
     {
+        /** @var IndexingWorkflow $indexing */
+        $indexing = IndexingWorkflow::create([
+            'integration' => 'jira',
+            'status' => 'syncing',
+            'user_id' => $this->team->users->first()->id,
+            'job_id' => $this->job->payload()['uuid'],
+        ]);
+
         $jiraIntegration = JiraIntegration::where('team_id', $this->team->id)->firstOrFail();
         $projects = $jira->getProjects($this->team);
         foreach ($projects as $project) {
@@ -43,7 +53,7 @@ class IndexJira implements ShouldQueue
                 foreach ($issues as $issueData) {
                     $description = $this->extractTextFromDescription($issueData['fields']['description']);
                     $issue = Issue::fromJira($issueData, $description);
-                    IndexedContent::create([
+                    $content = IndexedContent::create([
                         'team_id' => $this->team->id,
                         'user_id' => 1,
                         'source_type' => 'jira',
@@ -53,7 +63,13 @@ class IndexJira implements ShouldQueue
                         'priority' => $prio,
                         'metadata' => $issueData,
                     ]);
-                    IndexIssue::dispatch($issue);
+                    $indexingItem = IndexingWorkflowItem::create([
+                        'indexing_workflow_id' => $indexing->id,
+                        'data' => $issue,
+                        'status' => 'queued',
+                        'indexed_content_id' => $content->id,
+                    ]);
+                    IndexIssue::dispatch($issue, $indexingItem->id);
                 }
             }
         }
