@@ -2,6 +2,7 @@
 
 namespace App\Integrations\Communication\Jira;
 
+use App\Integrations\Communication\Issue;
 use App\Models\JiraIntegration;
 use App\Models\Team;
 use Carbon\Carbon;
@@ -80,20 +81,9 @@ class Jira
         return $response->json('issues');
     }
 
-    public function getCurrentUser(Team $team): array
+    public function getIssueComments(Team $team, Issue $issue): array
     {
-        $response = $this->makeRequest($team, '/rest/api/3/myself');
-
-        if (!$response->successful()) {
-            throw new Exception('Failed to fetch current user: ' . $response->body());
-        }
-
-        return $response->json();
-    }
-
-    public function getIssueComments(Team $team, string $issueKey): array
-    {
-        $response = $this->makeRequest($team, "/rest/api/3/issue/{$issueKey}/comment");
+        $response = $this->makeRequest($team, "/rest/api/3/issue/{$issue->id}/comment");
 
         if (!$response->successful()) {
             throw new Exception('Failed to fetch issue comments: ' . $response->body());
