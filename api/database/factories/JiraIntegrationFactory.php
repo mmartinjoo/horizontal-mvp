@@ -23,6 +23,7 @@ class JiraIntegrationFactory extends Factory
                 'https://acme-corp.atlassian.net',
                 'https://test-org.atlassian.net',
             ]),
+            'cloud_id' => $this->faker->uuid(),
             'access_token' => $this->faker->sha256(),
             'refresh_token' => $this->faker->sha256(),
             'expires_at' => now()->addHours(1),

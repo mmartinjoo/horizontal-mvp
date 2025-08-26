@@ -8,8 +8,10 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::get('/test', [\App\Http\Controllers\TestController::class, 'index']);;
-Route::get('/test/jira', [\App\Http\Controllers\TestController::class, 'jira']);;
+Route::get('/test', [\App\Http\Controllers\TestController::class, 'index']);
+Route::get('/test/jira', [\App\Http\Controllers\TestController::class, 'jira']);
+Route::get('/test/token', [\App\Http\Controllers\TestController::class, 'token']);
+Route::get('/test/refresh', [\App\Http\Controllers\TestController::class, 'refresh']);
 
 // Jira OAuth integration routes
 Route::get('/integrations/jira/oauth/callback', [JiraIntegrationController::class, 'callback']);

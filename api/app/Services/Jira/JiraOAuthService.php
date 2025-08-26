@@ -18,6 +18,7 @@ class JiraOAuthService
     private array $scopes = [
         'read:jira-user',
         'read:jira-work',
+        'offline_access',
     ];
 
     public function __construct(

@@ -80,6 +80,22 @@ class JiraIntegrationController extends Controller
             // Exchange authorization code for access token
             $tokenData = $this->jiraOAuthService->exchangeCodeForToken($code, $state);
 
+            // Get accessible resources to find cloud ID
+            $accessibleResources = $this->jiraOAuthService->getAccessibleResources($tokenData['access_token']);
+
+            // Find the matching Jira instance by URL
+            $cloudId = null;
+            foreach ($accessibleResources as $resource) {
+                if (isset($resource['url']) && str_contains($resource['url'], parse_url($jiraBaseUrl, PHP_URL_HOST))) {
+                    $cloudId = $resource['id'];
+                    break;
+                }
+            }
+
+            if (!$cloudId) {
+                throw new \Exception('Could not find cloud ID for Jira instance');
+            }
+
             // Calculate token expiration time
             $expiresAt = now()->addSeconds($tokenData['expires_in'] ?? 3600);
 
@@ -87,6 +103,7 @@ class JiraIntegrationController extends Controller
             $integration = JiraIntegration::create([
                 'team_id' => $teamId,
                 'jira_base_url' => $jiraBaseUrl,
+                'cloud_id' => $cloudId,
                 'access_token' => $tokenData['access_token'],
                 'refresh_token' => $tokenData['refresh_token'] ?? null,
                 'expires_at' => $expiresAt,
