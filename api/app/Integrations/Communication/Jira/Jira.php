@@ -17,20 +17,16 @@ class Jira
         private JiraTokenManager $tokenManager
     ) {}
 
-    public function makeRequest(Team $team, string $method, string $endpoint, array $data = []): Response
+    public function makeRequest(Team $team, string $endpoint): Response
     {
         $integration = $this->getValidIntegration($team);
 
         $url = $this->buildApiUrl($integration, $endpoint);
 
-        if (Str::contains($endpoint, 'search')) {
-//            dd($url);
-        }
         $response = Http::withToken($integration->access_token)
             ->acceptJson()
             ->throw()
             ->get($url);
-//            ->{strtolower($method)}($url, $data);
 
         // If token is invalid, try to refresh and retry once
         if ($response->status() === 401) {
@@ -44,7 +40,7 @@ class Jira
                 $integration->refresh();
                 $response = Http::withToken($integration->access_token)
                     ->acceptJson()
-                    ->{strtolower($method)}($url, $data);
+                    ->get($url);
             }
         }
 
@@ -53,7 +49,7 @@ class Jira
 
     public function getProjects(Team $team): array
     {
-        $response = $this->makeRequest($team, 'GET', '/rest/api/3/project');
+        $response = $this->makeRequest($team, '/rest/api/3/project');
 
         if (!$response->successful()) {
             throw new Exception('Failed to fetch Jira projects: ' . $response->body());
@@ -73,7 +69,7 @@ class Jira
         ];
 
         $endpoint = '/rest/api/3/search/jql?jql=project%3DCPG&fields=summary,status,assignee,created,updated';
-        $response = $this->makeRequest($team, 'GET', $endpoint);
+        $response = $this->makeRequest($team, $endpoint);
 
         if (!$response->successful()) {
             throw new Exception('Failed to fetch Jira issues: ' . $response->body());
@@ -84,7 +80,7 @@ class Jira
 
     public function getCurrentUser(Team $team): array
     {
-        $response = $this->makeRequest($team, 'GET', '/rest/api/3/myself');
+        $response = $this->makeRequest($team, '/rest/api/3/myself');
 
         if (!$response->successful()) {
             throw new Exception('Failed to fetch current user: ' . $response->body());
@@ -95,7 +91,7 @@ class Jira
 
     public function getIssueComments(Team $team, string $issueKey): array
     {
-        $response = $this->makeRequest($team, 'GET', "/rest/api/3/issue/{$issueKey}/comment");
+        $response = $this->makeRequest($team, "/rest/api/3/issue/{$issueKey}/comment");
 
         if (!$response->successful()) {
             throw new Exception('Failed to fetch issue comments: ' . $response->body());
