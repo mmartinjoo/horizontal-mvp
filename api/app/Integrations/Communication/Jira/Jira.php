@@ -67,7 +67,7 @@ class Jira
         $queryParams = [
             'jql' => $jql,
             'maxResults' => 200,
-            'fields' => 'summary,status,assignee,created,updated',
+            'fields' => 'summary,status,assignee,created,updated,description',
         ];
 
         $endpoint = '/rest/api/3/search/jql?' . http_build_query($queryParams);

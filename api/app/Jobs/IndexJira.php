@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Integrations\Communication\Issue;
 use App\Integrations\Communication\Jira\Jira;
 use App\Models\IndexedContent;
 use App\Models\JiraIntegration;
@@ -39,19 +40,38 @@ class IndexJira implements ShouldQueue
                     'low' => ['from' => now()->subMonths(6), 'to' => now()->subMonths(3)],
                 };
                 $issues = $jira->getIssues($this->team, $project['key'], $dateRange['from'], $dateRange['to']);
-                foreach ($issues as $issue) {
+                foreach ($issues as $issueData) {
+                    $description = $this->extractTextFromDescription($issueData['fields']['description']);
+                    $issue = Issue::fromJira($issueData, $description);
                     IndexedContent::create([
                         'team_id' => $this->team->id,
                         'user_id' => 1,
                         'source_type' => 'jira',
-                        'source_id' => $issue['id'],
-                        'source_url' => $issue['self'],
-                        'title' => $issue['fields']['summary'],
+                        'source_id' => $issue->id,
+                        'source_url' => $issue->url,
+                        'title' => $issue->title,
                         'priority' => $prio,
-                        'metadata' => $issue,
+                        'metadata' => $issueData,
                     ]);
+                    IndexIssue::dispatch($issue);
                 }
             }
         }
+    }
+
+    private function extractTextFromDescription(array $array): string
+    {
+        $textParts = [];
+        foreach ($array as $key => $value) {
+            if ($key === 'text' && is_string($value)) {
+                $textParts[] = $value;
+            } elseif (is_array($value)) {
+                $nestedText = $this->extractTextFromDescription($value);
+                if (!empty($nestedText)) {
+                    $textParts[] = $nestedText;
+                }
+            }
+        }
+        return implode(' ', $textParts);
     }
 }
