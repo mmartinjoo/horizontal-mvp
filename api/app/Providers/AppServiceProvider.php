@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\Jira\JiraOAuthService;
 use App\Services\LLM\Anthropic;
 use App\Services\LLM\Embedder;
 use App\Services\LLM\Fireworks;
@@ -55,5 +56,20 @@ class AppServiceProvider extends ServiceProvider
             ->bind(VectorStore::class, function () {
                 return VectorStoreFactory::create();
             });
+
+        $this->app
+            ->when(JiraOAuthService::class)
+            ->needs('$clientId')
+            ->give(config('services.jira.client_id'));
+
+        $this->app
+            ->when(JiraOAuthService::class)
+            ->needs('$clientSecret')
+            ->give(config('services.jira.client_secret'));
+
+        $this->app
+            ->when(JiraOAuthService::class)
+            ->needs('$redirectUri')
+            ->give(config('services.jira.redirect_uri'));
     }
 }

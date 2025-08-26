@@ -1,61 +1,226 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+1. Environment Setup
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+First, make sure you have the required environment variables in
+your .env file:
 
-## About Laravel
+# Add these to your .env file
+JIRA_CLIENT_ID=your_actual_jira_client_id
+JIRA_CLIENT_SECRET=your_actual_jira_client_secret
+JIRA_REDIRECT_URI=http://localhost:8000/api/integrations/jira/o
+auth/callback
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Getting Jira OAuth Credentials:
+1. Go to https://developer.atlassian.com/console/myapps/
+2. Create a new app or use existing one
+3. Add OAuth 2.0 (3LO) authorization
+4. Set redirect URL to:
+   http://localhost:8000/api/integrations/jira/oauth/callback
+5. Copy the Client ID and Client Secret
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+2. Start Your Development Environment
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+# Start Laravel with queue worker, logs, and Vite
+composer run dev
 
-## Learning Laravel
+# Or individually:
+php artisan serve              # Starts server on
+http://localhost:8000
+php artisan queue:work         # For background jobs
+php artisan pail               # For real-time logs
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+3. Create Test User and Team
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Since the system requires authentication, create a test user
+with a team:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+php artisan tinker
 
-## Laravel Sponsors
+// In Tinker console:
+$team = \App\Models\Team::create(['name' => 'Test Company']);
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+$user = \App\Models\User::create([
+'name' => 'Test User',
+'email' => 'test@example.com',
+'password' => bcrypt('password'),
+'team_id' => $team->id
+]);
 
-### Premium Partners
+// Create an API token for testing
+$token = $user->createToken('test-token')->plainTextToken;
+echo "API Token: " . $token;
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+4. Test the OAuth Flow
 
-## Contributing
+Step 1: Check Integration Status
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+curl -X GET
+"http://localhost:8000/api/integrations/jira/oauth/status" \
+-H "Authorization: Bearer YOUR_API_TOKEN" \
+-H "Accept: application/json"
 
-## Code of Conduct
+Should return: {"connected": false, "message": "No Jira
+integration found for this team"}
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Step 2: Initiate OAuth Flow
 
-## Security Vulnerabilities
+curl -X POST
+"http://localhost:8000/api/integrations/jira/oauth/authorize" \
+-H "Authorization: Bearer YOUR_API_TOKEN" \
+-H "Content-Type: application/json" \
+-H "Accept: application/json" \
+-d '{"jira_base_url": "https://your-company.atlassian.net"}'
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Response should include:
+{
+"authorization_url":
+"https://auth.atlassian.com/authorize?...",
+"state": "random_40_char_string"
+}
 
-## License
+Step 3: Complete OAuth in Browser
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+1. Copy the authorization_url from the response
+2. Open it in your browser
+3. Login to your Atlassian account
+4. Grant permissions
+5. You'll be redirected back to your callback URL
+
+Step 4: Verify Integration
+
+curl -X GET
+"http://localhost:8000/api/integrations/jira/oauth/status" \
+-H "Authorization: Bearer YOUR_API_TOKEN" \
+-H "Accept: application/json"
+
+Should now return:
+{
+"connected": true,
+"integration": {
+"id": 1,
+"jira_base_url": "https://your-company.atlassian.net",
+"expires_at": "2025-08-26T10:34:21.000000Z",
+"scope": ["read:jira-user", "read:jira-work"],
+"is_token_valid": true,
+"is_expired": false
+},
+"status": "active"
+}
+
+5. Test Token Management
+
+php artisan tinker
+
+// Test token refresh
+$integration = \App\Models\JiraIntegration::first();
+$tokenManager =
+app(\App\Services\Jira\JiraTokenManager::class);
+
+// Check if token is valid
+$tokenManager->ensureValidToken($integration);
+
+// Force refresh (for testing)
+$tokenManager->refreshToken($integration);
+
+// Test cleanup methods
+$tokenManager->cleanupExpiredTokens();
+$tokenManager->cleanupInvalidTokens();
+
+6. Test Disconnection
+
+curl -X DELETE
+"http://localhost:8000/api/integrations/jira/oauth/disconnect"
+\
+-H "Authorization: Bearer YOUR_API_TOKEN" \
+-H "Accept: application/json"
+
+7. Monitor Logs
+
+Watch the logs to see the OAuth flow in action:
+tail -f storage/logs/laravel.log
+
+Look for log entries like:
+- "Refreshing Jira access token"
+- "Jira integration successfully connected"
+- "Token refresh completed"
+
+8. Database Inspection
+
+Check the database to verify data is stored correctly:
+
+php artisan tinker
+
+// View integrations
+\App\Models\JiraIntegration::with('team')->get();
+
+// Check encrypted tokens (they should be encrypted in DB but
+decrypted when accessed)
+$integration = \App\Models\JiraIntegration::first();
+echo "Access Token (decrypted): " . $integration->access_token;
+echo "Refresh Token (decrypted): " .
+$integration->refresh_token;
+
+9. Error Testing
+
+Test error scenarios:
+
+# Test invalid Jira URL
+curl -X POST
+"http://localhost:8000/api/integrations/jira/oauth/authorize" \
+-H "Authorization: Bearer YOUR_API_TOKEN" \
+-H "Content-Type: application/json" \
+-d '{"jira_base_url": "https://invalid-domain.com"}'
+
+# Test duplicate integration (after first one is created)
+curl -X POST
+"http://localhost:8000/api/integrations/jira/oauth/authorize" \
+-H "Authorization: Bearer YOUR_API_TOKEN" \
+-H "Content-Type: application/json" \
+-d '{"jira_base_url": "https://your-company.atlassian.net"}'
+
+10. Test with Postman/Insomnia (Optional)
+
+Import this collection for easier testing:
+
+{
+"name": "Jira OAuth Integration",
+"requests": [
+{
+"name": "Check Status",
+"method": "GET",
+"url":
+"http://localhost:8000/api/integrations/jira/oauth/status",
+"headers": {
+"Authorization": "Bearer {{token}}",
+"Accept": "application/json"
+}
+},
+{
+"name": "Start OAuth",
+"method": "POST",
+"url":
+"http://localhost:8000/api/integrations/jira/oauth/authorize",
+"headers": {
+"Authorization": "Bearer {{token}}",
+"Content-Type": "application/json"
+},
+"body": {
+"jira_base_url": "https://your-company.atlassian.net"
+}
+},
+{
+"name": "Disconnect",
+"method": "DELETE",
+"url":
+"http://localhost:8000/api/integrations/jira/oauth/disconnect",
+"headers": {
+"Authorization": "Bearer {{token}}",
+"Accept": "application/json"
+}
+}
+]
+}
+
+That's the complete testing workflow! The key is getting the
+Jira OAuth credentials set up correctly, then you can test the
+full flow end-to-end. Let me know if you run into any issues!
+🚀

@@ -2,95 +2,133 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
-
-This is a Laravel application called "Project X" - a knowledge search platform that integrates multiple data sources (GitHub, Slack, Linear, etc.) to create a unified search experience across team knowledge. The app uses vector embeddings and full-text search to help teams find information scattered across different tools.
-
 ## Development Commands
 
-### Core Laravel Commands
-- `composer run dev` - Start full development environment (server, queue, logs, vite)
-- `php artisan serve` - Start Laravel development server only
-- `php artisan queue:listen --tries=1` - Start queue worker for background jobs
-- `php artisan pail --timeout=0` - Real-time log monitoring
-- `npm run dev` - Start Vite development server for assets
-- `npm run build` - Build production assets
+**Start development environment** (recommended):
+```bash
+composer run dev
+```
+This starts Laravel server, queue worker, logs, and Vite concurrently.
 
-### Testing & Quality
-- `composer run test` - Run PHPUnit tests (clears config first)
-- `php artisan test` - Run tests directly
-- `vendor/bin/pint` - Run Laravel Pint code formatter
+**Alternative individual commands**:
+```bash
+php artisan serve              # Start Laravel server
+php artisan queue:work         # Start queue worker
+php artisan pail               # View logs in real-time
+npm run dev                    # Start Vite for asset compilation
+```
 
-### Database
-- `php artisan migrate` - Run database migrations
-- `php artisan migrate:fresh --seed` - Fresh migration with seeding
-- `php artisan db:seed` - Run database seeders
+**Testing**:
+```bash
+composer run test              # Run full test suite
+php artisan test               # Alternative test command
+php artisan test --filter=TestName  # Run specific test
+```
 
-### Queue Management
-- `make worker-dev` - Start queue worker with development settings
-- `php artisan queue:work --timeout=120 --max-jobs=100` - Production queue worker
+**Queue Management**:
+```bash
+make worker                    # Start queue worker with production settings
+php artisan queue:listen --tries=1  # Start queue listener (dev)
+php artisan queue:restart      # Restart queue workers
+```
+
+**Code Quality**:
+```bash
+./vendor/bin/pint              # Fix PHP code style
+php artisan config:clear       # Clear cached config
+php artisan migrate:fresh --seed  # Fresh database with seeders
+```
 
 ## Architecture Overview
 
-### Core Concepts
-- **Content Ingestion**: Integrates with external services (GitHub, Slack, Linear) to pull data
-- **Vector Search**: Uses PostgreSQL with pgvector extension for semantic search
-- **Full-text Search**: PostgreSQL's tsvector for keyword-based search
-- **Hybrid Search**: Combines vector similarity with keyword matching
-- **Background Processing**: Queue-based embedding generation for content
+This is a **knowledge search platform** with AI-powered content indexing and semantic search capabilities.
 
-### Key Models
-- `Content` - Central model storing all indexed content with embeddings
-- `Integration` - Manages OAuth connections to external services  
-- `Team` - Multi-tenant organization structure
-- `User` - Team members with role-based access
+### Core Domain Concepts
 
-### Service Architecture
-- **LLM Services** (`app/Services/LLM/`):
-  - `LLMFactory` - Creates LLM instances (Anthropic, OpenAI, Fireworks)
-  - `Embedder` - Generates vector embeddings for content
-- **Vector Store Services** (`app/Services/VectorStore/`):
-  - `VectorStoreFactory` - Creates vector store instances (Postgres, Pinecone)
-  - Database uses pgvector extension with HNSW indexing
+**Content Indexing Pipeline**:
+- `IndexingWorkflow` → `IndexingWorkflowItem` → Async job processing
+- Files are downloaded, parsed, chunked, embedded, and stored in vector database
+- Supports PDF parsing and text chunking with configurable strategies
 
-### Database Structure
-- **contents** table: Core content storage with vector embeddings and full-text search
-- **integrations** table: OAuth tokens and sync metadata for external services
-- **teams** table: Multi-tenant organization structure
-- Uses PostgreSQL with pgvector extension for vector operations
-- Generated tsvector columns for full-text search with weighted rankings
+**Multi-LLM Architecture**:
+- Factory pattern for LLM providers (Anthropic, OpenAI, Fireworks)
+- Separate embedding service (primarily OpenAI)
+- Configurable via `config/llm.php` and `config/embedder.php`
 
-### Configuration Files
-- `config/llm.php` - LLM provider and model configuration
-- `config/vector_store.php` - Vector database driver selection
-- `config/embedder.php` - Embedding model configuration
+**Vector Storage**:
+- Supports PostgreSQL (with pgvector) and Pinecone
+- Factory pattern in `VectorStoreFactory`
+- Embeddings stored alongside searchable metadata
 
-## Key Patterns
+### Key Service Patterns
 
-### Factory Pattern Usage
-- `LLMFactory::create()` - Get configured LLM instance
-- `LLMFactory::createEmbedder()` - Get embedding service
-- `VectorStoreFactory::create()` - Get vector store instance
+**LLM Services** (`app/Services/LLM/`):
+- `LLMFactory::create()` - Creates LLM instance based on config
+- `LLMFactory::createEmbedder()` - Creates embedding service
+- Provider classes: `Anthropic`, `OpenAI`, `Fireworks`
 
-### Background Job Processing
-- `CreateEmbeddingJob` - Asynchronously generates embeddings for content
-- Jobs are queued when new content is ingested from integrations
+**Vector Storage** (`app/Services/VectorStore/`):
+- `VectorStoreFactory::create()` - Creates vector store based on config
+- `Postgres` and `Pinecone` implementations
 
-### Multi-tenant Design
-- All content is scoped to teams via foreign keys
-- Integrations are team-specific with separate OAuth tokens
+**Content Processing**:
+- `TextChunker` - Breaks content into embeddable chunks
+- `PdfParser` - Extracts text from PDF files stream-wise
+- `FilePrioritizer` - Determines indexing priority
 
-## Environment Variables
+### Database Architecture
 
-Key environment variables to configure:
-- `LLM_PROVIDER` - Set to 'anthropic', 'openai', or 'fireworks' 
-- `LLM_MODEL` - Model identifier for chosen provider
-- `VECTOR_STORE_DRIVER` - Set to 'postgres' or 'pinecone'
-- OAuth credentials for integrations (GitHub, Slack, etc.)
+**Core Models**:
+- `Team` - Multi-tenant scoping
+- `IndexedContent` - Main content entities with embeddings
+- `IndexedContentChunk` - Text chunks for semantic search
+- `IndexingWorkflow` / `IndexingWorkflowItem` - Async processing tracking
+- `Integration` - External service connections
 
-## Database Requirements
+**Key Traits**:
+- `Embeddable` - Interface for embeddable content
+- `HasEmbedding` - Trait for embedding functionality
 
-- PostgreSQL with pgvector extension enabled
-- Vector operations use cosine similarity
-- Full-text search uses English language configuration
-- HNSW indexing for efficient vector similarity search
+### Job Processing
+
+**Main Jobs**:
+- `IndexFile` - Downloads, processes, and indexes individual files
+- `EmbedContentJob` - Creates embeddings for content
+- `PrepareContentChunks` - Chunks content for embedding
+
+**Processing Flow**:
+1. File queued via `IndexFile` job
+2. Downloaded from external source (Google Drive)
+3. Content extracted and chunked
+4. Each chunk embedded and stored in vector database
+5. Workflow status updated throughout process
+
+### Integration Layer
+
+**Storage Integrations**:
+- `GoogleDrive` - Google Drive file access
+- `File` - Generic file abstraction
+
+**Configuration**:
+- Multi-provider setup with environment-based switching
+- Separate configs for LLM, embedding, and vector storage
+- Service credentials in `config/services.php`
+
+## Testing Strategy
+
+- PHPUnit with SQLite in-memory database
+- Feature tests in `tests/Feature/`
+- Unit tests in `tests/Unit/`
+- Queue jobs run synchronously in test environment
+
+## Important Patterns
+
+**Factory Pattern**: Used extensively for LLM and VectorStore creation to support multiple providers.
+
+**Job Batching**: Content processing uses Laravel's job batching for coordinated async operations.
+
+**Exception Handling**: Custom exceptions for domain-specific errors (`EmbeddingException`, `IndexingException`, `NoContentToIndexException`).
+
+**Multi-Tenancy**: All content is scoped to Teams for proper data isolation.
+
+**Streaming Processing**: PDF parsing uses generators for memory-efficient processing of large files.

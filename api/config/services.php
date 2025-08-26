@@ -57,4 +57,11 @@ return [
         'refresh_token' => env('GOOGLE_DRIVE_REFRESH_TOKEN'),
         'access_token' => env('GOOGLE_DRIVE_ACCESS_TOKEN'),
     ],
+
+    'jira' => [
+        'app_id' => env('JIRA_APP_ID'),
+        'client_id' => env('JIRA_CLIENT_ID'),
+        'client_secret' => env('JIRA_CLIENT_SECRET'),
+        'redirect_uri' => env('JIRA_REDIRECT_URI'),
+    ]
 ];
