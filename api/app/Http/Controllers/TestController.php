@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Integrations\Communication\Jira\JiraTokenManager;
 use App\Jobs\IndexGoogleDrive;
 use App\Jobs\IndexJira;
+use App\Models\IndexedContentChunk;
 use App\Models\Team;
 
 class TestController extends Controller
@@ -13,9 +14,19 @@ class TestController extends Controller
     {
         $team = Team::where('name', 'Test Company')->firstOrFail();
         IndexJira::dispatch($team);
-//        IndexGoogleDrive::dispatch($team);
+        IndexGoogleDrive::dispatch($team);
 
         return response('indexing...');
+    }
+
+    public function search()
+    {
+        $chunks = IndexedContentChunk::whereRaw(
+            "search_vector @@ plainto_tsquery('english', ?)",
+            ['landing page']
+        )->get();
+
+        dd($chunks);
     }
 
     public function token()
