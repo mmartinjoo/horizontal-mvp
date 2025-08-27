@@ -112,9 +112,9 @@ const goToWaitlist = () => {
       <div class="text-center">
         <!-- Main Headline -->
         <h1 class="text-6xl lg:text-7xl font-bold text-black mb-8 leading-tight">
-          The <span class="bg-gradient-to-r from-purple-500 via-purple-600 to-blue-500 bg-clip-text text-transparent">everything app</span>
+          The <span class="bg-gradient-to-r from-purple-500 via-purple-600 to-blue-500 bg-clip-text text-transparent">knowledge app</span>
           <br>
-          for developer teams
+          for engineering teams
         </h1>
 
         <!-- Subheading -->
@@ -707,7 +707,7 @@ const goToWaitlist = () => {
 
           <!-- Company Description -->
           <p class="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-12">
-            The everything app for development teams. Connect all your tools, search everything, work faster.
+            The knowledge app for engineering teams. Connect all your tools, search everything, work faster.
           </p>
         </div>
 
