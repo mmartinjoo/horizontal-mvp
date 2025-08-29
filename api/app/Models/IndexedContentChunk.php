@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class IndexedContentChunk extends Model implements Embeddable
 {
@@ -22,6 +23,11 @@ class IndexedContentChunk extends Model implements Embeddable
     public function content()
     {
         return $this->belongsTo(IndexedContent::class);
+    }
+
+    public function entities(): HasMany
+    {
+        return $this->hasMany(IndexedContentChunkEntity::class);
     }
 
     public function getEmbeddableContent(): string

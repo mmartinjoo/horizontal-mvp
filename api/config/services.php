@@ -63,5 +63,9 @@ return [
         'client_id' => env('JIRA_CLIENT_ID'),
         'client_secret' => env('JIRA_CLIENT_SECRET'),
         'redirect_uri' => env('JIRA_REDIRECT_URI'),
-    ]
+    ],
+
+    'entity_extractor' => [
+        'url' => env('ENTITY_EXTRACTOR_URL'),
+    ],
 ];

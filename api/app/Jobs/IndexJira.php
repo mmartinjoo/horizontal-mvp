@@ -12,6 +12,7 @@ use App\Models\IndexingWorkflowItem;
 use App\Models\JiraIntegration;
 use App\Models\JiraProject;
 use App\Models\Team;
+use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -61,7 +62,7 @@ class IndexJira implements ShouldQueue
                 $issues = $jira->getIssues($this->team, $project['key'], $dateRange['from'], $dateRange['to']);
                 $indexing->increment('overall_items', count($issues));
                 foreach ($issues as $i => $issueData) {
-                    $description = $this->extractTextFromDocument($issueData['fields']['description']);
+                    $description = $this->extractTextFromDocument($issueData['fields']['description'] ?? []);
                     $issue = Issue::fromJira($issueData, $description);
                     if (!$this->issueNeedsIndexing($issue)) {
                         $indexing->increment('skipped_items', 1);
@@ -99,7 +100,7 @@ class IndexJira implements ShouldQueue
                     $commentsData = $jira->getIssueComments($this->team, $issue);
                     $bodies = [];
                     foreach ($commentsData as $commentData) {
-                        $bodies[] = $this->extractTextFromDocument($commentData['body']);
+                        $bodies[] = $this->extractTextFromDocument($commentData['body'] ?? []);
                     }
                     $comments = IssueComment::collectJira($commentsData, $bodies);
                     foreach ($comments as $comment) {
@@ -144,6 +145,6 @@ class IndexJira implements ShouldQueue
             return true;
         }
 
-        return $issue->getLastUpdatedAt()->gt($existingContent->indexed_at);
+        return $issue->getLastUpdatedAt()->gt($existingContent->indexed_at ?? Carbon::parse('1900-01-01 00:00:00'));
     }
 }

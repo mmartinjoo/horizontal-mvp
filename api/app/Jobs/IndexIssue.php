@@ -3,11 +3,13 @@
 namespace App\Jobs;
 
 use App\Exceptions\EmbeddingException;
+use App\Exceptions\ExtractingEntitiesException;
 use App\Exceptions\NoContentToIndexException;
 use App\Integrations\Communication\Issue;
 use App\Models\IndexedContentChunk;
 use App\Models\IndexingWorkflow;
 use App\Models\IndexingWorkflowItem;
+use App\Services\Indexing\EntityExtractor;
 use App\Services\Indexing\TextChunker;
 use App\Services\LLM\Embedder;
 use App\Services\VectorStore\VectorStore;
@@ -25,8 +27,12 @@ class IndexIssue implements ShouldQueue
     ) {
     }
 
-    public function handle(TextChunker $textChunker, Embedder $embedder, VectorStore $vectorStore): void
-    {
+    public function handle(
+        TextChunker $textChunker,
+        Embedder $embedder,
+        VectorStore $vectorStore,
+        EntityExtractor $entityExtractor,
+    ): void {
         $indexingWorkflowItem = IndexingWorkflowItem::findOrFail($this->indexingWorkflowItemId);
         $chunks = $textChunker->chunk($this->issue->toString());
         if (count($chunks) === 0) {
@@ -57,6 +63,7 @@ class IndexIssue implements ShouldQueue
             'status' => 'prepared',
         ]);
         $this->createEmbedding($indexingWorkflowItem, $embedder, $vectorStore);
+        $this->createEntities($indexingWorkflowItem, $entityExtractor);
         $this->updateWorkflowStatus($indexingWorkflowItem);
     }
 
@@ -73,7 +80,7 @@ class IndexIssue implements ShouldQueue
             }
 
             $indexingWorkflowItem->update([
-                'status' => 'completed',
+                'status' => 'vectorizing_completed',
             ]);
         } catch (Throwable $e) {
             $indexingWorkflowItem->update([
@@ -83,6 +90,35 @@ class IndexIssue implements ShouldQueue
             throw EmbeddingException::wrap($e);
         }
     }
+
+    private function createEntities(IndexingWorkflowItem $indexingWorkflowItem, EntityExtractor $entityExtractor)
+    {
+        try {
+            $indexingWorkflowItem->update([
+                'status' => 'extracting_entities',
+            ]);
+
+            foreach ($indexingWorkflowItem->indexed_content->chunks as $chunk) {
+                $entities = $entityExtractor->extract($chunk->body);
+                $chunk->entities()->create([
+                    'keywords' => $entities['keywords'],
+                    'people' => $entities['people'],
+                    'dates' => $entities['dates'],
+                ]);
+            }
+
+            $indexingWorkflowItem->update([
+                'status' => 'extracting_entities_completed',
+            ]);
+        } catch (Throwable $e) {
+            $indexingWorkflowItem->update([
+                'status' => 'warning',
+                'error_message' => $e->getMessage(),
+            ]);
+            throw ExtractingEntitiesException::wrap($e);
+        }
+    }
+
 
     private function updateWorkflowStatus(IndexingWorkflowItem $indexingWorkflowItem)
     {

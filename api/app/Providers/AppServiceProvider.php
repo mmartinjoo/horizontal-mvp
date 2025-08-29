@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Integrations\Communication\Jira\JiraOAuthService;
+use App\Services\Indexing\EntityExtractor;
 use App\Services\LLM\Anthropic;
 use App\Services\LLM\Embedder;
 use App\Services\LLM\Fireworks;
@@ -71,5 +72,10 @@ class AppServiceProvider extends ServiceProvider
             ->when(JiraOAuthService::class)
             ->needs('$redirectUri')
             ->give(config('services.jira.redirect_uri'));
+
+        $this->app
+            ->when(EntityExtractor::class)
+            ->needs('$url')
+            ->give(config('services.entity_extractor.url'));;
     }
 }

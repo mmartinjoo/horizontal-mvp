@@ -1,0 +1,316 @@
+Timestamp,"What’s your biggest challenge when managing knowledge across tools like Google Drive, Slack, GitHub, Jira, Email, etc.?","If you had a magic wand, what would you wish for to solve this problem?","If a tool could integrate ALL your apps into ONE smart knowledge base, how valuable would that be to you?",What specific features would you expect from such a tool?,What would make you hesitant to use a tool like this?,Would you pay for a tool like this?,"If yes, how much would you expect to pay per month?",Would you be open to a follow-up conversation about this?,"If yes, leave your email address here, and I'll reach out to you soon",What is the most annoying tool you have to use at work?,Email sent?,Meeting notes
+8/18/2025 17:30:29,"I think the biggest challenge i have would be switching between different tabs, apps and screens to get work done.","Focus. An all-in-one solution would let me stay in a single app that connects all my tools, so I don’t have to waste time switching between screens, apps, and dealing with team permissions .",4,"1. Unified search across all teams😋
+2. Link sharing (something like creating a private link where specific members can access only certain things) 
+3. Great UI, minimalistic and simple enough to use","Security, i wouldn't love a situation where my account would be hacked and i would lose access to all linked apps/tools",Yeah,1,Yeah,dunsin.bada@gmail.com,,Yes (Twitter),
+8/19/2025 15:10:23,distributed knowledge,centralized service such as Obsidian,5,graph and offline,cross plarforms,Yeah,1,Yeah,hungthai1401.it@gmail.com,,,
+8/19/2025 16:28:08,"Scattered information, its difficult to know where to look for the latest information",Real time sync of all platform in a single hub,5,"Cross-Tool Linking, Unified search",Data privacy and security ,Yeah,4,Yeah,ajetetimothysamuel@gmail.com,,Yes,
+8/19/2025 16:43:46,Timeline,Put everything in some kind or chronological order,5,Brief summaries of long-winded conversations,Worry about it missing out some hugely important detail,Yeah,1,Nah,,,,
+8/19/2025 18:53:46,Changing a status on one of the applications and getting it to mean the same thing on the other apps. I'll explain: Defining a custom business action and defining what it means on each individual application and handling the action as per this requirement. ,Having a system that lets you define a custom business rule that means something without having to define complex rules on each individual app. Using natural language to define the business rule would be a bonus. Allowing users to easily test the workflow would be great. Having an intuitive UI to define this would make this product unique. ,4,"Clear and affordable pricing, ease of use and onboarding, meaningful reports that help guide business decisions (like deciding which of the individual apps are a waste of money) & way to find swap in replacements for an app that does not suite your business needs. ","Unclear business benefits, expensive packages & too many errors in complex workflows. ",Yeah,3,Yeah,morgan@shadung.com,,Yes,He would be interested in joining the project
+8/20/2025 1:59:51,"I'm a bootstrapping SaaS developer working on his own, so my life is in Obsidian ATM - no problems there. 
+
+At my last job (of 17+ years!) there were big issues though. Context and relevance - people get project codes/tags wrong (or they get lazy and don't do it properly), important slack messages get lost/forgotten easily in busy channels, colleagues/clients don't follow procedures (eg email directly instead of email the teamwork hosted project email)
+
+As a result info/requirements/changes/issues get lost 
+
+This survey from here is answered from the perspective of my last job. ","That people would follow procedures and process properly 😂
+
+But I'd settle for a system which made sure guardrails were in place to keep people in appropriate lanes ",4,"Automatic surfacing and structuring of actionable information 
+
+Eg, request for details/info, change requests, testing results, additional tasks
+
+Automatic collation of attachments/files (we were an agency and design files/assets got lost all the time)","My boss would love all the automation, me personally, I have a bit of trouble ""taking my hands off the wheel"", automated systems haven't always been super effective in the past so I have a preference to do things myself ",Yeah,10,Nah,We're messaging via twitter/X already 🙂,,Yes,-
+8/20/2025 9:13:30,Knowing where the source of truth,A single access point,5,"Fast, accurate",Risk of information leakage,Yeah,3,Nah,,,,
+8/20/2025 9:15:30,Finnding all the context around an issue. could be multiple sources like email then slack message and forget to add to one truth of source,Would love to have ai help me get to the meat and give me complete context,5,Just be connected to all my tools,price,Yeah,1,Nah,,,,
+8/20/2025 9:16:22,"Finding where things are. For example, you know you had written somewhere but it'd take some time to find that file where that idea is written. ",Exactly the thing you're thinking of building 😉,5,Nothing comes to my mind at this moment but I would say getting all the relevant information and docs,Nothing,Yeah,3,Yeah,darkllangle@yahoo.com,,Yes,
+8/20/2025 9:18:57,"Migration, for e.g. git commit starts with #someJiraId then some explanation. What if we switch Jira to something else? Task ID should be covered by 3rd system that will know how to redirect request - to Jira, to Youtrack, Zendesk, Freshdesk, whatever",,3,"Creating unique ids, one - to redirect to correct tracking task tool, second id for summary page","Missing self-hosting option, what if tool will be unavailable?",Yeah,1,Yeah,krzysztof@safjanowski.pl,,,
+8/20/2025 9:24:27,"Where is what and when was it mentioned, added",A privacy first AI that could go through all of these things,3,Amazing search,Privacy concerns and price,Yeah,10,Yeah,neverything@gmail.com,,Yes,"### Context and Current Challenges
+
+Martin Joó, CTO of Content Catalog, discussed challenges with information scattered across multiple platforms:
+
+- Communication primarily in Google Chat and Gmail
+- Sales documents and presentations in Google Drive
+- Development work spread across chat, GitHub, and Linear
+- Multiple browser profiles required for different projects (personal, Content Catalog, university research)
+- Poor search functionality in Google Drive despite Google being a ""search company""
+- Difficulty organizing files and managing multiple Google accounts
+
+### Ideal Solution Features
+
+Martin described several key features for an ideal knowledge management tool:
+
+- **Search Capabilities**:
+    - Natural language search across all platforms
+    - Search by tags with simple date filters
+    - Ability to search by people involved (via @mentions, email addresses, or names)
+    - Example query: ""What did I discuss last week with Samuel regarding the notifications feature?""
+    - Data retention of approximately 3 months would be sufficient for most needs
+- **Organization Structure**:
+    - Multiple teams/tenants to separate different projects and contexts
+    - Easy navigation between different workspaces
+
+### Privacy Considerations
+
+- Privacy is important, especially for enterprise clients (banks, insurance companies, pharma)
+- Preference for privacy-first solutions that don't send data to OpenAI/Anthropic
+- Mentioned options:
+    - Fireworks AI - hosts open source models, SOC 2 and GDPR compliant
+    - Peak Privacy - similar service based in Switzerland
+- Even though Content Catalog mainly works with public data, clients still require privacy assurances
+
+### Pricing Model
+
+- Seat-based pricing makes most sense
+- Suggested price range: €15-20 per user per month
+- For Content Catalog (team of 7), could justify approximately €140/month
+- Potential limits based on:
+    - Retention time of data (e.g., 3 months vs 1 year)
+    - Number of integrations
+- Value proposition: could help avoid upgrading to higher tiers in other tools (Linear, GitHub)
+
+### About Content Catalog
+
+- Started in early 2023 as a tool to structure content for social media ads
+- Originally conceived as a WordPress plugin but expanded to a full app
+- Helps companies manage marketing content and ad variations
+- Client base includes a mix of larger enterprises and some smaller clients
+- Small team with 3 part-time developers
+- Collects feedback through:
+    - Regular calls with clients
+    - University partnerships where students test the software
+    - Custom-built feedback widget that captures screenshots with context
+
+Freelancer with a small team
+SaaS
+
+Content catalog
+
+What tools do you use?
+- Jira
+- Notion
+- EVERYTHING
+
+
+ContentCatalog
+- GitHub
+- Google Chat
+- Gmail
+- Drive
+- Linear
+
+Only big clients.
+
+
+Challenges:
+- Multiple projects. It’s a mess.
+- Sometimes it’s an email, a Google chat, a direct comment on GitHub, Linear.
+- Too many inboxes
+- Needs a unified interface
+
+Privacy first
+- They work with public client data (from a website)
+- Sharing its would be a problem (in the clients’ head)
+- For him the concern is not very big
+
+Searches:
+- Search by text simple date filters
+    - “What did I discuss last week @Samuel regarding of Notifications”
+    - Seeing the entire conversation in one place
+    - Usually last week, last month
+    - Usually 3 months max
+- People involved
+- Natural language
+- Why the feature X not yet do ABC?
+- Both technical and org stuff
+
+Structure
+- Multiple teams
+    - Personal team
+    - ContentCatalog
+    - Research project with a university
+
+Pricing:
+- $15-$20
+- Retention time of looking back
+- Number of integrations
+
+Town hall calls with clients. Asking questions, etc
+Getting feedback"
+8/20/2025 9:25:29,,,4,As much automation as possible ,Concerned about reliability,Nah,1,Nah,,,,
+8/20/2025 9:28:07,GitHub,Laravel + AI,5,reports,high price,Yeah,1,Yeah,andreyapg@gmail.com,,,
+8/20/2025 9:30:55,,,5,,,Yeah,1,Yeah,ahmedsamigeek@gmail.com,,,
+8/20/2025 9:31:23,Have information presentend in a complete and up to date way.,A single place; single source of truth.,3,A way to import and save the data to a central point.,Privacy/data protection.,Yeah,1,Nah,,,,
+8/20/2025 9:36:44,documentation,confluence like platform,4,,,Yeah,1,Yeah,najm@njeim.net,,,
+8/20/2025 10:26:46,Data referencing and easy location ,To a have a secure and personal data security focused solution that can articulate the scattered information ,4,Knowledge gpt,High cost and data privacy concern ,Yeah,1,Yeah,bamigboyebiodun@gmail.com,,Yes,
+8/20/2025 10:38:59,Syncing discussions and updates across systems. ,"A system that integrates with all communication channels, understands and categorises the discussions based on topics. Should have options to manually update association of a content with topics.",5,"Auto classification of discussions, emails etc based on keywords and, optionally hashtags.",Is it going to solve the hassle of syncing key discussion points? Or it's going to add another tool on top of what we need manage and sync between? ,Yeah,2,Yeah,anis.programmer@gmail.com,,Yes,
+8/20/2025 10:52:33,"I'm in the UK. I'm not a dev in my full time job but work with devs and PMs. We don't use these tool as it's Microsoft stack mainly. (Teams, Outlook, SharePoint, Azure DevOps, etc) but the biggest challenge is the same that is inertia out of ineffectiveness. We're duplicating work bc we don't it might be already done. Microsoft is pushing Copilot everywhere and I think they're heading into the same direction that you plan to build. So it's a good idea for non-MS stack business. Just don't call ""everything app"" it's too generic.","Ask my questions and it would check all emails, chat, files, support tickets so if it's occurred before.",5,speech to text as I might not have time to type for long.,"security, compliance and privacy (I don't want a tool to scan all my messages but probably they already doing it.) I would pay as I'm an employee but as a business owner I would consider.",Nah,,Yeah,balazs.fortuna@gmail.com,,Yes,
+8/20/2025 12:00:14,To exclude some of them,"Make developers write proper comments, documentation etc.",2,,"It encourages everyone to avoid writing good comments, tasks, documentation...",Nah,,Yeah,zile.lhs@gmail.com,,Yes,
+8/20/2025 12:14:38,"First of all, thank you Martin for all of your content that you share on the Internet. Second of all, idea is interesting but challenging at the same time. Answering on this question I would say consistency between me and colleagues and maybe if I understood you correct is forcing colleagues to share their knowledge with everyone in company. ",Don't know really,4,-,-,,1,Yeah,Igorryd7@gmail.com,,Yes,
+8/20/2025 13:30:41,That every tool integrates its own ai tools and that these tools are always active automatically and each ai tool is shouting for attention. ,I would prefere an opt-in for all ai functionality.,1,"I don't need such a tool, I memorize topics and I am able to use the search tools to find everything I need.",,Nah,,Nah,,,,
+8/20/2025 13:56:09,All of them,"To have an app where everyone can find, create and link development docs from the conceptual idea to the implementation",5,"To be able to create relationships between diferent types of ""docs"". i.e.: If a conceptual idea is written in some kind of Google Docs, it can be related to the Task ticket, to a previous task that have some business rule, logic rule, etc...","Company budget and team members acceptation. Currently, I was looking for a ClickUp subscription, but there was a huge resistance from the non-technical members to move from popular apps to a new one",Yeah,7,Nah,,Google Drive (maybe it's because a lack of order/structure when creating docs),,
+8/20/2025 14:06:37,"Keeping track of it and keeping on top of it.
+I often see messages on slack but often don't notice jira until I check my emails later on the day 😂",An aggregated feed I can reply to right on my desktop. Having a meaningful search would be nice.,4,Desktop notifications and keyboard navigation with global shortcuts. ,Mostly company policies and regulations.,Nah,1,Yeah,Jonas.kerwin.hansen@gmail.com,"Trello & Jira. Those apps hog memory and I often find too complicated, when all I really need is a RSS feed or mailing list.",Yes,
+8/21/2025 2:27:48,The only problem its when there are a loot of people in the same team using the same tool and every one its talking and writing at the same time,limit the people in the team,5,"Kanban table, calendar, online folders like google drive, sheet like google sheet and spread",,Nah,,Yeah,,No because there are a lot of tool which do that for free,No,
+8/21/2025 4:01:32,"Enshitification of Google search in google drive.
+When a tool is used ""only because"" this project involves customer X or partner Y who uses /mandates it, then never again or seldom",Custom intelligent search across tools ,4,"Meta search capabilities, it would know /learn what type of information is ""likely"" to be where, based on type, topic, era",It obviously could not integrate with everything I use and my memory is still pretty sharp. Plus I'm bootstrapped and barely cash flow positive ,Yeah,3,Yeah,flaporte@processoft.com,Used to be Jira (no longer used). Now it's slack,Yes,
+8/21/2025 7:25:18,"Too many tools to keep track of, really hard to centralise all my workflows in one ""OS""","My own personal ""OS"" which shows me views, actions to be taken, and integrations for me to take these actions via a widget on this ""OS"" rather than have to context switch to the requisite web app.",4,"Personally I would find more use in a tool that would MCP-ify, or enable me to build my own workflows that are custom to my use-case.","Having to fit my workflows according to the limitations of the system, biggest example would be Notion.",Yeah,8,Yeah,jasoncruz98@gmail.com,JIRA/other open-source ticketing tools,Yes,"Freelancer
+Would be interested in being a beta user
+
+Introduction
+Full stack SWE, js react, node
+Past 4 months freelancer
+intern:
+- GuruLab on-site
+- ClickUp for documentation?
+- 4 devs, 10 full team
+- Uncomfortable using ClickUp
+- Task management wise it was good
+- Tasks were dev-focused (low level)
+- Tech lead had a separate slide show -> management team
+- Slack (little)
+
+Startup:
+- DataSwyft, remote async
+- MVP-based mindset
+- Small team
+- No accessible information not workflows
+- Slack
+- Then Google Chat. Less features. Worst UI/UX. Worst search capabilities.
+- Jira. Was not that bad. He wanted to write a CLI-based tool based on Jira.
+- Lots of ceremonies
+- Notion. Simple workflow. Simple task descriptions.
+
+Freelancer:
+- plane.so PM
+
+Context switching is a problem.
+Reporting?
+
+
+What are your primary tools?
+
+Which tools create the most friction or context loss for you, and why? (Slack? GitHub? Jira?)
+- PM tools
+
+Shows me views and actions to be taken?
+
+Sceptic:
+- My tool is just another tool
+- Somewhat positive because of simplicity
+- Writing is a sign of clear thinking
+
+MCPs and own workflows?
+- How many PRs do I have?
+- How many tasks do I have?
+- Some kind of personal dashboard.
+- Add more tools on the fly
+- CRM for engineers
+- Control over integrations
+
+Notion example?
+- Too complicated
+
+Data privacy
+- Big thing
+- Convinience over privacy
+- Just wants to see something on the landing page
+
+Can you walk me through a typical situation where context is lost across multiple apps? What’s the real-world consequence for your team?
+
+Price
+- $5-$10
+
+Keep me in the loop
+
+
+
+
+
+"
+8/21/2025 13:32:43,"People don't document things sufficiently, they don't know where to store documents, they don't remember to do all the steps. Keeping files organized.
+
+Also maybe taking notes and todos from calls and turning them into tickets etc","Maybe a tool to make sure processes are being followed? Like if the data is not there, we can't benefit from it",5,It would need to be able to pull from multiple Google accounts. People often build tools that assume you only need to access one instance of any given provider.,Privacy concerns,Yeah,3,,,,,
+8/21/2025 14:24:47,"The biggest challenge is keeping information organized and accessible, since knowledge is spread across too many tools and is hard to connect in context.","If there’s a tool that brings everything together in one place, that would be perfect—for example, being able to access an email right inside a Meet, or instantly share a file from Dropbox when I need it. Having everything in one place without wasting time would let me handle tasks much more efficiently.",4,"I’d expect features like:
+Seamless integration with email, calendar, file storage, and project management tools
+Unified search across all platforms
+Context-aware linking between tasks, files, and conversations
+Real-time collaboration and sharing without switching apps
+Smart recommendations to quickly find relevant information","I’d be hesitant if the tool isn’t secure, feels too complex to use, or doesn’t integrate smoothly with the apps I already rely on.",Yeah,3,Nah,mrzeroone0101@gmail.com,"The most annoying tool is email;t easily gets cluttered, important messages get lost, and switching context takes too much time.",,
+8/21/2025 16:40:57,Emails tend to be loose and harder to integrate with other systems without a lot of manual intervention ,"One stop to see issues, responses, meeting minutes, related tickets (Jira, git hub, help desk), conversations (email, notes) etc",5,Having everything related to an issue in one summary view with ability to drill down and link to sources would be very helpful. ,Opening up so many accounts to one app,Yeah,1,Yeah,scottsweep@gmail.com,Email,Yes,
+8/21/2025 18:05:15,Finding the needle in the haystack,One api to rule them all,5,Sync to mobile app,The economy,Yeah,2,Nah,,growcrm,,
+8/22/2025 18:37:16,Just too many tools and its hard to keep context,for ai to understand everything,4,just the ability to ask questions and it can build the context,data privacy,Yeah,4,Yeah,paul@bunce.so,most are alright tbh,Yes,"He runs a startup with investments in Nigeria
+He would be interested in being a beta user
+
+Introduction
+- 8 years of dev
+- PHP
+- Haskell
+- Startups
+- 3 years ago his own startup
+- $220k
+- Team of 12
+- Also a freelancer
+- 
+
+What are your primary tools?
+- GitHub
+- Linear
+    - Very good
+- Notion
+    - Roadmap
+    - Internal documentation
+- Google Drive
+- Slack
+- Email
+- WhatsApp
+- Laravel Forge
+- AWS
+- OpenAI
+
+“just the ability to ask questions and it can build the context”
+
+Perfect situation in a perfect world
+- WhatsApp so many messages
+- Both with customers and internal
+- They need forwarding the message
+- Indexing conversations on WhatsApp
+- So many documents disorganized
+- “Where is this file?” -> get the link
+- “I need our logo” -> get the link
+- “Where is the letter head” -> get the link
+- Old documents, and you don’t know where it is
+- Fragmented information such as part of the the context
+- Recommendations
+    - Helping to summarize things
+    - We had al this customer complains today
+    - We solved them
+    - An ask questions like: “were all those complains fixed by the engineering team”
+
+- Issues on GitHub are not pressing issues
+- Customer on Slack and WhatsApp
+- Linear ticket
+- PR automatically resolves the Linear
+
+The workflow now:
+- Check nightwatch for error messages
+- Write the code
+- Push the code
+
+Finding issues that are in Slack but not in Linear
+
+When you say “AI to understand everything,” what exactly do you mean? (e.g., summarizing conversations, linking related docs, finding past bugs)
+- 
+
+Can you walk me through a typical situation where context is lost across multiple apps? What’s the real-world consequence for your team?
+
+Which tools create the most friction or context loss for you, and why? (Slack? GitHub? Jira?)
+
+What types of questions would you want to ask the AI? Are they mostly technical (“why did we do X?”), organizational (“where’s the docs?”), or project-oriented (“who worked on Y?”)?
+
+Data privacy
+- FireworksAI
+- Local LLMs
+
+Not so big because not exposing customers data.
+Not everybody can access Google Drive."
+8/28/2025 13:53:57,Fragmentation across tools,A standardized protocol to inter-connect tools for knowledge aggregation,3,"Cross domain search, ability to add personal notes/tags for content that I deem important","If the tools I'm forced to use are not supported 100% (e.g. we don't use Jira or Github Issues, and Slack is not used for anything beyond simple conversations, emails are rarely used by the dev team)",Yeah,2,Nah,,Backlog,,
+8/29/2025 10:19:41,Understanding the messages from people who don’t care about proper grammar. It’s atrocious.,"Make everyone in the world care about grammar at all times, regardless of the circumstances.",3,"Well, the truth is I prefer pen and paper for organizing thoughts, ideas, and projects in general. However, I could use a tool that would summarize an e-mail thread, and maybe messages in a given time frame from Signal, WhatsApp, Slack, and others. It would be quite interesting to have that exported to Notion, for example, or a PDF file.","Privacy, security, errors in the summary, and multi-language interpretation—I speak English, so I want all my notes in English; but I don’t always speak English with my clients because they don’t speak it.",Yeah,2,Yeah,zeke0816@aol.com,"Google Chrome and WhatsApp. Loathe them both, but a client pays for Google Workspace and Google stuff just works better on Chrome, unfortunately. And I just loathe WhatsApp, I wish people switched to Signal.",,

@@ -3,12 +3,14 @@
 namespace App\Jobs;
 
 use App\Exceptions\EmbeddingException;
+use App\Exceptions\ExtractingEntitiesException;
 use App\Exceptions\NoContentToIndexException;
 use App\Integrations\Storage\File;
 use App\Integrations\Storage\GoogleDrive;
 use App\Models\IndexedContentChunk;
 use App\Models\IndexingWorkflow;
 use App\Models\IndexingWorkflowItem;
+use App\Services\Indexing\EntityExtractor;
 use App\Services\Indexing\TextChunker;
 use App\Services\LLM\Embedder;
 use App\Services\PdfParser;
@@ -36,6 +38,7 @@ class IndexFile implements ShouldQueue
         PdfParser $pdfParser,
         Embedder $embedder,
         VectorStore $vectorStore,
+        EntityExtractor $entityExtractor,
     ): void {
         try {
             $indexingWorkflowItem = IndexingWorkflowItem::find($this->indexingWorkflowItemId);
@@ -54,7 +57,11 @@ class IndexFile implements ShouldQueue
 
             if ($this->file->mimeType() === 'application/pdf') {
                 $this->indexPDF($pdfParser, $textChunker, $indexingWorkflowItem);
-                $this->createEmbedding($indexingWorkflowItem, $embedder, $vectorStore);;
+                $this->createEmbedding($indexingWorkflowItem, $embedder, $vectorStore);
+                $this->createEntities($indexingWorkflowItem, $entityExtractor);
+                $indexingWorkflowItem->update([
+                    'status' => 'completed',
+                ]);
                 $this->updateWorkflowStatus($indexingWorkflowItem);
                 return;
             } else {
@@ -98,6 +105,10 @@ class IndexFile implements ShouldQueue
                 'status' => 'prepared',
             ]);
             $this->createEmbedding($indexingWorkflowItem, $embedder, $vectorStore);
+            $this->createEntities($indexingWorkflowItem, $entityExtractor);
+            $indexingWorkflowItem->update([
+                'status' => 'completed',
+            ]);
             $this->updateWorkflowStatus($indexingWorkflowItem);
         } finally {
             Storage::delete($this->file->path());
@@ -154,7 +165,7 @@ class IndexFile implements ShouldQueue
             }
 
             $indexingWorkflowItem->update([
-                'status' => 'completed',
+                'status' => 'vectorizing_completed',
             ]);
         } catch (Throwable $e) {
             $indexingWorkflowItem->update([
@@ -162,6 +173,36 @@ class IndexFile implements ShouldQueue
                 'error_message' => $e->getMessage(),
             ]);
             throw EmbeddingException::wrap($e);
+        }
+    }
+
+    private function createEntities(IndexingWorkflowItem $indexingWorkflowItem, EntityExtractor $entityExtractor)
+    {
+        try {
+            $indexingWorkflowItem->update([
+                'status' => 'extracting_entities',
+            ]);
+
+            foreach ($indexingWorkflowItem->indexed_content->chunks as $chunk) {
+                $entities = $entityExtractor->extract($chunk->body);
+                foreach ($entities as $entity) {
+                    $chunk->entities()->create([
+                        'keywords' => $entity['keywords'],
+                        'people' => $entity['people'],
+                        'dates' => $entity['dates'],
+                    ]);
+                }
+            }
+
+            $indexingWorkflowItem->update([
+                'status' => 'extracting_entities_completed',
+            ]);
+        } catch (Throwable $e) {
+            $indexingWorkflowItem->update([
+                'status' => 'warning',
+                'error_message' => $e->getMessage(),
+            ]);
+            throw ExtractingEntitiesException::wrap($e);
         }
     }
 

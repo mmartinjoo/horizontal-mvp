@@ -14,6 +14,10 @@ Route::get('/test/token', [\App\Http\Controllers\TestController::class, 'token']
 Route::get('/test/refresh', [\App\Http\Controllers\TestController::class, 'refresh']);
 Route::get('/test/search', [\App\Http\Controllers\TestController::class, 'search']);
 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/test/ask', [\App\Http\Controllers\TestController::class, 'ask']);
+});
+
 // Jira OAuth integration routes
 Route::get('/integrations/jira/oauth/callback', [JiraIntegrationController::class, 'callback']);
 Route::middleware('auth:sanctum')->prefix('/integrations/jira/oauth')->group(function () {
