@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\IndexedContent;
+use App\Models\Document;
 use App\Models\Team;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;

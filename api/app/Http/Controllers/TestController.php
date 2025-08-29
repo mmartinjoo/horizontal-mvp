@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Integrations\Communication\Jira\JiraTokenManager;
 use App\Jobs\IndexGoogleDrive;
 use App\Jobs\IndexJira;
-use App\Models\IndexedContentChunk;
+use App\Models\DocumentChunk;
 use App\Models\Team;
 use App\Services\LLM\Embedder;
 use Illuminate\Http\Request;
@@ -23,7 +23,7 @@ class TestController extends Controller
 
     public function search()
     {
-        $chunks = IndexedContentChunk::whereRaw(
+        $chunks = DocumentChunk::whereRaw(
             "search_vector @@ plainto_tsquery('english', ?)",
             ['landing page']
         )->get();
@@ -58,7 +58,7 @@ class TestController extends Controller
 
         // <=> returns cosine distance
         // (1 - cosine_distance) returns cosine similarity
-        $chunks = IndexedContentChunk::selectRaw('
+        $chunks = DocumentChunk::selectRaw('
               *,
               1 - (embedding <=> ?) as similarity
           ', [$embeddingStr])

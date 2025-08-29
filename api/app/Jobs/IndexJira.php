@@ -5,8 +5,8 @@ namespace App\Jobs;
 use App\Integrations\Communication\Issue;
 use App\Integrations\Communication\IssueComment;
 use App\Integrations\Communication\Jira\Jira;
-use App\Models\IndexedContent;
-use App\Models\IndexedContentComment;
+use App\Models\Document;
+use App\Models\DocumentComment;
 use App\Models\IndexingWorkflow;
 use App\Models\IndexingWorkflowItem;
 use App\Models\JiraIntegration;
@@ -73,14 +73,14 @@ class IndexJira implements ShouldQueue
                         }
                         continue;
                     }
-                    $count = IndexedContent::query()
+                    $count = Document::query()
                         ->where('team_id', $this->team->id)
                         ->where('source_type', 'jira')
                         ->where('source_id', $issue->id)
                         ->delete();
 
                     $indexing->increment('deleted_items', $count);
-                    $content = IndexedContent::create([
+                    $content = Document::create([
                         'team_id' => $this->team->id,
                         'source_type' => 'jira',
                         'source_id' => $issue->id,
@@ -93,7 +93,7 @@ class IndexJira implements ShouldQueue
                         'indexing_workflow_id' => $indexing->id,
                         'data' => $issue,
                         'status' => 'queued',
-                        'indexed_content_id' => $content->id,
+                        'document_id' => $content->id,
                     ]);
                     IndexIssue::dispatch($issue, $indexingItem->id);
 
@@ -104,8 +104,8 @@ class IndexJira implements ShouldQueue
                     }
                     $comments = IssueComment::collectJira($commentsData, $bodies);
                     foreach ($comments as $comment) {
-                        $indexedComment = IndexedContentComment::create([
-                            'indexed_content_id' => $content->id,
+                        $indexedComment = DocumentComment::create([
+                            'document_id' => $content->id,
                             'body' => $comment->body,
                             'author' => $comment->author,
                             'commented_at' => $comment->createdAt,
@@ -137,7 +137,7 @@ class IndexJira implements ShouldQueue
 
     private function issueNeedsIndexing(Issue $issue): bool
     {
-        $existingContent = IndexedContent::query()
+        $existingContent = Document::query()
             ->where('source_id', $issue->id)
             ->first();
 

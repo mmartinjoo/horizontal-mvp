@@ -6,7 +6,7 @@ use App\Exceptions\EmbeddingException;
 use App\Exceptions\ExtractingEntitiesException;
 use App\Exceptions\NoContentToIndexException;
 use App\Integrations\Communication\Issue;
-use App\Models\IndexedContentChunk;
+use App\Models\DocumentChunk;
 use App\Models\IndexingWorkflow;
 use App\Models\IndexingWorkflowItem;
 use App\Services\Indexing\EntityExtractor;
@@ -49,13 +49,13 @@ class IndexIssue implements ShouldQueue
         }
 
         foreach ($chunks as $i => $chunk) {
-            IndexedContentChunk::create([
-                'indexed_content_id' => $indexingWorkflowItem->indexed_content->id,
+            DocumentChunk::create([
+                'document_id' => $indexingWorkflowItem->document->id,
                 'body' => $chunk,
                 'position' => $i+1,
             ]);
         }
-        $indexingWorkflowItem->indexed_content()->update([
+        $indexingWorkflowItem->document()->update([
             'preview' => $chunks->first(),
             'indexed_at' => now(),
         ]);
@@ -74,7 +74,7 @@ class IndexIssue implements ShouldQueue
                 'status' => 'vectorizing',
             ]);
 
-            foreach ($indexingWorkflowItem->indexed_content->chunks as $chunk) {
+            foreach ($indexingWorkflowItem->document->chunks as $chunk) {
                 $embedding = $embedder->createEmbedding($chunk->getEmbeddableContent());
                 $vectorStore->upsert($chunk, $embedding);
             }
@@ -98,7 +98,7 @@ class IndexIssue implements ShouldQueue
                 'status' => 'extracting_entities',
             ]);
 
-            foreach ($indexingWorkflowItem->indexed_content->chunks as $chunk) {
+            foreach ($indexingWorkflowItem->document->chunks as $chunk) {
                 $entities = $entityExtractor->extract($chunk->body);
                 $people = $entities['people'];
                 if ($this->issue->assignee && !in_array($this->issue->assignee, $people)) {

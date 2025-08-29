@@ -20,9 +20,9 @@ class IndexingWorkflowItem extends Model
         return $this->belongsTo(IndexingWorkflow::class);
     }
 
-    public function indexed_content(): BelongsTo
+    public function document(): BelongsTo
     {
-        return $this->belongsTo(IndexedContent::class);
+        return $this->belongsTo(Document::class);
     }
 
     public function user(): HasManyThrough

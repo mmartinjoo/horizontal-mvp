@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App\Integrations\Storage\File;
 use App\Integrations\Storage\GoogleDrive;
-use App\Models\IndexedContent;
+use App\Models\Document;
 use App\Models\IndexingWorkflow;
 use App\Models\IndexingWorkflowItem;
 use App\Models\Team;
@@ -48,14 +48,14 @@ class IndexGoogleDrive implements ShouldQueue
                     }
                     continue;
                 }
-                $count = IndexedContent::query()
+                $count = Document::query()
                     ->where('team_id', $this->team->id)
                     ->where('source_type', 'google_drive')
                     ->where('source_id', $file->extraMetadata()['id'])
                     ->delete();
 
                 $indexing->increment('deleted_items', $count);
-                $content = IndexedContent::create([
+                $content = Document::create([
                     'team_id' => $this->team->id,
                     'source_type' => 'google_drive',
                     'source_id' => $file->extraMetadata()['id'],
@@ -67,7 +67,7 @@ class IndexGoogleDrive implements ShouldQueue
                     'indexing_workflow_id' => $indexing->id,
                     'data' => $file,
                     'status' => 'queued',
-                    'indexed_content_id' => $content->id,
+                    'document_id' => $content->id,
                 ]);
                 IndexFile::dispatch($indexingItem->id, $file);
             }
@@ -76,7 +76,7 @@ class IndexGoogleDrive implements ShouldQueue
 
     private function fileNeedsIndexing(File $file): bool
     {
-        $existingContent = IndexedContent::query()
+        $existingContent = Document::query()
             ->where('source_id', $file->extraMetadata()['id'])
             ->first();
 

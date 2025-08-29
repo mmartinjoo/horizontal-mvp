@@ -27,7 +27,7 @@ class PrepareContentChunks implements ShouldQueue
             $this->indexingItem->refresh();
 
             if ($this->indexingItem->status === 'prepared' &&
-                $this->indexingItem->indexed_content->chunks()->exists()) {
+                $this->indexingItem->document->chunks()->exists()) {
                 return; // Chunks are ready
             }
 

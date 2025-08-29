@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class IndexedContentChunk extends Model implements Embeddable
+class DocumentChunk extends Model implements Embeddable
 {
     use HasEmbedding;
 
@@ -20,14 +20,14 @@ class IndexedContentChunk extends Model implements Embeddable
         'search_vector',
     ];
 
-    public function content()
+    public function document()
     {
-        return $this->belongsTo(IndexedContent::class);
+        return $this->belongsTo(Document::class);
     }
 
     public function entities(): HasMany
     {
-        return $this->hasMany(IndexedContentChunkEntity::class);
+        return $this->hasMany(DocumentChunkEntity::class);
     }
 
     public function getEmbeddableContent(): string

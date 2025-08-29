@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class IndexedContentComment extends Model implements Embeddable
+class DocumentComment extends Model implements Embeddable
 {
     use HasEmbedding;
 
@@ -22,14 +22,14 @@ class IndexedContentComment extends Model implements Embeddable
         'commented_at' => 'datetime',
     ];
 
-    public function content()
+    public function document()
     {
-        return $this->belongsTo(IndexedContent::class);
+        return $this->belongsTo(Document::class);
     }
 
     public function entities(): HasMany
     {
-        return $this->hasMany(IndexedContentCommentEntity::class);
+        return $this->hasMany(DocumentCommentEntity::class);
     }
 
     public function getEmbeddableContent(): string

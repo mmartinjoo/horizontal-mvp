@@ -13,7 +13,7 @@ return new class extends Migration
     {
         DB::statement('CREATE EXTENSION IF NOT EXISTS vector');
 
-        Schema::create('indexed_contents', function (Blueprint $table) {
+        Schema::create('documents', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Team::class)->constrained()->cascadeOnDelete();
 
@@ -35,6 +35,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('indexed_contents');
+        Schema::dropIfExists('documents');
     }
 };

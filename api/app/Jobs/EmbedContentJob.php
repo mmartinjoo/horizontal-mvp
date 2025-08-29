@@ -28,7 +28,7 @@ class EmbedContentJob implements ShouldQueue
         ]);
 
         $jobs = [];
-        foreach ($indexingWorkflowItem->indexed_content->chunks as $chunk) {
+        foreach ($indexingWorkflowItem->document->chunks as $chunk) {
             $jobs[] = new EmbedContentChunkJob($chunk, $indexingWorkflowItem->id);
         }
 

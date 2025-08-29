@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\IndexedContent;
+use App\Models\Document;
 use App\Models\IndexingWorkflow;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -15,7 +15,7 @@ return new class extends Migration
             $table->foreignIdFor(IndexingWorkflow::class)->constrained()->cascadeOnDelete();
             $table->jsonb('data');
             $table->string('status');
-            $table->foreignIdFor(IndexedContent::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Document::class)->nullable()->constrained()->cascadeOnDelete();
             $table->text('error_message')->nullable();
             $table->jsonb('job_ids')->nullable();
             $table->timestamps();

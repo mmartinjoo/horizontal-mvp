@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
-class IndexedContent extends Model implements Embeddable
+class Document extends Model implements Embeddable
 {
     use HasFactory;
     use HasEmbedding;
@@ -28,12 +28,12 @@ class IndexedContent extends Model implements Embeddable
 
     public function chunks()
     {
-        return $this->hasMany(IndexedContentChunk::class);
+        return $this->hasMany(DocumentChunk::class);
     }
 
     public function comments()
     {
-        return $this->hasMany(IndexedContentComment::class);
+        return $this->hasMany(DocumentComment::class);
     }
 
     public function getEmbeddableContent(): string

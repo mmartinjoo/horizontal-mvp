@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App\Exceptions\EmbeddingException;
 use App\Integrations\Communication\Issue;
-use App\Models\IndexedContentComment;
+use App\Models\DocumentComment;
 use App\Services\Indexing\EntityExtractor;
 use App\Services\LLM\Embedder;
 use App\Services\VectorStore\VectorStore;
@@ -17,8 +17,8 @@ class IndexIssueComment implements ShouldQueue
     use Queueable;
 
     public function __construct(
-        private Issue $issue,
-        private IndexedContentComment $comment,
+        private Issue           $issue,
+        private DocumentComment $comment,
     ) {
     }
 

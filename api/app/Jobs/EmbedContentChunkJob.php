@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\IndexedContentChunk;
+use App\Models\DocumentChunk;
 use App\Models\IndexingWorkflowItem;
 use App\Services\LLM\Embedder;
 use App\Services\VectorStore\VectorStore;
@@ -16,8 +16,8 @@ class EmbedContentChunkJob implements ShouldQueue
     use Batchable;
 
     public function __construct(
-        private IndexedContentChunk $chunk,
-        private int $workflowItemId,
+        private DocumentChunk $chunk,
+        private int           $workflowItemId,
     ) {
     }
 
@@ -27,8 +27,8 @@ class EmbedContentChunkJob implements ShouldQueue
         if ($workflowItem && $workflowItem->status === 'prepared') {
             $workflowItem->update(['status' => 'vectorizing']);
         }
-        
+
         $embedding = $embedder->createEmbedding($this->chunk->getEmbeddableContent());
-        $vectorStore->upsert($this->chunk, $embedding);        
+        $vectorStore->upsert($this->chunk, $embedding);
     }
 }

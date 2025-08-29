@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class IndexedContentChunkEntity extends Model
+class DocumentChunkEntity extends Model
 {
     protected $guarded = [];
 
@@ -16,6 +16,6 @@ class IndexedContentChunkEntity extends Model
 
     public function chunk()
     {
-        return $this->belongsTo(IndexedContentChunk::class);
+        return $this->belongsTo(DocumentChunk::class);
     }
 }

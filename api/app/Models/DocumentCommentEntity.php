@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class IndexedContentCommentEntity extends Model
+class DocumentCommentEntity extends Model
 {
     protected $guarded = [];
 
@@ -16,6 +16,6 @@ class IndexedContentCommentEntity extends Model
 
     public function comment()
     {
-        return $this->belongsTo(IndexedContentComment::class);
+        return $this->belongsTo(DocumentComment::class);
     }
 }
