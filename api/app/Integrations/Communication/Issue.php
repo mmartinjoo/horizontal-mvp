@@ -10,7 +10,7 @@ class Issue
     public function __construct(
         public string $id,
         public string $title,
-        public string  $description,
+        public string $description,
         public string $assignee,
         public string $url,
         public Carbon $createdAt,

@@ -34,7 +34,7 @@ class IndexIssue implements ShouldQueue
         EntityExtractor $entityExtractor,
     ): void {
         $indexingWorkflowItem = IndexingWorkflowItem::findOrFail($this->indexingWorkflowItemId);
-        $chunks = $textChunker->chunk($this->issue->toString());
+        $chunks = $textChunker->chunk($this->issue->title . ' ' . $this->issue->description);
         if (count($chunks) === 0) {
             $indexingWorkflowItem->update([
                 'status' => 'warning',
@@ -100,9 +100,13 @@ class IndexIssue implements ShouldQueue
 
             foreach ($indexingWorkflowItem->indexed_content->chunks as $chunk) {
                 $entities = $entityExtractor->extract($chunk->body);
+                $people = $entities['people'];
+                if ($this->issue->assignee && !in_array($this->issue->assignee, $people)) {
+                    $people[] = $this->issue->assignee;
+                }
                 $chunk->entities()->create([
                     'keywords' => $entities['keywords'],
-                    'people' => $entities['people'],
+                    'people' => $people,
                     'dates' => $entities['dates'],
                 ]);
             }

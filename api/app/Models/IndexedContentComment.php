@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class IndexedContentComment extends Model implements Embeddable
 {
@@ -24,6 +25,11 @@ class IndexedContentComment extends Model implements Embeddable
     public function content()
     {
         return $this->belongsTo(IndexedContent::class);
+    }
+
+    public function entities(): HasMany
+    {
+        return $this->hasMany(IndexedContentCommentEntity::class);
     }
 
     public function getEmbeddableContent(): string

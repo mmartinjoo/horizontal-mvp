@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Exceptions\EmbeddingException;
 use App\Integrations\Communication\Issue;
 use App\Models\IndexedContentComment;
+use App\Services\Indexing\EntityExtractor;
 use App\Services\LLM\Embedder;
 use App\Services\VectorStore\VectorStore;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -21,11 +22,25 @@ class IndexIssueComment implements ShouldQueue
     ) {
     }
 
-    public function handle(Embedder $embedder, VectorStore $vectorStore): void
-    {
+    public function handle(
+        Embedder $embedder,
+        VectorStore $vectorStore,
+        EntityExtractor $entityExtractor,
+    ): void {
         try {
             $embedding = $embedder->createEmbedding($this->comment->getEmbeddableContent());
             $vectorStore->upsert($this->comment, $embedding);
+
+            $entities = $entityExtractor->extract($this->comment->body);
+            $people = $entities['people'];
+            if ($this->comment->author && !in_array($this->comment->author, $entities['people'])) {
+                $people[] = $this->comment->author;
+            }
+            $this->comment->entities()->create([
+                'keywords' => $entities['keywords'],
+                'people' => $people,
+                'dates' => $entities['dates'],
+            ]);
         } catch (Throwable $e) {
             throw EmbeddingException::wrap($e);
         }
