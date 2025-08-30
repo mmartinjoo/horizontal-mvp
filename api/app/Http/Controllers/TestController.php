@@ -50,30 +50,4 @@ class TestController extends Controller
     {
         return $jiraTokenManager->refreshTokensExpiringSoon(30);
     }
-
-    public function ask(Request $request, Embedder $embedder)
-    {
-        $embedding = $embedder->createEmbedding($request->input('question'));
-        $embeddingStr = '[' . implode(',', $embedding) . ']';
-
-        // <=> returns cosine distance
-        // (1 - cosine_distance) returns cosine similarity
-        $chunks = DocumentChunk::selectRaw('
-              *,
-              1 - (embedding <=> ?) as similarity
-          ', [$embeddingStr])
-        ->whereRaw('embedding IS NOT NULL')
-        ->whereRaw('1 - (embedding <=> ?) > 0.5', [$embeddingStr])
-        ->orderByDesc('similarity')
-        ->limit(10)
-        ->get();
-
-//        $chunks = IndexedContentChunk::query()
-//             ->whereRaw('search_vector @@ plainto_tsquery(?)', [$request->input('question')])
-//              ->orderByRaw('ts_rank(search_vector, plainto_tsquery(?)) DESC', [$request->input('question')])
-//            ->limit(10)
-//            ->get();
-
-        dd($chunks);
-    }
 }

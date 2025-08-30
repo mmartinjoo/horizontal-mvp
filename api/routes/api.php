@@ -15,7 +15,7 @@ Route::get('/test/refresh', [\App\Http\Controllers\TestController::class, 'refre
 Route::get('/test/search', [\App\Http\Controllers\TestController::class, 'search']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/test/ask', [\App\Http\Controllers\TestController::class, 'ask']);
+    Route::post('/questions/ask', [\App\Http\Controllers\QuestionController::class, 'ask']);
 });
 
 // Jira OAuth integration routes
