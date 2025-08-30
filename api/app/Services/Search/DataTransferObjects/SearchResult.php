@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Services\Search\DataTransferObjects;
+
+use App\Models\DocumentChunk;
+
+class SearchResult
+{
+    public float $weightedScore;
+
+    public function __construct(
+        public DocumentChunk $documentChunk,
+        public ?float $semanticScore,
+        public ?float $keywordScore,
+    ) {
+    }
+
+    public static function from()
+    {
+
+    }
+}
