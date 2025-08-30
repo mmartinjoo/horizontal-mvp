@@ -18,17 +18,17 @@ class SearchEngine
 
     public function search(string $question)
     {
-        $entities = $this->entityExtractor->extract($question);
+        $questionEntities = $this->entityExtractor->extract($question);
         $semanticResults = $this->semanticSearch($question);
-        $keywordResults = $this->keywordSearch($entities['keywords']);
+        $keywordResults = $this->keywordSearch($questionEntities['keywords']);
         /** @var Collection<SearchResult> $combined */
         $combined = $this->combineResults($semanticResults, $keywordResults);
 
         return [
-            'combined' => $this->rankResults($combined, $entities),
+            'combined' => $this->rankResults($combined, $questionEntities),
             'semantic' => $semanticResults,
             'keyword' => $keywordResults,
-            'entities' => $entities,
+            'entities' => $questionEntities,
         ];
     }
 
@@ -36,7 +36,7 @@ class SearchEngine
      * @param Collection<SearchResult> $results
      * @return Collection<SearchResult>
      */
-    private function rankResults(Collection $results, array $entities)
+    private function rankResults(Collection $results, array $questionEntities)
     {
         foreach ($results as $result) {
             $score = 0;
@@ -46,7 +46,19 @@ class SearchEngine
             if ($result->keywordScore) {
                 $score += $result->keywordScore * 0.5;
             }
-            $result->weightedScore = max($score, 1);
+            $result->weightedScore = min($score, 1);
+
+            $people = $result->documentChunk
+                ->entities
+                ->people;
+
+            foreach ($people as $person) {
+                if (in_array($person, $questionEntities['people'])) {
+                    $result->weightedScore = min($result->weightedScore * 1.25, 1);
+                    $result->peopleBonus = 1.25;
+                    break;
+                }
+            }
         }
         return $results->sortByDesc('score');
     }

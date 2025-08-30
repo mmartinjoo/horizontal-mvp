@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class DocumentChunk extends Model implements Embeddable
 {
@@ -25,9 +26,9 @@ class DocumentChunk extends Model implements Embeddable
         return $this->belongsTo(Document::class);
     }
 
-    public function entities(): HasMany
+    public function entities(): HasOne
     {
-        return $this->hasMany(DocumentChunkEntity::class);
+        return $this->hasOne(DocumentChunkEntity::class);
     }
 
     public function getEmbeddableContent(): string
