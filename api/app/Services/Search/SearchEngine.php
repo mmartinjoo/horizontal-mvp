@@ -20,12 +20,29 @@ class SearchEngine
         $entities = $this->entityExtractor->extract($question);
         $semanticResults = $this->semanticSearch($question);
         $keywordResults = $this->keywordSearch($entities['keywords']);
+        $combined = $this->combineResults($semanticResults, $keywordResults);
 
         return [
+            'combined' => $this->rankResults($combined, $entities),
             'semantic' => $semanticResults,
             'keyword' => $keywordResults,
             'entities' => $entities,
         ];
+    }
+
+    private function rankResults(Collection $results, array $entities)
+    {
+        foreach ($results as $result) {
+            $score = 0;
+            if ($result->semantic_score) {
+                $score += $result->semantic_score * 0.5;
+            }
+            if ($result->keyword_score) {
+                $score += $result->keyword_score * 0.25;
+            }
+            $result->score = $score;
+        }
+        return $results->sortByDesc('score');
     }
 
     /**
@@ -43,10 +60,10 @@ class SearchEngine
         // <=> returns cosine distance
         // (1 - cosine_distance) returns cosine similarity
         return DocumentChunk::query()
-            ->selectRaw('*, 1 - (embedding <=> ?) as similarity', [$embeddingStr])
+            ->selectRaw('*, 1 - (embedding <=> ?) as semantic_score', [$embeddingStr])
             ->whereRaw('embedding IS NOT NULL')
             ->whereRaw('1 - (embedding <=> ?) > 0.5', [$embeddingStr])
-            ->orderByDesc('similarity')
+            ->orderByDesc('semantic_score')
             ->limit(10)
             ->get();
     }
@@ -62,10 +79,31 @@ class SearchEngine
 
         $query = implode(' | ', $keywords);
         return DocumentChunk::query()
-            ->selectRaw("*, ts_rank(search_vector, plainto_tsquery('english', ?)) as rank", [$query])
+            ->selectRaw("*, ts_rank(search_vector, plainto_tsquery('english', ?)) as keyword_score", [$query])
             ->whereRaw("search_vector @@ plainto_tsquery('english', ?)", [$query])
-            ->orderByDesc('rank')
+            ->orderByDesc('keyword_score')
             ->limit(10)
             ->get();
+    }
+
+    /**
+     * @return Collection<DocumentChunk>
+     */
+    private function combineResults(Collection $semanticResults, Collection $keywordResults): Collection
+    {
+        $results = collect();
+        foreach ($semanticResults as $result) {
+            $result->keyword_score = null;
+            $results->push($result);
+        }
+        foreach ($keywordResults as $result) {
+            $existingItem = $results->firstWhere('id', $result->id);
+            if ($existingItem) {
+                $existingItem->keyword_score = $result->keyword_score;
+            } else {
+                $results->push($result);
+            }
+        }
+        return $results;
     }
 }
