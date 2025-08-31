@@ -40,20 +40,9 @@ class IndexIssueComment implements ShouldQueue
                 ];
             }
             $this->comment->createParticipants($participants);
+
             $topics = $entityExtractor->extractTopics($this->comment->body);
-            foreach ($topics['topics'] as $topic) {
-                if (!Arr::get($topic, 'name')) {
-                    continue;
-                }
-                if (Arr::get($topic, 'importance', 'low') === 'low') {
-                    continue;
-                }
-                $this->comment->topics()->create([
-                    'name' => $topic['name'],
-                    'variations' => $topic['variations'],
-                    'category' => $topic['category'],
-                ]);
-            }
+            $this->comment->createTopics($topics['topics']);
         } catch (Throwable $e) {
             throw EmbeddingException::wrap($e);
         }

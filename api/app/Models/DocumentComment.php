@@ -10,6 +10,7 @@ class DocumentComment extends Model implements Embeddable
 {
     use HasEmbedding;
     use HasParticipants;
+    use HasTopics;
 
     protected $guarded = [];
 
@@ -27,16 +28,6 @@ class DocumentComment extends Model implements Embeddable
     public function document()
     {
         return $this->belongsTo(Document::class);
-    }
-
-//    public function participants(): MorphMany
-//    {
-//        return $this->morphMany(DocumentParticipant::class, 'entity');
-//    }
-
-    public function topics(): MorphMany
-    {
-        return $this->morphMany(DocumentTopic::class, 'entity');
     }
 
     public function getEmbeddableContent(): string

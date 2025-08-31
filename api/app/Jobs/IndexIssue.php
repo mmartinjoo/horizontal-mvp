@@ -108,20 +108,9 @@ class IndexIssue implements ShouldQueue
                     ];
                 }
                 $chunk->createParticipants($participants);
+
                 $topics = $entityExtractor->extractTopics($chunk->body);
-                foreach ($topics['topics'] as $topic) {
-                    if (!Arr::get($topic, 'name')) {
-                        continue;
-                    }
-                    if (Arr::get($topic, 'importance', 'low') === 'low') {
-                        continue;
-                    }
-                    $chunk->topics()->create([
-                        'name' => $topic['name'],
-                        'variations' => $topic['variations'],
-                        'category' => $topic['category'],
-                    ]);
-                }
+                $chunk->createTopics($topics['topics']);
             }
 
             $indexingWorkflowItem->update([
