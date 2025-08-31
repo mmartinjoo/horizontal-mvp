@@ -72,10 +72,5 @@ class AppServiceProvider extends ServiceProvider
             ->when(JiraOAuthService::class)
             ->needs('$redirectUri')
             ->give(config('services.jira.redirect_uri'));
-
-        $this->app
-            ->when(EntityExtractor::class)
-            ->needs('$url')
-            ->give(config('services.entity_extractor.url'));;
     }
 }

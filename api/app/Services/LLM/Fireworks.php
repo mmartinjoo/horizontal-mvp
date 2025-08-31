@@ -26,6 +26,6 @@ class Fireworks extends LLM
             throw new Exception('Fireworks: No completion found: '.json_encode($res));
         }
 
-        return $res['choices'][0]['text'];
+        return $this->sanitizeJSON($res['choices'][0]['text']);
     }
 }
