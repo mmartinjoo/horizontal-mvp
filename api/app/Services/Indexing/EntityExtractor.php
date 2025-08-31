@@ -187,18 +187,12 @@ class EntityExtractor
             Return a JSON structure:
             ```json
             {
-              \"primary_topics\": [
+              \"topics\": [
                 {
                   \"topic\": \"exact phrase from text\",
                   \"variations\": [\"alternate names\", \"abbreviations\"],
                   \"category\": \"feature|person|issue|tool|incident|process\",
                   \"importance\": \"high|medium|low\"
-                }
-              ],
-              \"connections\": [
-                {
-                  \"topics\": [\"topic1\", \"topic2\"],
-                  \"relationship\": \"brief description\"
                 }
               ]
             }
@@ -450,24 +444,10 @@ class EntityExtractor
             \"organizations\": [
              {
                \"name\": \"Company/Organization Name\",
-               \"associated_people\": [\"names of people from this org\"],
-               \"context\": \"how it was mentioned\"
+               \"context\": \"how it was mentioned\",
+               \"confidence\": \"high|medium|low\"
              }
             ],
-            \"relationships\": [
-             {
-               \"person1\": \"name\",
-               \"person2\": \"name\",
-               \"relationship\": \"introduced|manages|works_with|contacted\",
-               \"context\": \"brief description\"
-             }
-            ],
-            \"potential_duplicates\": [
-             {
-               \"names\": [\"John Doe\", \"JD\", \"@jdoe\"],
-               \"reason\": \"similar names and context suggest same person\"
-             }
-            ]
             }
             ```
 
