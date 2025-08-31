@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Exceptions\EmbeddingException;
-use App\Exceptions\ExtractingEntitiesException;
 use App\Exceptions\NoContentToIndexException;
 use App\Integrations\Communication\Issue;
 use App\Models\DocumentChunk;

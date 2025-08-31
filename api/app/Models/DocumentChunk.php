@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class DocumentChunk extends Model implements Embeddable
@@ -22,14 +20,10 @@ class DocumentChunk extends Model implements Embeddable
         'search_vector',
     ];
 
+
     public function document()
     {
         return $this->belongsTo(Document::class);
-    }
-
-    public function entities(): HasOne
-    {
-        return $this->hasOne(DocumentChunkEntity::class);
     }
 
     public function participants(): MorphMany
@@ -40,6 +34,21 @@ class DocumentChunk extends Model implements Embeddable
     public function topics(): MorphMany
     {
         return $this->morphMany(DocumentTopic::class, 'entity');
+    }
+
+    protected static function booted()
+    {
+        static::deleting(function (DocumentChunk $chunk) {
+            DocumentParticipant::query()
+                ->where('entity_id', $chunk->id)
+                ->where('entity_type', get_class($chunk))
+                ->delete();
+
+            DocumentTopic::query()
+                ->where('entity_id', $chunk->id)
+                ->where('entity_type', get_class($chunk))
+                ->delete();
+        });
     }
 
     public function getEmbeddableContent(): string
