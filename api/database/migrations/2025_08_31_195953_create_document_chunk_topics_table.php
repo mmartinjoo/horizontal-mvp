@@ -13,7 +13,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(DocumentChunk::class)->constrained()->cascadeOnDelete();
             $table->string('name');
-            $table->jsonb('variations');
+            $table->jsonb('variations')->nullable();
             $table->string('category')->nullable();
             $table->timestamps();
         });

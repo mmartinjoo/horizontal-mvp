@@ -15,6 +15,7 @@ use App\Services\LLM\Embedder;
 use App\Services\VectorStore\VectorStore;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Arr;
 use Throwable;
 
 class IndexIssue implements ShouldQueue
@@ -99,16 +100,41 @@ class IndexIssue implements ShouldQueue
             ]);
 
             foreach ($indexingWorkflowItem->document->chunks as $chunk) {
-                $entities = $entityExtractor->extract($chunk->body);
-                $people = $entities['people'];
-                if ($this->issue->assignee && !in_array($this->issue->assignee, $people)) {
-                    $people[] = $this->issue->assignee;
+                $participants = $entityExtractor->extractParticipants($chunk->body);
+                if ($this->issue->assignee) {
+                    $participants['people'] = [
+                        'name' => $this->issue->assignee,
+                        'context' => 'assignee',
+                    ];
                 }
-                $chunk->entities()->create([
-                    'keywords' => $entities['keywords'],
-                    'people' => $people,
-                    'dates' => $entities['dates'],
-                ]);
+                foreach ($participants as $person) {
+                    if (Arr::get($person, 'confidence') === 'low') {
+                        continue;
+                    }
+                    if (!Arr::get($person, 'name')) {
+                        continue;
+                    }
+                    $chunk->participants()->create([
+                        'name' => $person['name'],
+                        'context' => Arr::get($person, 'context'),
+                    ]);
+                }
+
+                logger('CHUNK: ' . $chunk->body);
+                $topics = $entityExtractor->extractTopics($chunk->body);
+                foreach ($topics['topics'] as $topic) {
+                    if (!Arr::get($topic, 'name')) {
+                        continue;
+                    }
+                    if (Arr::get($topic, 'importance', 'low') === 'low') {
+                        continue;
+                    }
+                    $chunk->topics()->create([
+                        'name' => $topic['name'],
+                        'variations' => $topic['variations'],
+                        'category' => $topic['category'],
+                    ]);
+                }
             }
 
             $indexingWorkflowItem->update([
@@ -119,7 +145,7 @@ class IndexIssue implements ShouldQueue
                 'status' => 'warning',
                 'error_message' => $e->getMessage(),
             ]);
-            throw ExtractingEntitiesException::wrap($e);
+            logger($e);
         }
     }
 

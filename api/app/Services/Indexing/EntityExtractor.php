@@ -189,7 +189,7 @@ class EntityExtractor
             {
               \"topics\": [
                 {
-                  \"topic\": \"exact phrase from text\",
+                  \"name\": \"exact phrase from text\",
                   \"variations\": [\"alternate names\", \"abbreviations\"],
                   \"category\": \"feature|person|issue|tool|incident|process\",
                   \"importance\": \"high|medium|low\"
@@ -215,10 +215,14 @@ class EntityExtractor
         ";
 
         $response = $this->llm->completion($prompt, 4096);
-        return json_decode($response, true);
+        $json = json_decode($response, true);
+        return !$json
+            ? []
+            : $json;
+
     }
 
-    public function extractPeople(string $text): array
+    public function extractParticipants(string $text): array
     {
         $prompt = "
             You are a person and entity extraction specialist for a knowledge management system that connects information across multiple tools (Slack, Gmail, Google Drive, GitHub, Linear, Jira, etc.).
@@ -476,6 +480,9 @@ class EntityExtractor
         ";
 
         $response = $this->llm->completion($prompt, 4096);
-        dd(json_decode($response, true));
+        $json = json_decode($response, true);
+        return !$json
+            ? []
+            : $json;
     }
 }

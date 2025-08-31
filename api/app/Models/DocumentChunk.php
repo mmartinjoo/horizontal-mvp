@@ -31,6 +31,16 @@ class DocumentChunk extends Model implements Embeddable
         return $this->hasOne(DocumentChunkEntity::class);
     }
 
+    public function participants(): HasMany
+    {
+        return $this->hasMany(DocumentChunkParticipant::class);
+    }
+
+    public function topics(): HasMany
+    {
+        return $this->hasMany(DocumentChunkTopic::class);
+    }
+
     public function getEmbeddableContent(): string
     {
         return $this->body;
