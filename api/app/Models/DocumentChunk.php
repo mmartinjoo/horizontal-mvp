@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class DocumentChunk extends Model implements Embeddable
 {
@@ -31,14 +32,14 @@ class DocumentChunk extends Model implements Embeddable
         return $this->hasOne(DocumentChunkEntity::class);
     }
 
-    public function participants(): HasMany
+    public function participants(): MorphMany
     {
-        return $this->hasMany(DocumentChunkParticipant::class);
+        return $this->morphMany(DocumentParticipant::class, 'entity');
     }
 
-    public function topics(): HasMany
+    public function topics(): MorphMany
     {
-        return $this->hasMany(DocumentChunkTopic::class);
+        return $this->morphMany(DocumentTopic::class, 'entity');
     }
 
     public function getEmbeddableContent(): string

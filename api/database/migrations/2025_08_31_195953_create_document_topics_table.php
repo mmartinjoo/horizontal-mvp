@@ -9,17 +9,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('document_chunk_participants', function (Blueprint $table) {
+        Schema::create('document_topics', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(DocumentChunk::class)->constrained()->cascadeOnDelete();
+            $table->string('entity_type');
+            $table->unsignedBigInteger('entity_id');
             $table->string('name');
-            $table->string('context')->nullable();
+            $table->jsonb('variations')->nullable();
+            $table->string('category')->nullable();
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('document_chunk_participants');
+        Schema::dropIfExists('document_topics');
     }
 };
