@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class DocumentComment extends Model implements Embeddable
 {
     use HasEmbedding;
+    use HasParticipants;
 
     protected $guarded = [];
 
@@ -28,10 +29,10 @@ class DocumentComment extends Model implements Embeddable
         return $this->belongsTo(Document::class);
     }
 
-    public function participants(): MorphMany
-    {
-        return $this->morphMany(DocumentParticipant::class, 'entity');
-    }
+//    public function participants(): MorphMany
+//    {
+//        return $this->morphMany(DocumentParticipant::class, 'entity');
+//    }
 
     public function topics(): MorphMany
     {

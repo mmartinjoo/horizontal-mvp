@@ -98,6 +98,7 @@ class IndexIssue implements ShouldQueue
                 'status' => 'extracting_entities',
             ]);
 
+            /** @var DocumentChunk $chunk */
             foreach ($indexingWorkflowItem->document->chunks as $chunk) {
                 $participants = $entityExtractor->extractParticipants($chunk->body);
                 if ($this->issue->assignee) {
@@ -106,24 +107,7 @@ class IndexIssue implements ShouldQueue
                         'context' => 'assignee',
                     ];
                 }
-                logger('PARTICIPANTS: ' . json_encode($participants));
-                $keys = ['people', 'organizations'];
-                foreach ($keys as $key) {
-                    foreach ($participants[$key] as $person) {
-                        logger($person);
-                        if (Arr::get($person, 'confidence') === 'low') {
-                            continue;
-                        }
-                        if (!Arr::get($person, 'name')) {
-                            continue;
-                        }
-                        $chunk->participants()->create([
-                            'name' => $person['name'],
-                            'context' => Arr::get($person, 'context'),
-                        ]);
-                    }
-                }
-
+                $chunk->createParticipants($participants);
                 $topics = $entityExtractor->extractTopics($chunk->body);
                 foreach ($topics['topics'] as $topic) {
                     if (!Arr::get($topic, 'name')) {

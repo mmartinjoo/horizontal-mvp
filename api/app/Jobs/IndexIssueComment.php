@@ -39,34 +39,20 @@ class IndexIssueComment implements ShouldQueue
                     'context' => 'assignee',
                 ];
             }
-            $keys = ['people', 'organizations'];
-            foreach ($keys as $key) {
-                foreach ($participants[$key] as $person) {
-                    if (Arr::get($person, 'confidence') === 'low') {
-                        continue;
-                    }
-                    if (!Arr::get($person, 'name')) {
-                        continue;
-                    }
-                    $this->comment->participants()->create([
-                        'name' => $person['name'],
-                        'context' => Arr::get($person, 'context'),
-                    ]);
+            $this->comment->createParticipants($participants);
+            $topics = $entityExtractor->extractTopics($this->comment->body);
+            foreach ($topics['topics'] as $topic) {
+                if (!Arr::get($topic, 'name')) {
+                    continue;
                 }
-                $topics = $entityExtractor->extractTopics($this->comment->body);
-                foreach ($topics['topics'] as $topic) {
-                    if (!Arr::get($topic, 'name')) {
-                        continue;
-                    }
-                    if (Arr::get($topic, 'importance', 'low') === 'low') {
-                        continue;
-                    }
-                    $this->comment->topics()->create([
-                        'name' => $topic['name'],
-                        'variations' => $topic['variations'],
-                        'category' => $topic['category'],
-                    ]);
+                if (Arr::get($topic, 'importance', 'low') === 'low') {
+                    continue;
                 }
+                $this->comment->topics()->create([
+                    'name' => $topic['name'],
+                    'variations' => $topic['variations'],
+                    'category' => $topic['category'],
+                ]);
             }
         } catch (Throwable $e) {
             throw EmbeddingException::wrap($e);
