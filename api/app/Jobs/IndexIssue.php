@@ -101,25 +101,29 @@ class IndexIssue implements ShouldQueue
             foreach ($indexingWorkflowItem->document->chunks as $chunk) {
                 $participants = $entityExtractor->extractParticipants($chunk->body);
                 if ($this->issue->assignee) {
-                    $participants['people'] = [
+                    $participants['people'][] = [
                         'name' => $this->issue->assignee,
                         'context' => 'assignee',
                     ];
                 }
-                foreach ($participants as $person) {
-                    if (Arr::get($person, 'confidence') === 'low') {
-                        continue;
+                logger('PARTICIPANTS: ' . json_encode($participants));
+                $keys = ['people', 'organizations'];
+                foreach ($keys as $key) {
+                    foreach ($participants[$key] as $person) {
+                        logger($person);
+                        if (Arr::get($person, 'confidence') === 'low') {
+                            continue;
+                        }
+                        if (!Arr::get($person, 'name')) {
+                            continue;
+                        }
+                        $chunk->participants()->create([
+                            'name' => $person['name'],
+                            'context' => Arr::get($person, 'context'),
+                        ]);
                     }
-                    if (!Arr::get($person, 'name')) {
-                        continue;
-                    }
-                    $chunk->participants()->create([
-                        'name' => $person['name'],
-                        'context' => Arr::get($person, 'context'),
-                    ]);
                 }
 
-                logger('CHUNK: ' . $chunk->body);
                 $topics = $entityExtractor->extractTopics($chunk->body);
                 foreach ($topics['topics'] as $topic) {
                     if (!Arr::get($topic, 'name')) {

@@ -112,7 +112,7 @@ class IndexJira implements ShouldQueue
                             'comment_id' => $comment->id,
                             'metadata' => $comment,
                         ]);
-//                        IndexIssueComment::dispatch($issue, $indexedComment);
+                        IndexIssueComment::dispatch($issue, $indexedComment);
                     }
                 }
             }

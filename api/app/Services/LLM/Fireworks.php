@@ -14,10 +14,11 @@ class Fireworks extends LLM
         ])
             ->timeout(300)
             ->post('https://api.fireworks.ai/inference/v1/completions', [
-                'model' => $this->model,
-                'prompt' => $prompt,
-                'max_tokens' => $maxTokens,
-            ],
+                    'model' => $this->model,
+                    'prompt' => $prompt,
+                    'max_tokens' => $maxTokens,
+                    'temperature' => 0.4,
+                ],
             )
             ->throw()
             ->json();

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class DocumentComment extends Model implements Embeddable
 {
@@ -27,9 +28,14 @@ class DocumentComment extends Model implements Embeddable
         return $this->belongsTo(Document::class);
     }
 
-    public function entities(): HasMany
+    public function participants(): MorphMany
     {
-        return $this->hasMany(DocumentCommentEntity::class);
+        return $this->morphMany(DocumentParticipant::class, 'entity');
+    }
+
+    public function topics(): MorphMany
+    {
+        return $this->morphMany(DocumentTopic::class, 'entity');
     }
 
     public function getEmbeddableContent(): string

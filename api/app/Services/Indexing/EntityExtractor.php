@@ -148,10 +148,7 @@ class EntityExtractor
             - Project/feature names (e.g., \"Feature XYZ\", \"bulk create API\", \"notification system\")
             - Technical components and systems (e.g., \"MySQL server\", \"docker compose stack\", \"certbot\")
             - Error messages and issues (e.g., \"MySQL server has gone away\", \"max_allowed_packet exceeded\")
-            - People's names and their roles/expertise
             - Internal tools, services, and codebases
-            - Customer/client names
-            - Specific dates or time periods related to events/incidents
             - Internal terminology and acronyms unique to the organization
 
             ### MEDIUM PRIORITY:
@@ -162,9 +159,9 @@ class EntityExtractor
             - Ticket/issue IDs with context (e.g., \"DEV-238\", \"PR #247\")
 
             ### LOW/SKIP:
-                - Generic programming terms (unless specifically discussed as a topic)
+            - Generic programming terms (unless specifically discussed as a topic)
             - Common words that appear everywhere
-                - Generic business terms unless they're part of a specific initiative
+            - Generic business terms unless they're part of a specific initiative
 
             ## Extraction Rules
 
@@ -427,6 +424,7 @@ class EntityExtractor
             - Placeholder names (e.g., \"USER\", \"CUSTOMER\", \"[Name]\")
             - Bot/system accounts (e.g., \"github-bot\", \"jira-automation\")
             - Group mentions (@channel, @here, @everyone, \"the team\")
+            - Don't extract company names that are likely just internal tools such as Jira, Slack, GitHub, etc. These are not real \"contacts\" in most cases
 
             **Confidence Indicators**:
             - HIGH: Full name with email or @mention
