@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Integrations\Communication\Jira\JiraOAuthService;
+use App\Services\GraphDB\GraphDB;
+use App\Services\GraphDB\Memgraph;
 use App\Services\Indexing\EntityExtractor;
 use App\Services\LLM\Anthropic;
 use App\Services\LLM\Embedder;
@@ -72,5 +74,9 @@ class AppServiceProvider extends ServiceProvider
             ->when(JiraOAuthService::class)
             ->needs('$redirectUri')
             ->give(config('services.jira.redirect_uri'));
+
+        $this->app->bind(GraphDB::class, function () {
+            return new Memgraph(config('graphdb.connections.memgraph'));
+        });
     }
 }
