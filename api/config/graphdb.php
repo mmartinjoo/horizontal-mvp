@@ -9,7 +9,7 @@ return [
             'port'     => env('GRAPH_DB_PORT', 7687),
             'user'     => env('GRAPH_DB_USER', null),
             'password' => env('GRAPH_DB_PASSWORD', null),
-            'scheme'   => 'bolt', // Or 'bolt+s' for SSL
+            'scheme'   => 'none', // 'bolt' or 'bolt+s' for SSL
         ],
     ],
 ];
