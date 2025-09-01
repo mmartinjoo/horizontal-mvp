@@ -1,4 +1,21 @@
-# horizontal.app
+# Horizontal
+
+Horizontal is a search platform for engineering teams. It integrates with 10+ tools such as 
+- Gmail
+- Google Drive
+- Dropbox
+- Calendar
+- Notion
+- Trello
+- Linear
+- Jira
+- Slack
+- AWS S3
+- etc
+
+and provides one search platform for all of them.
+
+In seconds, you can find relevant information to your question that is spread across multiple documents, tickets, conversations.
 
 ## The problem
 Companies use lots of different applications to:
@@ -77,6 +94,35 @@ Slack #engineering - Thread from April 15 [Link to Slack conversation]
 Linear ticket DEV-238 - Refactor bulk creation INSERT query [Link to Linear issue]
 Linear ticket DEV-240 - Increase MySQL `max_allowed_packet` [Link to Linear issue]
 """
+
+## Use cases
+
+Use case: Search
+Capability: search across 10+ different sources using natural language
+Benefit: incredibly fast
+
+Use case: Connected insights
+Capability: 
+    Visualize your information as a connected graph. When you search with Horizontal it doesn't just provide a summary and data sources. It also creates a beautiful graph that shows how your information is connected.
+    For example, let's say you have a feature in your application but you're not sure why.
+    You can ask Horizontal: "why do we have feature X?"
+    It will find the related:
+        - PRs
+        - Tickets
+        - Drive docs
+        - Slack conversation
+
+    From the Slack conversation it knows which product manager or support staff, or other stakeholders participated with ideas and requests.
+    From this relationship, you'll understand that have this feature because of Mike from sales suggested it to oyu based on a customer feedback.
+Benefit: in a second you can see the relation between your slack conversations, Drive docs, Linear tickets, GitHub PR. See which team member contributed to which part.
+
+Use case: Recall past decisions
+Capability: read a quick summary about a decision that was made based on 4 Slack conversations, 3 Google Docs, etc
+Benefit: makes it really easy to recall past decision with all the sources
+
+Use case: Onboarding
+Capability: you can use Horizontal to onboard new developers way faster than you would normally do. Horizontal will be their mentor and answers all of their questions.
+Benefit: save valuable engineering hours when bringing new developers into your team.
 
 ## The feedback
 
