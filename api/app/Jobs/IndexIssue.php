@@ -8,6 +8,7 @@ use App\Integrations\Communication\Issue;
 use App\Models\DocumentChunk;
 use App\Models\IndexingWorkflow;
 use App\Models\IndexingWorkflowItem;
+use App\Services\GraphDB\GraphDB;
 use App\Services\Indexing\EntityExtractor;
 use App\Services\Indexing\TextChunker;
 use App\Services\LLM\Embedder;
@@ -32,6 +33,7 @@ class IndexIssue implements ShouldQueue
         Embedder $embedder,
         VectorStore $vectorStore,
         EntityExtractor $entityExtractor,
+        GraphDB $graphDB,
     ): void {
         $indexingWorkflowItem = IndexingWorkflowItem::findOrFail($this->indexingWorkflowItemId);
         $chunks = $textChunker->chunk($this->issue->title . ' ' . $this->issue->description);
@@ -49,7 +51,7 @@ class IndexIssue implements ShouldQueue
         }
 
         foreach ($chunks as $i => $chunk) {
-            DocumentChunk::create([
+            $chunk = DocumentChunk::create([
                 'document_id' => $indexingWorkflowItem->document->id,
                 'body' => $chunk,
                 'position' => $i+1,
@@ -62,13 +64,17 @@ class IndexIssue implements ShouldQueue
         $indexingWorkflowItem->update([
             'status' => 'prepared',
         ]);
-        $this->createEmbedding($indexingWorkflowItem, $embedder, $vectorStore);
+        $this->createEmbedding($indexingWorkflowItem, $embedder, $vectorStore, $graphDB);
         $this->createEntities($indexingWorkflowItem, $entityExtractor);
         $this->updateWorkflowStatus($indexingWorkflowItem);
     }
 
-    private function createEmbedding(IndexingWorkflowItem $indexingWorkflowItem, Embedder $embedder, VectorStore $vectorStore)
-    {
+    private function createEmbedding(
+        IndexingWorkflowItem $indexingWorkflowItem,
+        Embedder $embedder,
+        VectorStore $vectorStore,
+        GraphDB $graphDB,
+    ) {
         try {
             $indexingWorkflowItem->update([
                 'status' => 'vectorizing',
@@ -77,6 +83,16 @@ class IndexIssue implements ShouldQueue
             foreach ($indexingWorkflowItem->document->chunks as $chunk) {
                 $embedding = $embedder->createEmbedding($chunk->getEmbeddableContent());
                 $vectorStore->upsert($chunk, $embedding);
+                $graphDB->createNodeWithRelation(
+                    newNodeLabel: 'IssueChunk',
+                    newNodeAttributes: [
+                        'id' => $chunk->id,
+                        'embedding' => $embedding,
+                    ],
+                    relation: 'CHUNK_OF',
+                    relatedNodeLabel: 'Issue',
+                    relatedNodeID: $indexingWorkflowItem->document->id,
+                );
             }
 
             $indexingWorkflowItem->update([

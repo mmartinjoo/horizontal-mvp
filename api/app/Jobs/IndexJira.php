@@ -37,21 +37,24 @@ class IndexJira implements ShouldQueue
 
         $jiraIntegration = JiraIntegration::where('team_id', $this->team->id)->firstOrFail();
         $projects = $jira->getProjects($this->team);
-        foreach ($projects as $project) {
+        foreach ($projects as $projectData) {
             $exists = JiraProject::query()
-                ->where('key', $project['key'])
+                ->where('key', $projectData['key'])
                 ->where('team_id', $this->team->id)
                 ->exists();
 
             if (!$exists) {
-                JiraProject::create([
+                $project = JiraProject::create([
                     'team_id' => $this->team->id,
                     'jira_integration_id' => $jiraIntegration->id,
-                    'title' => $project['name'],
-                    'key' => $project['key'],
-                    'jira_id' => $project['id'],
+                    'title' => $projectData['name'],
+                    'key' => $projectData['key'],
+                    'jira_id' => $projectData['id'],
                 ]);
-                $graphDB->createNode($project['key'], 'Project', []);
+                $graphDB->createNode('Project', [
+                    'id' => $project->id,
+                    'title' => $project->title,
+                ]);
             }
 
             $prios = ['high', 'medium', 'low'];
@@ -61,7 +64,7 @@ class IndexJira implements ShouldQueue
                     'medium' => ['from' => now()->subMonths(3), 'to' => now()->subMonths(1)],
                     'low' => ['from' => now()->subMonths(6), 'to' => now()->subMonths(3)],
                 };
-                $issues = $jira->getIssues($this->team, $project['key'], $dateRange['from'], $dateRange['to']);
+                $issues = $jira->getIssues($this->team, $projectData['key'], $dateRange['from'], $dateRange['to']);
                 $indexing->increment('overall_items', count($issues));
                 foreach ($issues as $i => $issueData) {
                     $description = $this->extractTextFromDocument($issueData['fields']['description'] ?? []);
@@ -82,7 +85,7 @@ class IndexJira implements ShouldQueue
                         ->delete();
 
                     $indexing->increment('deleted_items', $count);
-                    $content = Document::create([
+                    $doc = Document::create([
                         'team_id' => $this->team->id,
                         'source_type' => 'jira',
                         'source_id' => $issue->id,
@@ -91,11 +94,15 @@ class IndexJira implements ShouldQueue
                         'priority' => $prio,
                         'metadata' => $issueData,
                     ]);
+                    $graphDB->createNode('Issue', [
+                        'id' => $doc->id,
+                        'title' => $doc->title,
+                    ]);
                     $indexingItem = IndexingWorkflowItem::create([
                         'indexing_workflow_id' => $indexing->id,
                         'data' => $issue,
                         'status' => 'queued',
-                        'document_id' => $content->id,
+                        'document_id' => $doc->id,
                     ]);
                     IndexIssue::dispatch($issue, $indexingItem->id);
 
@@ -107,7 +114,7 @@ class IndexJira implements ShouldQueue
                     $comments = IssueComment::collectJira($commentsData, $bodies);
                     foreach ($comments as $comment) {
                         $indexedComment = DocumentComment::create([
-                            'document_id' => $content->id,
+                            'document_id' => $doc->id,
                             'body' => $comment->body,
                             'author' => $comment->author,
                             'commented_at' => $comment->createdAt,
