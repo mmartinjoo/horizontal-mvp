@@ -36,6 +36,36 @@ class Document extends Model implements Embeddable
         return $this->hasMany(DocumentComment::class);
     }
 
+    protected static function booted()
+    {
+        static::deleting(function (Document $document) {
+            $chunks = DocumentChunk::where('document_id', $document->id)->get();
+            foreach ($chunks as $chunk) {
+                DocumentParticipant::query()
+                    ->where('entity_id', $chunk->id)
+                    ->where('entity_type', get_class($chunk))
+                    ->delete();
+
+                DocumentTopic::query()
+                    ->where('entity_id', $chunk->id)
+                    ->where('entity_type', get_class($chunk))
+                    ->delete();
+            }
+            $comments = DocumentComment::where('document_id', $document->id)->get();
+            foreach ($comments as $comment) {
+                DocumentParticipant::query()
+                    ->where('entity_id', $comment->id)
+                    ->where('entity_type', get_class($comment))
+                    ->delete();
+
+                DocumentTopic::query()
+                    ->where('entity_id', $comment->id)
+                    ->where('entity_type', get_class($comment))
+                    ->delete();
+            }
+        });
+    }
+
     public function getEmbeddableContent(): string
     {
         if (!$this->body && !$this->preview) {
@@ -45,18 +75,5 @@ class Document extends Model implements Embeddable
             return $this->preview;
         }
         return $this->body;
-    }
-
-    public function getParticipants(): Collection
-    {
-        $participants = collect();
-        if ($this->source_type === 'jira') {
-            $participants[] = Arr::get($this->metadata, 'fields.assignee.displayName');
-
-            foreach ($this->comments as $comment) {
-                $participants[] = $comment->author;
-            }
-        }
-        return $participants->unique();
     }
 }

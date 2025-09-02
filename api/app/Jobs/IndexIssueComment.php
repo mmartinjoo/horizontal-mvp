@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Exceptions\EmbeddingException;
-use App\Integrations\Communication\Issue;
 use App\Models\DocumentComment;
 use App\Services\GraphDB\GraphDB;
 use App\Services\Indexing\EntityExtractor;
@@ -11,8 +10,6 @@ use App\Services\LLM\Embedder;
 use App\Services\VectorStore\VectorStore;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Throwable;
 
 class IndexIssueComment implements ShouldQueue
@@ -20,7 +17,6 @@ class IndexIssueComment implements ShouldQueue
     use Queueable;
 
     public function __construct(
-        private Issue           $issue,
         private DocumentComment $comment,
     ) {
     }
@@ -42,21 +38,23 @@ class IndexIssueComment implements ShouldQueue
                 ],
                 relation: 'COMMENT_OF',
                 relatedNodeLabel: 'Issue',
-                relatedNodeID: $this->issue->id,
+                relatedNodeID: $this->comment->document->id,
             );
 
-            $participants = $entityExtractor->extractParticipants($this->comment->body);
             if ($this->comment->author) {
-                $count = collect($participants['people'])
-                    ->filter(fn (array $person) => Str::slug($person['name']) === Str::slug($this->comment->author))
-                    ->count();
-                if ($count === 0) {
-                    $participants['people'][] = [
-                        'name' => $this->issue->assignee,
-                        'context' => 'assignee',
-                    ];
-                }
+                $graphDB->createNodeWithRelation(
+                    newNodeLabel: 'Participant',
+                    newNodeAttributes: [
+                        'id' => $this->comment->author->id,
+                        'name' => $this->comment->author->name,
+                    ],
+                    relation: 'AUTHOR_OF',
+                    relatedNodeLabel: 'IssueComment',
+                    relatedNodeID: $this->comment->id,
+                );
             }
+
+            $participants = $entityExtractor->extractParticipants($this->comment->body);
             $this->comment->createParticipants($participants);
             foreach ($this->comment->participants as $participant) {
                 $graphDB->createNodeWithRelation(
@@ -64,11 +62,10 @@ class IndexIssueComment implements ShouldQueue
                     newNodeAttributes: [
                         'id' => $participant->id,
                         'name' => $participant->name,
-                        'slug' => $participant->slug,
                     ],
-                    relation: $participant->slug === Str::slug($this->comment->author) ? 'AUTHOR_OF' : 'PARTICIPATED_IN',
-                    relatedNodeLabel: 'Issue',
-                    relatedNodeID: $this->issue->id,
+                    relation: 'MENTIONED_IN',
+                    relatedNodeLabel: 'IssueComment',
+                    relatedNodeID: $this->comment->id,
                 );
             }
 
@@ -80,7 +77,6 @@ class IndexIssueComment implements ShouldQueue
                     newNodeAttributes: [
                         'id' => $topic->id,
                         'name' => $topic->name,
-                        'slug' => $topic->slug,
                     ],
                     relation: 'MENTIONED_IN',
                     relatedNodeLabel: 'IssueComment',

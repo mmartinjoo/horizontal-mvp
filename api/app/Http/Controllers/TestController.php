@@ -6,6 +6,7 @@ use App\Integrations\Communication\Jira\JiraTokenManager;
 use App\Jobs\IndexGoogleDrive;
 use App\Jobs\IndexJira;
 use App\Models\DocumentChunk;
+use App\Models\DocumentComment;
 use App\Models\JiraProject;
 use App\Models\Team;
 use App\Services\LLM\Embedder;
@@ -26,12 +27,17 @@ class TestController extends Controller
     {
         $team = \App\Models\Team::where(['name' => 'Test Company'])->firstOrFail();
 
-        $user = \App\Models\User::create([
-            'name' => 'Test User',
-            'email' => 'jira1@example.com',
-            'password' => bcrypt('password'),
-            'team_id' => $team->id
-        ]);
+        $user = \App\Models\User::updateOrCreate(
+            [
+                'email' => 'jira1@example.com',
+            ],
+            [
+                'name' => 'Test User',
+                'email' => 'jira1@example.com',
+                'password' => bcrypt('password'),
+                'team_id' => $team->id
+            ],
+        );
 
         $token = $user->createToken('test-token')->plainTextToken;
         dd($token);

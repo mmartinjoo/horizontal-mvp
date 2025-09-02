@@ -27,21 +27,6 @@ class DocumentChunk extends Model implements Embeddable
         return $this->belongsTo(Document::class);
     }
 
-    protected static function booted()
-    {
-        static::deleting(function (DocumentChunk $chunk) {
-            DocumentParticipant::query()
-                ->where('entity_id', $chunk->id)
-                ->where('entity_type', get_class($chunk))
-                ->delete();
-
-            DocumentTopic::query()
-                ->where('entity_id', $chunk->id)
-                ->where('entity_type', get_class($chunk))
-                ->delete();
-        });
-    }
-
     public function getEmbeddableContent(): string
     {
         return $this->body;

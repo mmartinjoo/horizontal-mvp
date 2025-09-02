@@ -24,6 +24,7 @@ abstract class GraphDB
         string $relatedNodeID,
     );
     abstract public function getNode(string $label, array $attributes): Node;
+    abstract public function query(string $query);
 
     public function __construct(array $config)
     {

@@ -37,7 +37,13 @@ class Memgraph extends GraphDB
         string $relatedNodeLabel,
         string $relatedNodeID,
     ) {
+        logger('creating node');
+        logger($newNodeLabel);
         $attributesStr = $this->arrToAttributeStr($newNodeAttributes);
+        logger($attributesStr);
+        logger($relation);
+        logger($relatedNodeLabel);
+        logger($relatedNodeID);
         $rows = MemgraphClient::query("
             merge (r:$relatedNodeLabel { id: \"$relatedNodeID\" })
             with r
@@ -53,5 +59,10 @@ class Memgraph extends GraphDB
         $attributesStr = $this->arrToAttributeStr($attributes);
         $rows = MemgraphClient::query("match (n:$label $attributesStr) return n)");
         return $this->parseNode($rows);
+    }
+
+    public function query(string $query)
+    {
+        MemgraphClient::query($query);
     }
 }

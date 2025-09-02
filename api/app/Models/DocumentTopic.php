@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class DocumentTopic extends Model
 {
+    protected $table = 'documents_topics';
     protected $guarded = [];
 
     protected $casts = [

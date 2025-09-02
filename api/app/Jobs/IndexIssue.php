@@ -8,6 +8,7 @@ use App\Integrations\Communication\Issue;
 use App\Models\DocumentChunk;
 use App\Models\IndexingWorkflow;
 use App\Models\IndexingWorkflowItem;
+use App\Models\Participant;
 use App\Services\GraphDB\GraphDB;
 use App\Services\Indexing\EntityExtractor;
 use App\Services\Indexing\TextChunker;
@@ -118,20 +119,34 @@ class IndexIssue implements ShouldQueue
                 'status' => 'extracting_entities',
             ]);
 
+            if ($this->issue->assignee) {
+                $assignee = Participant::updateOrCreate(
+                    [
+                        'slug' => Str::slug($this->issue->assignee),
+                        'type' => 'person',
+                    ],
+                    [
+                        'slug' => Str::slug($this->issue->assignee),
+                        'name' => $this->issue->assignee,
+                        'type' => 'person',
+                    ],
+                );
+                $graphDB->createNodeWithRelation(
+                    newNodeLabel: 'Participant',
+                    newNodeAttributes: [
+                        'id' => $assignee->id,
+                        'name' => $assignee->name,
+                        'slug' => $assignee->slug,
+                    ],
+                    relation: 'ASSIGNEE_OF',
+                    relatedNodeLabel: 'Issue',
+                    relatedNodeID: $indexingWorkflowItem->document->id,
+                );
+            }
+
             /** @var DocumentChunk $chunk */
             foreach ($indexingWorkflowItem->document->chunks as $chunk) {
                 $participants = $entityExtractor->extractParticipants($chunk->body);
-                if ($this->issue->assignee) {
-                    $count = collect($participants['people'])
-                        ->filter(fn (array $person) => Str::slug($person['name']) === Str::slug($this->issue->assignee))
-                        ->count();
-                    if ($count === 0) {
-                        $participants['people'][] = [
-                            'name' => $this->issue->assignee,
-                            'context' => 'assignee',
-                        ];
-                    }
-                }
                 $chunk->createParticipants($participants);
                 foreach ($chunk->participants as $participant) {
                     $graphDB->createNodeWithRelation(
