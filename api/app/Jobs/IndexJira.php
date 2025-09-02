@@ -40,12 +40,12 @@ class IndexJira implements ShouldQueue
         $jiraIntegration = JiraIntegration::where('team_id', $this->team->id)->firstOrFail();
         $projects = $jira->getProjects($this->team);
         foreach ($projects as $projectData) {
-            $exists = JiraProject::query()
+            $project = JiraProject::query()
                 ->where('key', $projectData['key'])
                 ->where('team_id', $this->team->id)
-                ->exists();
+                ->first();
 
-            if (!$exists) {
+            if (!$project) {
                 $project = JiraProject::create([
                     'team_id' => $this->team->id,
                     'jira_integration_id' => $jiraIntegration->id,
@@ -55,7 +55,7 @@ class IndexJira implements ShouldQueue
                 ]);
                 $graphDB->createNode('Project', [
                     'id' => $project->id,
-                    'title' => $project->title,
+                    'name' => $project->title,
                 ]);
             }
 
@@ -96,10 +96,16 @@ class IndexJira implements ShouldQueue
                         'priority' => $prio,
                         'metadata' => $issueData,
                     ]);
-                    $graphDB->createNode('Issue', [
-                        'id' => $doc->id,
-                        'title' => $doc->title,
-                    ]);
+                    $graphDB->createNodeWithRelation(
+                        newNodeLabel: 'Issue',
+                        newNodeAttributes: [
+                            'id' => $doc->id,
+                            'name' => $doc->title,
+                        ],
+                        relation: 'PART_OF',
+                        relatedNodeLabel: 'Project',
+                        relatedNodeID: $project->id,
+                    );
                     $indexingItem = IndexingWorkflowItem::create([
                         'indexing_workflow_id' => $indexing->id,
                         'data' => $issue,

@@ -6,6 +6,7 @@ use App\Integrations\Communication\Jira\JiraTokenManager;
 use App\Jobs\IndexGoogleDrive;
 use App\Jobs\IndexJira;
 use App\Models\DocumentChunk;
+use App\Models\JiraProject;
 use App\Models\Team;
 use App\Services\LLM\Embedder;
 use Illuminate\Http\Request;
