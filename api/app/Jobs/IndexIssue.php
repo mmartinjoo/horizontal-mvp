@@ -136,7 +136,6 @@ class IndexIssue implements ShouldQueue
                     newNodeAttributes: [
                         'id' => $assignee->id,
                         'name' => $assignee->name,
-                        'slug' => $assignee->slug,
                     ],
                     relation: 'ASSIGNEE_OF',
                     relatedNodeLabel: 'Issue',
@@ -154,7 +153,6 @@ class IndexIssue implements ShouldQueue
                         newNodeAttributes: [
                             'id' => $participant->id,
                             'name' => $participant->name,
-                            'slug' => $participant->slug,
                         ],
                         relation: $participant->context === 'assignee' ? 'ASSIGNEE_OF' : 'PARTICIPATED_IN',
                         relatedNodeLabel: 'Issue',
