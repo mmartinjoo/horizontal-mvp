@@ -41,7 +41,7 @@ class Memgraph extends GraphDB
         $rows = MemgraphClient::query("
             merge (r:$relatedNodeLabel { id: \"$relatedNodeID\" })
             with r
-            create (n:$newNodeLabel { $attributesStr })
+            merge (n:$newNodeLabel { $attributesStr })
             merge (n)-[:$relation]->(r)
             return n;
         ");

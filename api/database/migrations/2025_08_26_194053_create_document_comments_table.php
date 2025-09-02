@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Document;
+use App\Models\Participant;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Document::class)->constrained()->cascadeOnDelete();
             $table->longText('body');
-            $table->string('author');
+            $table->foreignIdFor(Participant::class, 'author_id')->constrained()->cascadeOnDelete();
             $table->dateTime('commented_at');
             $table->string('comment_id');
             $table->jsonb('metadata')->nullable();
@@ -27,8 +28,7 @@ return new class extends Migration
           ALTER TABLE document_comments
           ADD COLUMN search_vector tsvector
           GENERATED ALWAYS AS (
-              setweight(to_tsvector('english', body), 'A') ||
-              setweight(to_tsvector('english', author), 'B')
+              setweight(to_tsvector('english', body), 'A')
           ) STORED
       ");
 

@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class DocumentComment extends Model implements Embeddable
 {
@@ -25,9 +27,14 @@ class DocumentComment extends Model implements Embeddable
         'commented_at' => 'datetime',
     ];
 
-    public function document()
+    public function document(): BelongsTo
     {
         return $this->belongsTo(Document::class);
+    }
+
+    public function author(): BelongsTo
+    {
+        return $this->belongsTo(Participant::class, 'author_id');
     }
 
     public function getEmbeddableContent(): string

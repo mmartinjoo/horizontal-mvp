@@ -11,11 +11,13 @@ use App\Models\IndexingWorkflow;
 use App\Models\IndexingWorkflowItem;
 use App\Models\JiraIntegration;
 use App\Models\JiraProject;
+use App\Models\Participant;
 use App\Models\Team;
 use App\Services\GraphDB\GraphDB;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Str;
 
 class IndexJira implements ShouldQueue
 {
@@ -113,10 +115,21 @@ class IndexJira implements ShouldQueue
                     }
                     $comments = IssueComment::collectJira($commentsData, $bodies);
                     foreach ($comments as $comment) {
+                        $p = Participant::updateOrCreate(
+                            [
+                                'slug' => Str::slug($comment->author),
+                                'type' => 'person',
+                            ],
+                            [
+                                'slug' => Str::slug($comment->author),
+                                'name' => $comment->author,
+                                'type' => 'person',
+                            ],
+                        );
                         $indexedComment = DocumentComment::create([
                             'document_id' => $doc->id,
+                            'author_id' => $p->id,
                             'body' => $comment->body,
-                            'author' => $comment->author,
                             'commented_at' => $comment->createdAt,
                             'comment_id' => $comment->id,
                             'metadata' => $comment,

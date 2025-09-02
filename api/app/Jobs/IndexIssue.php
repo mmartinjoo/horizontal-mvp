@@ -16,6 +16,7 @@ use App\Services\VectorStore\VectorStore;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Throwable;
 
 class IndexIssue implements ShouldQueue
@@ -51,7 +52,7 @@ class IndexIssue implements ShouldQueue
         }
 
         foreach ($chunks as $i => $chunk) {
-            $chunk = DocumentChunk::create([
+            DocumentChunk::create([
                 'document_id' => $indexingWorkflowItem->document->id,
                 'body' => $chunk,
                 'position' => $i+1,
@@ -122,7 +123,7 @@ class IndexIssue implements ShouldQueue
                 $participants = $entityExtractor->extractParticipants($chunk->body);
                 if ($this->issue->assignee) {
                     $count = collect($participants['people'])
-                        ->filter(fn ($person) => $person['name'] === $this->issue->assignee)
+                        ->filter(fn (array $person) => Str::slug($person['name']) === Str::slug($this->issue->assignee))
                         ->count();
                     if ($count === 0) {
                         $participants['people'][] = [
