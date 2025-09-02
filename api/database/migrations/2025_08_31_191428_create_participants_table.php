@@ -8,18 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('document_participants', function (Blueprint $table) {
+        Schema::create('participants', function (Blueprint $table) {
             $table->id();
-            $table->string('entity_type');
-            $table->unsignedBigInteger('entity_id');
             $table->string('name');
-            $table->string('context')->nullable();
+            $table->string('slug');
+            $table->string('type')->default('person');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('document_participants');
+        Schema::dropIfExists('participants');
     }
 };

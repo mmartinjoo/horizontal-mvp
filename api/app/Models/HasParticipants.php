@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Arr;
-use SebastianBergmann\Diff\Chunk;
+use Illuminate\Support\Str;
 
 trait HasParticipants
 {
-    public function participants(): MorphMany
+    public function participants(): MorphToMany
     {
-        return $this->morphMany(DocumentParticipant::class, 'entity');
+        return $this
+            ->morphToMany(Participant::class, 'entity', 'documents_participants')
+            ->withTimestamps();
     }
 
     public function createParticipants(array $participants)
@@ -24,8 +26,19 @@ trait HasParticipants
                 if (!Arr::get($person, 'name')) {
                     continue;
                 }
-                $this->participants()->create([
-                    'name' => $person['name'],
+                $type = $key === 'people' ? 'person' : 'organization';
+                $p = Participant::updateOrCreate(
+                    [
+                        'slug' => Str::slug($person['name']),
+                        'type' => $type,
+                    ],
+                    [
+                        'slug' => Str::slug($person['name']),
+                        'name' => $person['name'],
+                        'type' => $type,
+                    ],
+                );
+                $this->participants()->attach($p->id, [
                     'context' => Arr::get($person, 'context'),
                 ]);
             }

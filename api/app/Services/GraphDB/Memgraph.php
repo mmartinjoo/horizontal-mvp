@@ -39,9 +39,10 @@ class Memgraph extends GraphDB
     ) {
         $attributesStr = $this->arrToAttributeStr($newNodeAttributes);
         $rows = MemgraphClient::query("
-            match (r:$relatedNodeLabel { id: \"$relatedNodeID\" })
-            create (n:$newNodeLabel { $attributesStr }),
-            (n)-[:$relation]->(r)
+            merge (r:$relatedNodeLabel { id: \"$relatedNodeID\" })
+            with r
+            create (n:$newNodeLabel { $attributesStr })
+            merge (n)-[:$relation]->(r)
             return n;
         ");
         return $this->parseNode($rows);

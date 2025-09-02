@@ -65,7 +65,7 @@ class IndexIssue implements ShouldQueue
             'status' => 'prepared',
         ]);
         $this->createEmbedding($indexingWorkflowItem, $embedder, $vectorStore, $graphDB);
-        $this->createEntities($indexingWorkflowItem, $entityExtractor);
+        $this->createEntities($indexingWorkflowItem, $entityExtractor, $graphDB);
         $this->updateWorkflowStatus($indexingWorkflowItem);
     }
 
@@ -107,8 +107,11 @@ class IndexIssue implements ShouldQueue
         }
     }
 
-    private function createEntities(IndexingWorkflowItem $indexingWorkflowItem, EntityExtractor $entityExtractor)
-    {
+    private function createEntities(
+        IndexingWorkflowItem $indexingWorkflowItem,
+        EntityExtractor $entityExtractor,
+        GraphDB $graphDB,
+    ) {
         try {
             $indexingWorkflowItem->update([
                 'status' => 'extracting_entities',
@@ -118,12 +121,30 @@ class IndexIssue implements ShouldQueue
             foreach ($indexingWorkflowItem->document->chunks as $chunk) {
                 $participants = $entityExtractor->extractParticipants($chunk->body);
                 if ($this->issue->assignee) {
-                    $participants['people'][] = [
-                        'name' => $this->issue->assignee,
-                        'context' => 'assignee',
-                    ];
+                    $count = collect($participants['people'])
+                        ->filter(fn ($person) => $person['name'] === $this->issue->assignee)
+                        ->count();
+                    if ($count === 0) {
+                        $participants['people'][] = [
+                            'name' => $this->issue->assignee,
+                            'context' => 'assignee',
+                        ];
+                    }
                 }
                 $chunk->createParticipants($participants);
+                foreach ($chunk->participants as $participant) {
+                    $graphDB->createNodeWithRelation(
+                        newNodeLabel: 'Participant',
+                        newNodeAttributes: [
+                            'id' => $participant->id,
+                            'name' => $participant->name,
+                            'slug' => $participant->slug,
+                        ],
+                        relation: $participant->context === 'assignee' ? 'ASSIGNEE_OF' : 'PARTICIPATED_IN',
+                        relatedNodeLabel: 'Issue',
+                        relatedNodeID: $chunk->document->id,
+                    );
+                }
 
                 $topics = $entityExtractor->extractTopics($chunk->body);
                 $chunk->createTopics($topics['topics']);
@@ -140,7 +161,6 @@ class IndexIssue implements ShouldQueue
             logger($e);
         }
     }
-
 
     private function updateWorkflowStatus(IndexingWorkflowItem $indexingWorkflowItem)
     {
