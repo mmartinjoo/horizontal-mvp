@@ -12,6 +12,7 @@ use App\Models\IndexingWorkflowItem;
 use App\Models\JiraIntegration;
 use App\Models\JiraProject;
 use App\Models\Team;
+use App\Services\GraphDB\GraphDB;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -24,7 +25,7 @@ class IndexJira implements ShouldQueue
     {
     }
 
-    public function handle(Jira $jira): void
+    public function handle(Jira $jira, GraphDB $graphDB): void
     {
         /** @var IndexingWorkflow $indexing */
         $indexing = IndexingWorkflow::create([
@@ -50,6 +51,7 @@ class IndexJira implements ShouldQueue
                     'key' => $project['key'],
                     'jira_id' => $project['id'],
                 ]);
+                $graphDB->createNode($project['key'], 'Project', []);
             }
 
             $prios = ['high', 'medium', 'low'];

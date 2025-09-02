@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7337a055d3b8f5159ab758687261815e",
+    "content-hash": "70f1cefb28da6f146bb8f2e8394561f2",
     "packages": [
         {
             "name": "brick/math",
@@ -4322,6 +4322,64 @@
                 }
             ],
             "time": "2025-07-18T06:32:36+00:00"
+        },
+        {
+            "name": "stefanak-michal/memgraph-bolt-wrapper",
+            "version": "v3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stefanak-michal/memgraph-bolt-wrapper.git",
+                "reference": "f5610cd537d43deaf165703c15b49db7cc3cb87e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stefanak-michal/memgraph-bolt-wrapper/zipball/f5610cd537d43deaf165703c15b49db7cc3cb87e",
+                "reference": "f5610cd537d43deaf165703c15b49db7cc3cb87e",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1",
+                "stefanak-michal/bolt": "^7"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/Memgraph.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michal Stefanak",
+                    "homepage": "https://www.linkedin.com/in/michalstefanak/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Wrapper for Memgraph over PHP Bolt library to simplify usage.",
+            "homepage": "https://github.com/stefanak-michal/memgraph-bolt-wrapper",
+            "keywords": [
+                "Socket",
+                "bolt",
+                "database",
+                "memgraph"
+            ],
+            "support": {
+                "issues": "https://github.com/stefanak-michal/memgraph-bolt-wrapper/issues",
+                "source": "https://github.com/stefanak-michal/memgraph-bolt-wrapper"
+            },
+            "funding": [
+                {
+                    "url": "https://ko-fi.com/michalstefanak",
+                    "type": "ko-fi"
+                }
+            ],
+            "time": "2023-12-19T17:06:18+00:00"
         },
         {
             "name": "symfony/clock",

@@ -10,7 +10,7 @@ use Bolt\protocol\Response;
 
 abstract class GraphDB
 {
-    private AProtocol $protocol;
+    protected AProtocol $protocol;
     public function __construct(array $config)
     {
         $conn = new Socket();
@@ -34,4 +34,6 @@ abstract class GraphDB
     {
         $this->protocol->run($chyper);
     }
+
+    public abstract function createNode(string $label, array $attributes);
 }

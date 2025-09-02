@@ -14,7 +14,8 @@
         "openai-php/client": "^0.15.0",
         "predis/predis": "^3.2",
         "prinsfrank/pdfparser": "^2.3",
-        "stefanak-michal/bolt": "^7.2"
+        "stefanak-michal/bolt": "^7.2",
+        "stefanak-michal/memgraph-bolt-wrapper": "^3.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
