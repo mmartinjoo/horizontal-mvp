@@ -21,16 +21,6 @@ class TestController extends Controller
         return response('indexing...');
     }
 
-    public function search()
-    {
-        $chunks = DocumentChunk::whereRaw(
-            "search_vector @@ plainto_tsquery('english', ?)",
-            ['landing page']
-        )->get();
-
-        dd($chunks);
-    }
-
     public function token()
     {
         $team = \App\Models\Team::where(['name' => 'Test Company'])->firstOrFail();
@@ -44,10 +34,5 @@ class TestController extends Controller
 
         $token = $user->createToken('test-token')->plainTextToken;
         dd($token);
-    }
-
-    public function refresh(JiraTokenManager $jiraTokenManager)
-    {
-        return $jiraTokenManager->refreshTokensExpiringSoon(30);
     }
 }

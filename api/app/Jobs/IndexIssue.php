@@ -148,6 +148,19 @@ class IndexIssue implements ShouldQueue
 
                 $topics = $entityExtractor->extractTopics($chunk->body);
                 $chunk->createTopics($topics['topics']);
+                foreach ($chunk->topics as $topic) {
+                    $graphDB->createNodeWithRelation(
+                        newNodeLabel: 'Topic',
+                        newNodeAttributes: [
+                            'id' => $topic->id,
+                            'name' => $topic->name,
+                            'slug' => $topic->slug,
+                        ],
+                        relation: 'MENTIONED_IN',
+                        relatedNodeLabel: 'Issue',
+                        relatedNodeID: $chunk->document->id,
+                    );
+                }
             }
 
             $indexingWorkflowItem->update([

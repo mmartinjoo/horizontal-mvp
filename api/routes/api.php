@@ -8,10 +8,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::get('/test/jira', [\App\Http\Controllers\TestController::class, 'jira']);
-Route::get('/test/token', [\App\Http\Controllers\TestController::class, 'token']);
-Route::get('/test/refresh', [\App\Http\Controllers\TestController::class, 'refresh']);
-Route::get('/test/search', [\App\Http\Controllers\TestController::class, 'search']);
+Route::get('/token', [\App\Http\Controllers\TestController::class, 'token']);
 Route::get('/test', [\App\Http\Controllers\TestController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
