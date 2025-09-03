@@ -15,7 +15,7 @@ abstract class GraphDB
 {
     protected AProtocol $protocol;
 
-    public abstract function createNode(string $label, array $attributes);
+    public abstract function createNode(string $label, array $attributes): ?Node;
     public abstract function createNodeWithRelation(
         string $newNodeLabel,
         array $newNodeAttributes,
@@ -23,9 +23,9 @@ abstract class GraphDB
         string $relatedNodeLabel,
         string $relatedNodeID,
         array $relationAttributes = [],
-    );
-    abstract public function getNode(string $label, array $attributes): Node;
-    abstract public function query(string $query);
+    ): ?Node;
+    abstract public function getNode(string $label, array $attributes): ?Node;
+    abstract public function query(string $query): ?Node;
 
     public function __construct(array $config)
     {
@@ -53,6 +53,11 @@ abstract class GraphDB
             if (is_array($value)) {
                 $value = json_encode($value);
             }
+            // Vector index has to be a list so omit the "" signs
+            if ($key === 'embedding') {
+                $attributesStr .= "$key: $value, ";
+                continue;
+            }
             $attributesStr .= "$key: \"$value\", ";
         }
         return rtrim($attributesStr, ", ");
@@ -65,17 +70,17 @@ abstract class GraphDB
             if (is_array($value)) {
                 $value = json_encode($value);
             }
+            if ($key === 'embedding') {
+                $attributesStr .= "n.$key = $value, ";
+                continue;
+            }
             $attributesStr .= "n.$key = \"$value\", ";
         }
         return rtrim($attributesStr, ", ");
     }
 
-    protected function parseNode(array $rows): Node
+    protected function parseNode(array $rows): ?Node
     {
-        $node = Arr::get($rows, '0.n');
-        if (!$node) {
-            throw new NodeNotFoundException('Unable to return node');
-        }
-        return $node;
+        return Arr::get($rows, '0.n');
     }
 }

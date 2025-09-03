@@ -78,6 +78,19 @@ class GoogleDrive
         }
     }
 
+    public function getRevisionAuthors(File $file): array
+    {
+        $revisions = $this->drive->revisions->listRevisions($file->extraMetadata()['id'], [
+            'fields' => 'revisions(id,modifiedTime,lastModifyingUser,size,mimeType,keepForever,published)',
+            'pageSize' => 100,
+        ]);
+        $authors = [];
+        foreach ($revisions as $revision) {
+            $authors[$revision->lastModifyingUser->emailAddress] = $revision->lastModifyingUser->displayName;
+        }
+        return $authors;
+    }
+
     private function isGoogleNativeFile(File $file): bool
     {
         return in_array($file->mimeType(), self::GOOGLE_NATIVE_TYPES);

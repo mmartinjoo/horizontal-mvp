@@ -7,12 +7,14 @@ use App\Integrations\Storage\GoogleDrive;
 use App\Models\Document;
 use App\Models\IndexingWorkflow;
 use App\Models\IndexingWorkflowItem;
+use App\Models\Participant;
 use App\Models\Team;
 use App\Services\GraphDB\GraphDB;
 use App\Services\Indexing\FilePrioritizer;
 use App\Services\LLM\Embedder;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Str;
 
 class IndexGoogleDrive implements ShouldQueue
 {
@@ -83,6 +85,38 @@ class IndexGoogleDrive implements ShouldQueue
                     'document_id' => $document->id,
                 ]);
                 IndexFile::dispatch($indexingItem->id, $file);
+
+                $revisionAuthors = $drive->getRevisionAuthors($file);
+                foreach ($revisionAuthors as $author) {
+                    $embedding = $embedder->createEmbedding($author);
+                    $p = Participant::updateOrCreate(
+                        [
+                            'slug' => Str::slug($author),
+                            'type' => 'person',
+                        ],
+                        [
+                            'slug' => Str::slug($author),
+                            'name' => $author,
+                            'type' => 'person',
+                            'embedding' => $embedding,
+                        ],
+                    );
+                    $document->participants()->attach($p->id, [
+                        'context' => 'revision author',
+                        'embedding' => json_encode($embedding),
+                    ]);
+                    $graphDB->createNodeWithRelation(
+                        newNodeLabel: 'Participant',
+                        newNodeAttributes: [
+                            'id' => $p->id,
+                            'name' => $p->name,
+                            'embedding' => $embedding,
+                        ],
+                        relation: 'REVISION_AUTHOR_OF',
+                        relatedNodeLabel: 'File',
+                        relatedNodeID: $document->id,
+                    );
+                }
             }
         }
     }
@@ -97,6 +131,6 @@ class IndexGoogleDrive implements ShouldQueue
             return true;
         }
 
-        return $file->getUpdatedAt()->gt($existingContent->indexed_at);
+        return $file->getUpdatedAt()->gt($existingContent->indexed_at ?? '1900-01-01 00:00:00');
     }
 }

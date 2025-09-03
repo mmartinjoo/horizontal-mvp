@@ -15,15 +15,11 @@ class Memgraph extends GraphDB
         MemgraphClient::$auth = ['scheme' => $config['scheme']];
     }
 
-    public function createNode(string $label, array $attributes): Node
+    public function createNode(string $label, array $attributes): ?Node
     {
         $attributesStr = $this->arrToAttributeStr($attributes);
         $rows = MemgraphClient::query("create (n:$label { $attributesStr }) return n;");
-        $node = Arr::get($rows, '0.n');
-        if (!$node) {
-            throw new InvalidCypherException('Unable to return node');
-        }
-        return $node;
+        return $this->parseNode($rows);
     }
 
     public function createNodeWithRelation(
@@ -33,7 +29,7 @@ class Memgraph extends GraphDB
         string $relatedNodeLabel,
         string $relatedNodeID,
         array $relationAttributes = [],
-    ) {
+    ): ?Node {
         $newNodeId = $newNodeAttributes['id'];
         $upsertQuery = "merge (n:$newNodeLabel { id: \"$newNodeId\" })";
         $set = $this->arrToSetStyleStr($newNodeAttributes);
@@ -68,15 +64,16 @@ class Memgraph extends GraphDB
         }
     }
 
-    public function getNode(string $label, array $attributes): Node
+    public function getNode(string $label, array $attributes): ?Node
     {
         $attributesStr = $this->arrToAttributeStr($attributes);
         $rows = MemgraphClient::query("match (n:$label $attributesStr) return n)");
         return $this->parseNode($rows);
     }
 
-    public function query(string $query)
+    public function query(string $query): ?Node
     {
-        MemgraphClient::query($query);
+        $rows = MemgraphClient::query($query);
+        return $this->parseNode($rows);
     }
 }
