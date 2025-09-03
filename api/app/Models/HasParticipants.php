@@ -13,6 +13,7 @@ trait HasParticipants
     {
         return $this
             ->morphToMany(Participant::class, 'entity', 'documents_participants')
+            ->withPivot('context', 'embedding')
             ->withTimestamps();
     }
 

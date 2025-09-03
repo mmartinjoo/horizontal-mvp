@@ -161,6 +161,10 @@ class IndexIssue implements ShouldQueue
                         relation: $participant->context === 'assignee' ? 'ASSIGNEE_OF' : 'PARTICIPATED_IN',
                         relatedNodeLabel: 'Issue',
                         relatedNodeID: $chunk->document->id,
+                        relationAttributes: [
+                            'context' => $participant->pivot->context,
+                            'embedding' => $participant->pivot->embedding,
+                        ],
                     );
                 }
 

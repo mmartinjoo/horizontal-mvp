@@ -68,6 +68,10 @@ class IndexIssueComment implements ShouldQueue
                     relation: 'MENTIONED_IN',
                     relatedNodeLabel: 'IssueComment',
                     relatedNodeID: $this->comment->id,
+                    relationAttributes: [
+                        'context' => $participant->pivot->context,
+                        'embedding' => $participant->pivot->embedding,
+                    ],
                 );
             }
 

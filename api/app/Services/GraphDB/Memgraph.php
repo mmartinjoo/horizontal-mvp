@@ -32,6 +32,7 @@ class Memgraph extends GraphDB
         string $relation,
         string $relatedNodeLabel,
         string $relatedNodeID,
+        array $relationAttributes = [],
     ) {
         $newNodeId = $newNodeAttributes['id'];
         $upsertQuery = "merge (n:$newNodeLabel { id: \"$newNodeId\" })";
@@ -45,14 +46,26 @@ class Memgraph extends GraphDB
             throw new InvalidCypherException('Unable to return node');
         }
 
-        $rows = MemgraphClient::query("
-            merge (r:$relatedNodeLabel { id: \"$relatedNodeID\" })
-            with r
-            match (n:$newNodeLabel { id: \"$newNodeId\" })
-            merge (n)-[:$relation]->(r)
-            return n;
-        ");
-        return $this->parseNode($rows);
+        if (count($relationAttributes) === 0) {
+            $rows = MemgraphClient::query("
+                merge (r:$relatedNodeLabel { id: \"$relatedNodeID\" })
+                with r
+                match (n:$newNodeLabel { id: \"$newNodeId\" })
+                merge (n)-[:$relation]->(r)
+                return n;
+            ");
+            return $this->parseNode($rows);
+        } else {
+            $relationAttributesStr = $this->arrToAttributeStr($relationAttributes);
+            $rows = MemgraphClient::query("
+                merge (r:$relatedNodeLabel { id: \"$relatedNodeID\" })
+                with r
+                match (n:$newNodeLabel { id: \"$newNodeId\" })
+                merge (n)-[:$relation { $relationAttributesStr }]->(r)
+                return n;
+            ");
+            return $this->parseNode($rows);
+        }
     }
 
     public function getNode(string $label, array $attributes): Node
