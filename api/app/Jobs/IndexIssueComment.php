@@ -47,6 +47,7 @@ class IndexIssueComment implements ShouldQueue
                     newNodeAttributes: [
                         'id' => $this->comment->author->id,
                         'name' => $this->comment->author->name,
+                        'embedding' => $this->comment->author->embedding,
                     ],
                     relation: 'AUTHOR_OF',
                     relatedNodeLabel: 'IssueComment',
@@ -62,6 +63,7 @@ class IndexIssueComment implements ShouldQueue
                     newNodeAttributes: [
                         'id' => $participant->id,
                         'name' => $participant->name,
+                        'embedding' => $participant->embedding,
                     ],
                     relation: 'MENTIONED_IN',
                     relatedNodeLabel: 'IssueComment',

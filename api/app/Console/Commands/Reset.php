@@ -3,6 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\Document;
+use App\Models\IndexingWorkflow;
+use App\Models\IndexingWorkflowItem;
+use App\Models\JiraProject;
 use App\Models\Participant;
 use App\Models\Topic;
 use App\Services\GraphDB\GraphDB;
@@ -28,6 +31,9 @@ class Reset extends Command
         Document::all()->each->delete();
         Participant::all()->each->delete();
         Topic::all()->each->delete();
+        JiraProject::all()->each->delete();
+        IndexingWorkflow::all()->each->delete();
+        IndexingWorkflowItem::all()->each->delete();
         DB::table('jobs')->delete();
         DB::table('failed_jobs')->delete();
         $graphDB->query('MATCH (n) DETACH DELETE n');

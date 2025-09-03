@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\LLM\Embedder;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -17,6 +18,7 @@ trait HasParticipants
 
     public function createParticipants(array $participants)
     {
+        $embedder = app(Embedder::class);
         $keys = ['people', 'organizations'];
         foreach ($keys as $key) {
             foreach ($participants[$key] as $person) {
@@ -36,10 +38,15 @@ trait HasParticipants
                         'slug' => Str::slug($person['name']),
                         'name' => $person['name'],
                         'type' => $type,
+                        'embedding' => $person['embedding'],
                     ],
                 );
+                $embedding = Arr::get($person, 'context')
+                    ? $embedder->createEmbedding(Arr::get($person, 'context'))
+                    : [];
                 $this->participants()->attach($p->id, [
                     'context' => Arr::get($person, 'context'),
+                    'embedding' => json_encode($embedding),
                 ]);
             }
         }

@@ -33,12 +33,22 @@ class Memgraph extends GraphDB
         string $relatedNodeLabel,
         string $relatedNodeID,
     ) {
-        $attributesStr = $this->arrToAttributeStr($newNodeAttributes);
-        logger($attributesStr);
+        $newNodeId = $newNodeAttributes['id'];
+        $upsertQuery = "merge (n:$newNodeLabel { id: \"$newNodeId\" })";
+        $set = $this->arrToSetStyleStr($newNodeAttributes);
+        $upsertQuery .= " $set";
+        $upsertQuery .= " return n";
+
+        $rows = MemgraphClient::query($upsertQuery);
+        $node = Arr::get($rows, '0.n');
+        if (!$node) {
+            throw new InvalidCypherException('Unable to return node');
+        }
+
         $rows = MemgraphClient::query("
             merge (r:$relatedNodeLabel { id: \"$relatedNodeID\" })
             with r
-            merge (n:$newNodeLabel { $attributesStr })
+            match (n:$newNodeLabel { id: \"$newNodeId\" })
             merge (n)-[:$relation]->(r)
             return n;
         ");

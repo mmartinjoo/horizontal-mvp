@@ -39,6 +39,6 @@ class DocumentComment extends Model implements Embeddable
 
     public function getEmbeddableContent(): string
     {
-        return $this->author . ' commented: ' . $this->body;
+        return $this->author->name . ' commented: ' . $this->body;
     }
 }

@@ -3,6 +3,7 @@
 use App\Models\Participant;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -17,6 +18,9 @@ return new class extends Migration
             $table->string('context')->nullable();
             $table->timestamps();
         });
+
+        DB::statement("ALTER TABLE documents_participants ADD COLUMN embedding vector(1536)");
+        DB::statement("CREATE INDEX documents_participants_embedding_idx ON documents_participants USING hnsw (embedding vector_cosine_ops)");
     }
 
     public function down(): void

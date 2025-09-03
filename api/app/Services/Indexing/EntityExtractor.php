@@ -487,8 +487,16 @@ class EntityExtractor
 
         $response = $this->llm->completion($prompt, 4096);
         $json = json_decode($response, true);
-        return !$json
+        $data = !$json
             ? []
             : $json;
+
+        foreach ($data['people'] as $i => $person) {
+            $data['people'][$i]['embedding'] = $this->embedder->createEmbedding($person['name']);
+        }
+        foreach ($data['organizations'] as $i => $org) {
+            $data['organizations'][$i]['embedding'] = $this->embedder->createEmbedding($org['name']);
+        }
+        return $data;
     }
 }

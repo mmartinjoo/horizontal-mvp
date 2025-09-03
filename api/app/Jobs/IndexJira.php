@@ -140,6 +140,7 @@ class IndexJira implements ShouldQueue
                                 'slug' => Str::slug($comment->author),
                                 'name' => $comment->author,
                                 'type' => 'person',
+                                'embedding' => $embedder->createEmbedding($comment->author),
                             ],
                         );
                         $indexedComment = DocumentComment::create([

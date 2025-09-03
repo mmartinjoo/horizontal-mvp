@@ -3,12 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Participant extends Model
 {
     protected $guarded = [];
+
+    protected $casts = [
+        'embedding' => 'array',
+    ];
 
     public function document_chunks(): MorphToMany
     {

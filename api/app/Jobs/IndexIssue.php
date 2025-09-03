@@ -67,7 +67,7 @@ class IndexIssue implements ShouldQueue
             'status' => 'prepared',
         ]);
         $this->createEmbedding($indexingWorkflowItem, $embedder, $vectorStore, $graphDB);
-        $this->createEntities($indexingWorkflowItem, $entityExtractor, $graphDB);
+        $this->createEntities($indexingWorkflowItem, $entityExtractor, $graphDB, $embedder);
         $this->updateWorkflowStatus($indexingWorkflowItem);
     }
 
@@ -113,6 +113,7 @@ class IndexIssue implements ShouldQueue
         IndexingWorkflowItem $indexingWorkflowItem,
         EntityExtractor $entityExtractor,
         GraphDB $graphDB,
+        Embedder $embedder,
     ) {
         try {
             $indexingWorkflowItem->update([
@@ -129,6 +130,7 @@ class IndexIssue implements ShouldQueue
                         'slug' => Str::slug($this->issue->assignee),
                         'name' => $this->issue->assignee,
                         'type' => 'person',
+                        'embedding' => $embedder->createEmbedding($this->issue->assignee),
                     ],
                 );
                 $graphDB->createNodeWithRelation(
@@ -136,6 +138,7 @@ class IndexIssue implements ShouldQueue
                     newNodeAttributes: [
                         'id' => $assignee->id,
                         'name' => $assignee->name,
+                        'embedding' => $assignee->embedding,
                     ],
                     relation: 'ASSIGNEE_OF',
                     relatedNodeLabel: 'Issue',
@@ -153,6 +156,7 @@ class IndexIssue implements ShouldQueue
                         newNodeAttributes: [
                             'id' => $participant->id,
                             'name' => $participant->name,
+                            'embedding' => $participant->embedding,
                         ],
                         relation: $participant->context === 'assignee' ? 'ASSIGNEE_OF' : 'PARTICIPATED_IN',
                         relatedNodeLabel: 'Issue',

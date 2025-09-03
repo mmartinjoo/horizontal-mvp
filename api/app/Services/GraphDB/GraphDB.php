@@ -57,6 +57,18 @@ abstract class GraphDB
         return rtrim($attributesStr, ", ");
     }
 
+    protected function arrToSetStyleStr(array $attributes): string
+    {
+        $attributesStr = "set ";
+        foreach ($attributes as $key => $value) {
+            if (is_array($value)) {
+                $value = json_encode($value);
+            }
+            $attributesStr .= "n.$key = \"$value\", ";
+        }
+        return rtrim($attributesStr, ", ");
+    }
+
     protected function parseNode(array $rows): Node
     {
         $node = Arr::get($rows, '0.n');
