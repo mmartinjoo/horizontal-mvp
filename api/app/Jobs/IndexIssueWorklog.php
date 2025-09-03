@@ -56,31 +56,11 @@ class IndexIssueWorklog implements ShouldQueue
                 );
             }
 
-            if (!$this->worklog->comment) {
+            if (!$this->worklog->description) {
                 return;
             }
 
-            $participants = $entityExtractor->extractParticipants($this->worklog->comment);
-            $this->worklog->createParticipants($participants);
-            foreach ($this->worklog->participants as $participant) {
-                $graphDB->createNodeWithRelation(
-                    newNodeLabel: 'Participant',
-                    newNodeAttributes: [
-                        'id' => $participant->id,
-                        'name' => $participant->name,
-                        'embedding' => $participant->embedding,
-                    ],
-                    relation: 'MENTIONED_IN',
-                    relatedNodeLabel: 'IssueWorklog',
-                    relatedNodeID: $this->worklog->id,
-                    relationAttributes: [
-                        'context' => $participant->pivot->context,
-                        'embedding' => $participant->pivot->embedding,
-                    ],
-                );
-            }
-
-            $topics = $entityExtractor->extractTopics($this->worklog->comment);
+            $topics = $entityExtractor->extractTopics($this->worklog->description);
             $this->worklog->createTopics($topics['topics']);
             foreach ($this->worklog->topics as $topic) {
                 $graphDB->createNodeWithRelation(

@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class DocumentWorklog extends Model implements Embeddable
 {
     use HasEmbedding;
-    use HasParticipants;
     use HasTopics;
 
     protected $guarded = [];
