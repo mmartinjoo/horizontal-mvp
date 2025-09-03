@@ -180,6 +180,9 @@ class EntityExtractor
             5. **Time-sensitive topics**: For incidents or time-bound issues, preserve temporal context
                 - \"April 15 production outage\" not just \"production outage\"
 
+            6. **Capture context**: Capture how the given topics is being discussed or mentioned in the text
+                - For example, \"the pipeline is failing because of XYZ\" can be an important context
+
             ## Output Format
 
             Return a JSON structure:
@@ -190,7 +193,8 @@ class EntityExtractor
                   \"name\": \"exact phrase from text\",
                   \"variations\": [\"alternate names\", \"abbreviations\"],
                   \"category\": \"feature|person|issue|tool|incident|process\",
-                  \"importance\": \"high|medium|low\"
+                  \"importance\": \"high|medium|low\",
+                  \"context\": \"how the topic is mentioned in the text\",
                 }
               ]
             }

@@ -12,6 +12,7 @@ class DocumentTopic extends Model
 
     protected $casts = [
         'variations' => 'array',
+        'embedding' => 'array',
     ];
 
     public function entity(): MorphTo

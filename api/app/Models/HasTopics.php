@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\LLM\Embedder;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -12,11 +13,13 @@ trait HasTopics
     {
         return $this
             ->morphToMany(Topic::class, 'entity', 'documents_topics')
+            ->withPivot('context', 'embedding')
             ->withTimestamps();
     }
 
     public function createTopics(array $topics)
     {
+        $embedder = app(Embedder::class);
         foreach ($topics as $topic) {
             if (!Arr::get($topic, 'name')) {
                 continue;
@@ -36,7 +39,13 @@ trait HasTopics
                     'embedding' => $topic['embedding'],
                 ],
             );
-            $this->topics()->attach($t->id);
+            $embedding = Arr::get($topic, 'context')
+                ? $embedder->createEmbedding(Arr::get($topic, 'context'))
+                : [];
+            $this->topics()->attach($t->id, [
+                'context' => Arr::get($topic, 'context'),
+                'embedding' => json_encode($embedding),
+            ]);
         }
     }
 }

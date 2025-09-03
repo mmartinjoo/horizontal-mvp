@@ -218,6 +218,10 @@ class IndexFile implements ShouldQueue
                         relation: 'MENTIONED_IN',
                         relatedNodeLabel: 'FileChunk',
                         relatedNodeID: $chunk->id,
+                        relationAttributes: [
+                            'context' => $topic->pivot->context,
+                            'embedding' => $topic->pivot->embedding,
+                        ],
                     );
                 }
             }

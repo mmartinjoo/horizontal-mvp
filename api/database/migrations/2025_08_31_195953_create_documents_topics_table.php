@@ -14,8 +14,12 @@ return new class extends Migration
             $table->string('entity_type');
             $table->unsignedBigInteger('entity_id');
             $table->foreignIdFor(Topic::class)->constrained()->cascadeOnDelete();
+            $table->string('context')->nullable();
             $table->timestamps();
         });
+
+        DB::statement("ALTER TABLE documents_topics ADD COLUMN embedding vector(1536)");
+        DB::statement("CREATE INDEX documents_topics_embedding_idx ON documents_topics USING hnsw (embedding vector_cosine_ops)");
     }
 
     public function down(): void

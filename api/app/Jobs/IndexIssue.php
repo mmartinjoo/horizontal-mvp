@@ -181,6 +181,10 @@ class IndexIssue implements ShouldQueue
                         relation: 'MENTIONED_IN',
                         relatedNodeLabel: 'IssueChunk',
                         relatedNodeID: $chunk->id,
+                        relationAttributes: [
+                            'context' => $topic->pivot->context,
+                            'embedding' => $topic->pivot->embedding,
+                        ],
                     );
                 }
             }
