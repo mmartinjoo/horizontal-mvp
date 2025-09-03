@@ -114,6 +114,19 @@ class Jira
         return $response->json('watchers');
     }
 
+    public function getVoters(Team $team, Issue $issue): array
+    {
+        $response = $this->makeRequest($team, "/rest/api/3/issue/{$issue->id}/votes");
+
+        if (!$response->successful()) {
+            throw new Exception('Failed to fetch votes: ' . $response->body());
+        }
+
+        $voters = $response->json('voters');
+        return collect($voters)->map(fn (array $voter) => $voter['displayName'])->toArray();
+    }
+
+
     private function getValidIntegration(Team $team): JiraIntegration
     {
         $integration = JiraIntegration::where('team_id', $team->id)->first();

@@ -8,6 +8,7 @@ use App\Integrations\Communication\IssueWorklog;
 use App\Integrations\Communication\Jira\Jira;
 use App\Models\Document;
 use App\Models\DocumentComment;
+use App\Models\DocumentInteraction;
 use App\Models\DocumentWorklog;
 use App\Models\IndexingWorkflow;
 use App\Models\IndexingWorkflowItem;
@@ -213,6 +214,37 @@ class IndexJira implements ShouldQueue
                                 'embedding' => $p->embedding,
                             ],
                             relation: 'WATCHED_BY',
+                            relatedNodeLabel: 'Issue',
+                            relatedNodeID: $doc->id,
+                        );
+                    }
+
+                    $voters = $jira->getVoters($this->team, $issue);
+                    foreach ($voters as $voter) {
+                        $p = Participant::updateOrCreate(
+                            [
+                                'slug' => Str::slug($voter),
+                                'type' => 'person',
+                            ],
+                            [
+                                'slug' => Str::slug($voter),
+                                'name' => $voter,
+                                'type' => 'person',
+                                'embedding' => $embedder->createEmbedding($voter),
+                            ],
+                        );
+                        $doc->interactions()->create([
+                            'type' => 'vote',
+                            'participant_id' => $p->id,
+                        ]);
+                        $graphDB->createNodeWithRelation(
+                            newNodeLabel: 'Participant',
+                            newNodeAttributes: [
+                                'id' => $p->id,
+                                'name' => $p->name,
+                                'embedding' => $p->embedding,
+                            ],
+                            relation: 'VOTED_FOR',
                             relatedNodeLabel: 'Issue',
                             relatedNodeID: $doc->id,
                         );

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Exceptions\NoEmbeddingsException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Document extends Model implements Embeddable
 {
@@ -25,14 +26,19 @@ class Document extends Model implements Embeddable
         'indexed_at' => 'datetime',
     ];
 
-    public function chunks()
+    public function chunks(): HasMany
     {
         return $this->hasMany(DocumentChunk::class);
     }
 
-    public function comments()
+    public function comments(): HasMany
     {
         return $this->hasMany(DocumentComment::class);
+    }
+
+    public function interactions(): HasMany
+    {
+        return $this->hasMany(DocumentInteraction::class);
     }
 
     protected static function booted()
