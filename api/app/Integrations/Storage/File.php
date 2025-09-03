@@ -32,13 +32,13 @@ class File implements JsonSerializable
 
     public function setUpdatedAt(string|null $updatedAt): void
     {
-        $this->$updatedAt = Carbon::parse($updatedAt ?? "1900-01-01 00:00:00");
+        $this->updatedAt = Carbon::parse($updatedAt ?? "1900-01-01 00:00:00");
         $this->updateLastUsedAt();
     }
 
     public function setViewedAt(string|null $viewedAt): void
     {
-        $this->$viewedAt = Carbon::parse($viewedAt ?? "1900-01-01 00:00:00");
+        $this->viewedAt = Carbon::parse($viewedAt ?? "1900-01-01 00:00:00");
         $this->updateLastUsedAt();
     }
 

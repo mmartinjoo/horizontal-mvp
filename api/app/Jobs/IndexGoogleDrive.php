@@ -8,6 +8,7 @@ use App\Models\Document;
 use App\Models\IndexingWorkflow;
 use App\Models\IndexingWorkflowItem;
 use App\Models\Team;
+use App\Services\GraphDB\GraphDB;
 use App\Services\Indexing\FilePrioritizer;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -21,8 +22,11 @@ class IndexGoogleDrive implements ShouldQueue
     ) {
     }
 
-    public function handle(GoogleDrive $drive, FilePrioritizer $prioritizer): void
-    {
+    public function handle(
+        GoogleDrive $drive,
+        FilePrioritizer $prioritizer,
+        GraphDB $graphDB,
+    ): void {
         /** @var IndexingWorkflow $indexing */
         $indexing = IndexingWorkflow::create([
             'integration' => 'google_drive',
@@ -30,7 +34,7 @@ class IndexGoogleDrive implements ShouldQueue
             'team_id' => $this->team->id,
             'job_id' => $this->job->payload()['uuid'],
         ]);
-        $files = $drive->listDirectoryContents('deQenQ/test');
+        $files = $drive->listDirectoryContents('horizontal.app');
         $contents = $prioritizer->prioritize($files);
         $indexing->update([
             'status' => 'downloaded',
@@ -55,7 +59,7 @@ class IndexGoogleDrive implements ShouldQueue
                     ->delete();
 
                 $indexing->increment('deleted_items', $count);
-                $content = Document::create([
+                $document = Document::create([
                     'team_id' => $this->team->id,
                     'source_type' => 'google_drive',
                     'source_id' => $file->extraMetadata()['id'],
@@ -63,11 +67,15 @@ class IndexGoogleDrive implements ShouldQueue
                     'metadata' => $file,
                     'priority' => $prio,
                 ]);
+                $graphDB->createNode('File', [
+                    'id' => $document->id,
+                    'name' => $document->title,
+                ]);
                 $indexingItem = IndexingWorkflowItem::create([
                     'indexing_workflow_id' => $indexing->id,
                     'data' => $file,
                     'status' => 'queued',
-                    'document_id' => $content->id,
+                    'document_id' => $document->id,
                 ]);
                 IndexFile::dispatch($indexingItem->id, $file);
             }

@@ -168,11 +168,10 @@ class IndexIssue implements ShouldQueue
                         newNodeAttributes: [
                             'id' => $topic->id,
                             'name' => $topic->name,
-                            'slug' => $topic->slug,
                         ],
                         relation: 'MENTIONED_IN',
-                        relatedNodeLabel: 'Issue',
-                        relatedNodeID: $chunk->document->id,
+                        relatedNodeLabel: 'IssueChunk',
+                        relatedNodeID: $chunk->id,
                     );
                 }
             }

@@ -10,6 +10,7 @@ use App\Integrations\Storage\GoogleDrive;
 use App\Models\DocumentChunk;
 use App\Models\IndexingWorkflow;
 use App\Models\IndexingWorkflowItem;
+use App\Services\GraphDB\GraphDB;
 use App\Services\Indexing\EntityExtractor;
 use App\Services\Indexing\TextChunker;
 use App\Services\LLM\Embedder;
@@ -39,6 +40,7 @@ class IndexFile implements ShouldQueue
         Embedder $embedder,
         VectorStore $vectorStore,
         EntityExtractor $entityExtractor,
+        GraphDB $graphDB,
     ): void {
         try {
             $indexingWorkflowItem = IndexingWorkflowItem::find($this->indexingWorkflowItemId);
@@ -57,8 +59,8 @@ class IndexFile implements ShouldQueue
 
             if ($this->file->mimeType() === 'application/pdf') {
                 $this->indexPDF($pdfParser, $textChunker, $indexingWorkflowItem);
-                $this->createEmbedding($indexingWorkflowItem, $embedder, $vectorStore);
-                $this->createEntities($indexingWorkflowItem, $entityExtractor);
+                $this->createEmbedding($indexingWorkflowItem, $embedder, $vectorStore, $graphDB);
+                $this->createEntities($indexingWorkflowItem, $entityExtractor, $graphDB);
                 $indexingWorkflowItem->update([
                     'status' => 'completed',
                 ]);
@@ -104,8 +106,8 @@ class IndexFile implements ShouldQueue
             $indexingWorkflowItem->update([
                 'status' => 'prepared',
             ]);
-            $this->createEmbedding($indexingWorkflowItem, $embedder, $vectorStore);
-            $this->createEntities($indexingWorkflowItem, $entityExtractor);
+            $this->createEmbedding($indexingWorkflowItem, $embedder, $vectorStore, $graphDB);
+            $this->createEntities($indexingWorkflowItem, $entityExtractor, $graphDB);
             $indexingWorkflowItem->update([
                 'status' => 'completed',
             ]);
@@ -152,8 +154,12 @@ class IndexFile implements ShouldQueue
         ]);
     }
 
-    private function createEmbedding(IndexingWorkflowItem $indexingWorkflowItem, Embedder $embedder, VectorStore $vectorStore)
-    {
+    private function createEmbedding(
+        IndexingWorkflowItem $indexingWorkflowItem,
+        Embedder $embedder,
+        VectorStore $vectorStore,
+        GraphDB $graphDB,
+    ) {
         try {
             $indexingWorkflowItem->update([
                 'status' => 'vectorizing',
@@ -162,6 +168,17 @@ class IndexFile implements ShouldQueue
             foreach ($indexingWorkflowItem->document->chunks as $chunk) {
                 $embedding = $embedder->createEmbedding($chunk->getEmbeddableContent());
                 $vectorStore->upsert($chunk, $embedding);
+
+                $graphDB->createNodeWithRelation(
+                    newNodeLabel: 'FileChunk',
+                    newNodeAttributes: [
+                        'id' => $chunk->id,
+                        'embedding' => $embedding,
+                    ],
+                    relation: 'CHUNK_OF',
+                    relatedNodeLabel: 'File',
+                    relatedNodeID: $indexingWorkflowItem->document->id,
+                );
             }
 
             $indexingWorkflowItem->update([
@@ -176,21 +193,30 @@ class IndexFile implements ShouldQueue
         }
     }
 
-    private function createEntities(IndexingWorkflowItem $indexingWorkflowItem, EntityExtractor $entityExtractor)
-    {
+    private function createEntities(
+        IndexingWorkflowItem $indexingWorkflowItem,
+        EntityExtractor $entityExtractor,
+        GraphDB $graphDB,
+    ) {
         try {
             $indexingWorkflowItem->update([
                 'status' => 'extracting_entities',
             ]);
 
             foreach ($indexingWorkflowItem->document->chunks as $chunk) {
-                $entities = $entityExtractor->extract($chunk->body);
-                foreach ($entities as $entity) {
-                    $chunk->entities()->create([
-                        'keywords' => $entity['keywords'],
-                        'people' => $entity['people'],
-                        'dates' => $entity['dates'],
-                    ]);
+                $topics = $entityExtractor->extractTopics($chunk->body);
+                $chunk->createTopics($topics['topics']);
+                foreach ($chunk->topics as $topic) {
+                    $graphDB->createNodeWithRelation(
+                        newNodeLabel: 'Topic',
+                        newNodeAttributes: [
+                            'id' => $topic->id,
+                            'name' => $topic->name,
+                        ],
+                        relation: 'MENTIONED_IN',
+                        relatedNodeLabel: 'FileChunk',
+                        relatedNodeID: $chunk->id,
+                    );
                 }
             }
 

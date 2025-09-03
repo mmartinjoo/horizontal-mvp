@@ -21,7 +21,6 @@ class DocumentChunk extends Model implements Embeddable
         'search_vector',
     ];
 
-
     public function document()
     {
         return $this->belongsTo(Document::class);

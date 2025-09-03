@@ -17,8 +17,8 @@ class TestController extends Controller
     public function index()
     {
         $team = Team::where('name', 'Test Company')->firstOrFail();
-        IndexJira::dispatch($team);
-//        IndexGoogleDrive::dispatch($team);
+//        IndexJira::dispatch($team);
+        IndexGoogleDrive::dispatch($team);
 
         return response('indexing...');
     }
