@@ -5,13 +5,12 @@ namespace App\Models;
 use App\Exceptions\NoEmbeddingsException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 
 class Document extends Model implements Embeddable
 {
     use HasFactory;
     use HasEmbedding;
+    use HasParticipants;
 
     protected $guarded = [];
 

@@ -103,6 +103,17 @@ class Jira
         return $response->json('worklogs');
     }
 
+    public function getWatchers(Team $team, Issue $issue): array
+    {
+        $response = $this->makeRequest($team, "/rest/api/3/issue/{$issue->id}/watchers");
+
+        if (!$response->successful()) {
+            throw new Exception('Failed to fetch worklogs: ' . $response->body());
+        }
+
+        return $response->json('watchers');
+    }
+
     private function getValidIntegration(Team $team): JiraIntegration
     {
         $integration = JiraIntegration::where('team_id', $team->id)->first();

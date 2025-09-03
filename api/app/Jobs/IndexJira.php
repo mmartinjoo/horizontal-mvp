@@ -185,6 +185,38 @@ class IndexJira implements ShouldQueue
                         ]);
                         IndexIssueWorklog::dispatch($documentWorklog);
                     }
+
+                    $watchersData = $jira->getWatchers($this->team, $issue);
+                    $watchers = collect($watchersData)->map(fn($watcher) => $watcher['displayName']);
+                    foreach ($watchers as $watcher) {
+                        $p = Participant::updateOrCreate(
+                            [
+                                'slug' => Str::slug($watcher),
+                                'type' => 'person',
+                            ],
+                            [
+                                'slug' => Str::slug($watcher),
+                                'name' => $watcher,
+                                'type' => 'person',
+                                'embedding' => $embedder->createEmbedding($watcher),
+                            ],
+                        );
+                        $doc->participants()->attach($p->id, [
+                            'context' => 'watcher',
+                            'embedding' => json_encode($p->embedding),
+                        ]);
+                        $graphDB->createNodeWithRelation(
+                            newNodeLabel: 'Participant',
+                            newNodeAttributes: [
+                                'id' => $p->id,
+                                'name' => $p->name,
+                                'embedding' => $p->embedding,
+                            ],
+                            relation: 'WATCHED_BY',
+                            relatedNodeLabel: 'Issue',
+                            relatedNodeID: $doc->id,
+                        );
+                    }
                 }
             }
         }
