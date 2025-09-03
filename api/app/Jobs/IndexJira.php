@@ -4,9 +4,11 @@ namespace App\Jobs;
 
 use App\Integrations\Communication\Issue;
 use App\Integrations\Communication\IssueComment;
+use App\Integrations\Communication\IssueWorklog;
 use App\Integrations\Communication\Jira\Jira;
 use App\Models\Document;
 use App\Models\DocumentComment;
+use App\Models\DocumentWorklog;
 use App\Models\IndexingWorkflow;
 use App\Models\IndexingWorkflowItem;
 use App\Models\JiraIntegration;
@@ -152,6 +154,36 @@ class IndexJira implements ShouldQueue
                             'metadata' => $comment,
                         ]);
                         IndexIssueComment::dispatch($indexedComment);
+                    }
+
+                    $worklogsData = $jira->getWorklogs($this->team, $issue);
+                    $descriptions = [];
+                    foreach ($worklogsData as $worklogData) {
+                        $descriptions[] = $this->extractTextFromDocument($worklogData['comment'] ?? []);
+                    }
+                    $worklogs = IssueWorklog::collectJira($worklogsData, $descriptions);
+                    foreach ($worklogs as $worklog) {
+                        $p = Participant::updateOrCreate(
+                            [
+                                'slug' => Str::slug($worklog->author),
+                                'type' => 'person',
+                            ],
+                            [
+                                'slug' => Str::slug($worklog->author),
+                                'name' => $worklog->author,
+                                'type' => 'person',
+                                'embedding' => $embedder->createEmbedding($worklog->author),
+                            ],
+                        );
+                        $documentWorklog = DocumentWorklog::create([
+                            'document_id' => $doc->id,
+                            'author_id' => $p->id,
+                            'description' => $worklog->description,
+                            'logged_at' => $worklog->updatedAt,
+                            'worklog_id' => $worklog->id,
+                            'metadata' => $worklog,
+                        ]);
+                        IndexIssueWorklog::dispatch($documentWorklog);
                     }
                 }
             }

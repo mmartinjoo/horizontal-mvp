@@ -12,7 +12,7 @@ class EmbeddingException extends Exception
         parent::__construct($message, $code, $previous);
     }
 
-    public static function wrap(Exception $ex): self
+    public static function wrap(Throwable $ex): self
     {
         return new static($ex->getMessage(), $ex->getCode(), $ex);
     }
