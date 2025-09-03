@@ -17,11 +17,7 @@ class Memgraph extends GraphDB
 
     public function createNode(string $label, array $attributes): Node
     {
-        $attributesStr = "";
-        foreach ($attributes as $key => $value) {
-            $attributesStr .= "$key: \"$value\", ";
-        }
-        $attributesStr = rtrim($attributesStr, ", ");
+        $attributesStr = $this->arrToAttributeStr($attributes);
         $rows = MemgraphClient::query("create (n:$label { $attributesStr }) return n;");
         $node = Arr::get($rows, '0.n');
         if (!$node) {
@@ -37,13 +33,8 @@ class Memgraph extends GraphDB
         string $relatedNodeLabel,
         string $relatedNodeID,
     ) {
-        logger('creating node');
-        logger($newNodeLabel);
         $attributesStr = $this->arrToAttributeStr($newNodeAttributes);
         logger($attributesStr);
-        logger($relation);
-        logger($relatedNodeLabel);
-        logger($relatedNodeID);
         $rows = MemgraphClient::query("
             merge (r:$relatedNodeLabel { id: \"$relatedNodeID\" })
             with r

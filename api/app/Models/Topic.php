@@ -10,5 +10,6 @@ class Topic extends Model
 
     protected $casts = [
         'variations' => 'array',
+        'embedding' => 'array',
     ];
 }

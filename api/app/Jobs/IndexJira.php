@@ -14,6 +14,7 @@ use App\Models\JiraProject;
 use App\Models\Participant;
 use App\Models\Team;
 use App\Services\GraphDB\GraphDB;
+use App\Services\LLM\Embedder;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -27,8 +28,11 @@ class IndexJira implements ShouldQueue
     {
     }
 
-    public function handle(Jira $jira, GraphDB $graphDB): void
-    {
+    public function handle(
+        Jira $jira,
+        GraphDB $graphDB,
+        Embedder $embedder,
+    ): void {
         /** @var IndexingWorkflow $indexing */
         $indexing = IndexingWorkflow::create([
             'integration' => 'jira',
@@ -46,16 +50,19 @@ class IndexJira implements ShouldQueue
                 ->first();
 
             if (!$project) {
+                $embedding = $embedder->createEmbedding($projectData['name']);
                 $project = JiraProject::create([
                     'team_id' => $this->team->id,
                     'jira_integration_id' => $jiraIntegration->id,
                     'title' => $projectData['name'],
                     'key' => $projectData['key'],
                     'jira_id' => $projectData['id'],
+                    'embedding' => $embedding,
                 ]);
                 $graphDB->createNode('Project', [
                     'id' => $project->id,
                     'name' => $project->title,
+                    'embedding' => $embedding,
                 ]);
             }
 
@@ -87,6 +94,7 @@ class IndexJira implements ShouldQueue
                         ->delete();
 
                     $indexing->increment('deleted_items', $count);
+                    $embedding = $embedder->createEmbedding($issue->title);
                     $doc = Document::create([
                         'team_id' => $this->team->id,
                         'source_type' => 'jira',
@@ -95,12 +103,14 @@ class IndexJira implements ShouldQueue
                         'title' => $issue->title,
                         'priority' => $prio,
                         'metadata' => $issueData,
+                        'embedding' => $embedding,
                     ]);
                     $graphDB->createNodeWithRelation(
                         newNodeLabel: 'Issue',
                         newNodeAttributes: [
                             'id' => $doc->id,
                             'name' => $doc->title,
+                            'embedding' => $embedding,
                         ],
                         relation: 'PART_OF',
                         relatedNodeLabel: 'Project',

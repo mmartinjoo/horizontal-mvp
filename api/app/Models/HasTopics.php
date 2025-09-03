@@ -33,6 +33,7 @@ trait HasTopics
                     'name' => $topic['name'],
                     'variations' => $topic['variations'],
                     'category' => $topic['category'],
+                    'embedding' => $topic['embedding'],
                 ],
             );
             $this->topics()->attach($t->id);

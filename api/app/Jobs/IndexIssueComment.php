@@ -77,6 +77,7 @@ class IndexIssueComment implements ShouldQueue
                     newNodeAttributes: [
                         'id' => $topic->id,
                         'name' => $topic->name,
+                        'embedding' => $topic->embedding,
                     ],
                     relation: 'MENTIONED_IN',
                     relatedNodeLabel: 'IssueComment',

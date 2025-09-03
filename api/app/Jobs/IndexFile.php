@@ -203,6 +203,7 @@ class IndexFile implements ShouldQueue
                 'status' => 'extracting_entities',
             ]);
 
+            /** @var DocumentChunk $chunk */
             foreach ($indexingWorkflowItem->document->chunks as $chunk) {
                 $topics = $entityExtractor->extractTopics($chunk->body);
                 $chunk->createTopics($topics['topics']);
@@ -212,6 +213,7 @@ class IndexFile implements ShouldQueue
                         newNodeAttributes: [
                             'id' => $topic->id,
                             'name' => $topic->name,
+                            'embedding' => $topic->embedding,
                         ],
                         relation: 'MENTIONED_IN',
                         relatedNodeLabel: 'FileChunk',

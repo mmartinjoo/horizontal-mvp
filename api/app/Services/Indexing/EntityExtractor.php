@@ -2,11 +2,12 @@
 
 namespace App\Services\Indexing;
 
+use App\Services\LLM\Embedder;
 use App\Services\LLM\LLM;
 
 class EntityExtractor
 {
-    public function __construct(private LLM $llm)
+    public function __construct(private LLM $llm, private Embedder $embedder)
     {
     }
 
@@ -213,10 +214,17 @@ class EntityExtractor
 
         $response = $this->llm->completion($prompt, 4096);
         $json = json_decode($response, true);
-        return !$json
+        $data =  !$json
             ? []
             : $json;
 
+        foreach ($data['topics'] as $i => $topic) {
+            $embedding = $this->embedder->createEmbedding(
+                sprintf("%s %s %s", $topic['name'], $topic['category'], implode($topic['variations']))
+            );
+            $data['topics'][$i]['embedding'] = $embedding;
+        }
+        return $data;
     }
 
     public function extractParticipants(string $text): array

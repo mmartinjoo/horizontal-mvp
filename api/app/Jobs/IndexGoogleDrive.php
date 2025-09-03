@@ -10,6 +10,7 @@ use App\Models\IndexingWorkflowItem;
 use App\Models\Team;
 use App\Services\GraphDB\GraphDB;
 use App\Services\Indexing\FilePrioritizer;
+use App\Services\LLM\Embedder;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -26,6 +27,7 @@ class IndexGoogleDrive implements ShouldQueue
         GoogleDrive $drive,
         FilePrioritizer $prioritizer,
         GraphDB $graphDB,
+        Embedder $embedder,
     ): void {
         /** @var IndexingWorkflow $indexing */
         $indexing = IndexingWorkflow::create([
@@ -59,6 +61,7 @@ class IndexGoogleDrive implements ShouldQueue
                     ->delete();
 
                 $indexing->increment('deleted_items', $count);
+                $embedding = $embedder->createEmbedding($file->path());
                 $document = Document::create([
                     'team_id' => $this->team->id,
                     'source_type' => 'google_drive',
@@ -66,10 +69,12 @@ class IndexGoogleDrive implements ShouldQueue
                     'title' => $file->path(),
                     'metadata' => $file,
                     'priority' => $prio,
+                    'embedding' => $embedding,
                 ]);
                 $graphDB->createNode('File', [
                     'id' => $document->id,
                     'name' => $document->title,
+                    'embedding' => $embedding,
                 ]);
                 $indexingItem = IndexingWorkflowItem::create([
                     'indexing_workflow_id' => $indexing->id,

@@ -31,6 +31,9 @@ return new class extends Migration
             $table->dateTime('indexed_at')->nullable();
             $table->timestamps();
         });
+
+        DB::statement("ALTER TABLE documents ADD COLUMN embedding vector(1536)");
+        DB::statement("CREATE INDEX documents_embedding_idx ON documents USING hnsw (embedding vector_cosine_ops)");
     }
 
     public function down(): void
