@@ -40,7 +40,7 @@ class IndexGoogleDrive implements ShouldQueue
             'team_id' => $this->team->id,
             'job_id' => $this->job->payload()['uuid'],
         ]);
-        $files = $drive->listDirectoryContents('horizontal.app');
+        $files = $drive->listDirectoryContents();
         $contents = $prioritizer->prioritize($files);
         $indexing->update([
             'status' => 'downloaded',

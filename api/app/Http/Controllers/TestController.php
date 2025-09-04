@@ -20,7 +20,7 @@ class TestController extends Controller
     {
         $team = Team::where('name', 'Test Company')->firstOrFail();
         /** @var Topic $topic */
-        LinkRelatedTopics::dispatchSync();
+        LinkRelatedTopics::dispatch();
 //        IndexJira::dispatch($team);
 //        IndexGoogleDrive::dispatch($team);
 
