@@ -97,6 +97,33 @@ class GoogleDrive
         return $authors;
     }
 
+    public function getComments(File $file): array
+    {
+        $comments = $this->drive->comments->listComments($file->extraMetadata()['id'], [
+            'fields' => 'comments(id,createdTime,modifiedTime,author(displayName),content,replies)',
+            'pageSize' => 100,
+        ]);
+
+        $result = [];
+        foreach ($comments->getComments() as $comment) {
+            $result[] = [
+                'id' => $comment->getId(),
+                'content' => $comment->getContent(),
+                'created_at' => $comment->getCreatedTime(),
+                'author' => $comment->getAuthor()->getDisplayName(),
+            ];
+            foreach ($comment->getReplies() as $reply) {
+                $result[] = [
+                    'id' => $reply->getId(),
+                    'content' => $reply->getContent(),
+                    'created_at' => $reply->getCreatedTime(),
+                    'author' => $reply->getAuthor()->getDisplayName(),
+                ];
+            }
+        }
+        return $result;
+    }
+
     private function isGoogleNativeFile(File $file): bool
     {
         return in_array($file->mimeType(), self::GOOGLE_NATIVE_TYPES);

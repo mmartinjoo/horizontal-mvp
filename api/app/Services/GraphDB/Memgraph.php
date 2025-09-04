@@ -76,4 +76,18 @@ class Memgraph extends GraphDB
         $rows = MemgraphClient::query($query);
         return $this->parseNode($rows);
     }
+
+    public function addRelation(
+        string $fromNodeLabel,
+        string $fromNodeID,
+        string $relation,
+        string $toNodeLabel,
+        string $toNodeID,
+    ): void
+    {
+        MemgraphClient::query("
+            match (n1:$fromNodeLabel { id: \"$fromNodeID\" }), (n2:$toNodeLabel { id: \"$toNodeID\" })
+            merge (n1)-[:$relation]->(n2)
+        ");
+    }
 }

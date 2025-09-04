@@ -10,6 +10,7 @@ use App\Models\IndexingWorkflowItem;
 use App\Models\Participant;
 use App\Models\Team;
 use App\Services\GraphDB\GraphDB;
+use App\Services\Indexing\EntityExtractor;
 use App\Services\Indexing\FilePrioritizer;
 use App\Services\LLM\Embedder;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -30,6 +31,7 @@ class IndexGoogleDrive implements ShouldQueue
         FilePrioritizer $prioritizer,
         GraphDB $graphDB,
         Embedder $embedder,
+        EntityExtractor $entityExtractor,
     ): void {
         /** @var IndexingWorkflow $indexing */
         $indexing = IndexingWorkflow::create([
@@ -179,6 +181,83 @@ class IndexGoogleDrive implements ShouldQueue
                         relatedNodeLabel: 'File',
                         relatedNodeID: $document->id,
                     );
+                }
+
+                $comments = $drive->getComments($file);
+                foreach ($comments as $comment) {
+                    $authorEmbedding = $embedder->createEmbedding($comment['author']);
+                    $p = Participant::updateOrCreate(
+                        [
+                            'slug' => Str::slug($comment['author']),
+                            'type' => 'person',
+                        ],
+                        [
+                            'slug' => Str::slug($comment['author']),
+                            'name' => $comment['author'],
+                            'type' => 'person',
+                            'embedding' => $authorEmbedding,
+                        ],
+                    );
+                    $document->participants()->attach($p->id, [
+                        'context' => 'commented',
+                        'embedding' => json_encode($authorEmbedding),
+                    ]);
+                    $graphDB->createNodeWithRelation(
+                        newNodeLabel: 'Participant',
+                        newNodeAttributes: [
+                            'id' => $p->id,
+                            'name' => $p->name,
+                            'embedding' => $authorEmbedding,
+                        ],
+                        relation: 'COMMENTED_ON',
+                        relatedNodeLabel: 'File',
+                        relatedNodeID: $document->id,
+                    );
+                    $embedding = $embedder->createEmbedding($comment['content']);
+                    $documentComment = $document->comments()->create([
+                        'author_id' => $p->id,
+                        'body' => $comment['content'],
+                        'commented_at' => $comment['created_at'],
+                        'comment_id' => $comment['id'],
+                        'metadata' => $comment,
+                        'embedding' => $embedding,
+                    ]);
+                    $graphDB->createNodeWithRelation(
+                        newNodeLabel: 'FileComment',
+                        newNodeAttributes: [
+                            'id' => $documentComment->id,
+                            'embedding' => $embedding,
+                        ],
+                        relation: 'COMMENT_OF',
+                        relatedNodeLabel: 'File',
+                        relatedNodeID: $document->id,
+                    );
+                    $graphDB->addRelation(
+                        fromNodeLabel: 'Participant',
+                        fromNodeID: $p->id,
+                        relation: 'AUTHOR_OF',
+                        toNodeLabel: 'FileComment',
+                        toNodeID: $documentComment->id,
+                    );
+                    $topics = $entityExtractor->extractTopics($comment['content']);
+                    $documentComment->createTopics($topics['topics']);
+                    foreach ($documentComment->topics as $topic) {
+                        $graphDB->createNodeWithRelation(
+                            newNodeLabel: 'Topic',
+                            newNodeAttributes: [
+                                'id' => $topic->id,
+                                'name' => $topic->name,
+                                'embedding' => $topic->embedding,
+                            ],
+                            relation: 'MENTIONED_IN',
+                            relatedNodeLabel: 'FileComment',
+                            relatedNodeID: $documentComment->id,
+                            relationAttributes: [
+                                'context' => $topic->pivot->context,
+                                'embedding' => $topic->pivot->embedding,
+                            ],
+                        );
+                    }
                 }
             }
         }

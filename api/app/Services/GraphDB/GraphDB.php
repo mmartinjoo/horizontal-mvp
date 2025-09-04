@@ -26,6 +26,13 @@ abstract class GraphDB
     ): ?Node;
     abstract public function getNode(string $label, array $attributes): ?Node;
     abstract public function query(string $query): ?Node;
+    abstract public function addRelation(
+        string $fromNodeLabel,
+        string $fromNodeID,
+        string $relation,
+        string $toNodeLabel,
+        string $toNodeID,
+    ): void;
 
     public function __construct(array $config)
     {
