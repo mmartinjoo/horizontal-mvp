@@ -183,6 +183,8 @@ class EntityExtractor
             6. **Capture context**: Capture how the given topics is being discussed or mentioned in the text
                 - For example, \"the pipeline is failing because of XYZ\" can be an important context
 
+            7. Don't extract email addresses, usernames, phone numbers, or other personally identifiable information (PII). These are not topics.
+
             ## Output Format
 
             Return a JSON structure:

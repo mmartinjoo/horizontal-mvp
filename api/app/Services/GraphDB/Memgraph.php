@@ -83,11 +83,20 @@ class Memgraph extends GraphDB
         string $relation,
         string $toNodeLabel,
         string $toNodeID,
+        array $relationAttributes = [],
     ): void
     {
-        MemgraphClient::query("
-            match (n1:$fromNodeLabel { id: \"$fromNodeID\" }), (n2:$toNodeLabel { id: \"$toNodeID\" })
-            merge (n1)-[:$relation]->(n2)
-        ");
+        if (count($relationAttributes) === 0) {
+            MemgraphClient::query("
+                match (n1:$fromNodeLabel { id: \"$fromNodeID\" }), (n2:$toNodeLabel { id: \"$toNodeID\" })
+                merge (n1)-[:$relation]->(n2)
+            ");
+        } else {
+            $relationAttributesStr = $this->arrToAttributeStr($relationAttributes);
+            MemgraphClient::query("
+                match (n1:$fromNodeLabel { id: \"$fromNodeID\" }), (n2:$toNodeLabel { id: \"$toNodeID\" })
+                merge (n1)-[:$relation { $relationAttributesStr }]->(n2)
+            ");
+        }
     }
 }

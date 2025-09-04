@@ -32,6 +32,7 @@ abstract class GraphDB
         string $relation,
         string $toNodeLabel,
         string $toNodeID,
+        array $relationAttributes = [],
     ): void;
 
     public function __construct(array $config)
