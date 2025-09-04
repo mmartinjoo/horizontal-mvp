@@ -46,6 +46,7 @@ class IndexGoogleDrive implements ShouldQueue
         ]);
 
         foreach (['high', 'medium', 'low'] as $prio) {
+            /** @var File $file */
             foreach ($contents[$prio] as $i => $file) {
                 if (!$this->fileNeedsIndexing($file)) {
                     $indexing->increment('skipped_items', 1);
@@ -113,6 +114,68 @@ class IndexGoogleDrive implements ShouldQueue
                             'embedding' => $embedding,
                         ],
                         relation: 'REVISION_AUTHOR_OF',
+                        relatedNodeLabel: 'File',
+                        relatedNodeID: $document->id,
+                    );
+                }
+
+                $sharingUser = $file->getSharingUser();
+                if ($sharingUser) {
+                    $embedding = $embedder->createEmbedding($sharingUser);
+                    $p = Participant::updateOrCreate(
+                        [
+                            'slug' => Str::slug($sharingUser),
+                            'type' => 'person',
+                        ],
+                        [
+                            'slug' => Str::slug($sharingUser),
+                            'name' => $sharingUser,
+                            'type' => 'person',
+                            'embedding' => $embedding,
+                        ],
+                    );
+                    $document->participants()->attach($p->id, [
+                        'context' => 'sharing user',
+                        'embedding' => json_encode($embedding),
+                    ]);$graphDB->createNodeWithRelation(
+                        newNodeLabel: 'Participant',
+                        newNodeAttributes: [
+                            'id' => $p->id,
+                            'name' => $p->name,
+                            'embedding' => $embedding,
+                        ],
+                        relation: 'SHARING_USER_OF',
+                        relatedNodeLabel: 'File',
+                        relatedNodeID: $document->id,
+                    );
+                }
+
+                foreach ($file->getOwners() as $owner) {
+                    $embedding = $embedder->createEmbedding($owner);
+                    $p = Participant::updateOrCreate(
+                        [
+                            'slug' => Str::slug($owner),
+                            'type' => 'person',
+                        ],
+                        [
+                            'slug' => Str::slug($owner),
+                            'name' => $owner,
+                            'type' => 'person',
+                            'embedding' => $embedding,
+                        ],
+                    );
+                    $document->participants()->attach($p->id, [
+                        'context' => 'owner',
+                        'embedding' => json_encode($embedding),
+                    ]);
+                    $graphDB->createNodeWithRelation(
+                        newNodeLabel: 'Participant',
+                        newNodeAttributes: [
+                            'id' => $p->id,
+                            'name' => $p->name,
+                            'embedding' => $embedding,
+                        ],
+                        relation: 'OWNER_OF',
                         relatedNodeLabel: 'File',
                         relatedNodeID: $document->id,
                     );

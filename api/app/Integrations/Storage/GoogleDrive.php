@@ -50,11 +50,17 @@ class GoogleDrive
         $listing = $this->fs->listContents($directory, true);
         $files = File::fromDirectoryListing($listing);
         foreach ($files as $file) {
-            $dates = $this->getDates($file);
-            $file->setCreatedAt($dates->createdTime);
-            $file->setUpdatedAt($dates->modifiedTime);
-            $file->setViewedAt($dates->viewedByMeTime);
-
+            $data = $this->getMetaData($file);
+            $file->setCreatedAt($data->createdTime);
+            $file->setUpdatedAt($data->modifiedTime);
+            $file->setViewedAt($data->viewedByMeTime);
+            foreach ($data->getOwners() as $owner) {
+                $file->addOwner($owner->displayName);
+            }
+            $sharingUser = $data->getSharingUser();
+            if ($sharingUser) {
+                $file->setSharingUser($sharingUser->displayName);;
+            }
             yield $file;
         }
     }
@@ -115,9 +121,9 @@ class GoogleDrive
         }
     }
 
-    private function getDates(File $file): DriveFile
+    private function getMetaData(File $file): DriveFile
     {
-        $fields = 'modifiedTime,createdTime,viewedByMeTime';
+        $fields = 'modifiedTime,createdTime,viewedByMeTime,owners,sharingUser';
         return $this->drive->files->get($file->extraMetadata()['id'], ['fields' => $fields]);
     }
 }

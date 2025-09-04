@@ -15,6 +15,9 @@ class File implements JsonSerializable
     protected Carbon $updatedAt;
     protected Carbon $viewedAt;
     protected Carbon $lastUsedAt;
+    /** @var array[string] $owners  */
+    protected array $owners = [];
+    protected string $sharingUser;
 
     public function __construct(private FileAttributes $file)
     {
@@ -22,6 +25,8 @@ class File implements JsonSerializable
         $this->updatedAt = Carbon::createFromTimestamp($file->lastModified());
         $this->viewedAt = Carbon::parse("1900-01-01 00:00:00");
         $this->lastUsedAt = Carbon::parse("1900-01-01 00:00:00");
+
+        $this->sharingUser = "";
     }
 
     public function setCreatedAt(string|null $createdAt): void
@@ -50,6 +55,29 @@ class File implements JsonSerializable
     public function updateLastUsedAt()
     {
         $this->lastUsedAt = $this->viewedAt->max($this->createdAt)->max($this->updatedAt);
+    }
+
+    public function addOwner(string $owner): void
+    {
+        $this->owners[] = $owner;
+    }
+
+    /**
+     * @return array[string]
+     */
+    public function getOwners(): array
+    {
+        return $this->owners;
+    }
+
+    public function setSharingUser(string $sharingUser): void
+    {
+        $this->sharingUser = $sharingUser;
+    }
+
+    public function getSharingUser(): string
+    {
+        return $this->sharingUser;
     }
 
     public static function fromDirectoryListing(DirectoryListing $listing): Generator
