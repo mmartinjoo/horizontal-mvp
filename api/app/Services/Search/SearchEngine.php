@@ -3,6 +3,8 @@
 namespace App\Services\Search;
 
 use App\Models\DocumentChunk;
+use App\Models\Question;
+use App\Services\GraphDB\GraphDB;
 use App\Services\Indexing\EntityExtractor;
 use App\Services\LLM\Embedder;
 use App\Services\Search\DataTransferObjects\SearchResult;
@@ -13,6 +15,7 @@ class SearchEngine
     public function __construct(
         private Embedder $embedder,
         private EntityExtractor $entityExtractor,
+        private GraphDB $graphDB,
     ) {
     }
 
@@ -61,6 +64,33 @@ class SearchEngine
             }
         }
         return $results->sortByDesc('score');
+    }
+
+    public function graphSearch(Question $question): array
+    {
+        $embedding = $this->embedder->createEmbedding($question->question);
+        $results = $this->graphDB->vectorSearch('vector_index_filechunk', $embedding, 3);
+        $pivotNodes = [];
+        foreach ($results as $node) {
+            if ($node['similarity'] >= 0.5) {
+                $pivotNodes[] = $node;
+            }
+        }
+
+        foreach ($pivotNodes as &$pivotNode) {
+            $neighbours = $this->graphDB->queryMany("
+                MATCH (n)-[*1..2]-(m)
+                WHERE id(n) = {$pivotNode['node']->id}
+                AND (m:File OR m:FileChunk OR m:Issue OR m:IssueComment OR m:IssueWorklog)
+                RETURN m;
+            ", 'm');
+            $pivotNode['neighbours'] = $neighbours;
+        }
+        return $pivotNodes;
+
+        // Strategies:
+        //  - Visit all related topics
+        //  - Visit 1-hop of nodes on the other side on a Topic
     }
 
     /**

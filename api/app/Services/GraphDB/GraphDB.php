@@ -26,7 +26,9 @@ abstract class GraphDB
     ): ?Node;
     abstract public function getNode(string $label, array $attributes): ?Node;
     abstract public function query(string $query): ?Node;
-    abstract public function vectorSearch(string $indexName, array $embedding);
+    /** @return array<Node> */
+    abstract public function queryMany(string $query): array;
+    abstract public function vectorSearch(string $indexName, array $embedding, int $n): array;
     abstract public function addRelation(
         string $fromNodeLabel,
         string $fromNodeID,
@@ -88,8 +90,24 @@ abstract class GraphDB
         return rtrim($attributesStr, ", ");
     }
 
-    protected function parseNode(array $rows): ?Node
+    protected function parseNode(array $rows, string $nodeName = 'n'): ?Node
     {
-        return Arr::get($rows, '0.n');
+        return Arr::get($rows, '0.' . $nodeName);
+    }
+
+    /**
+     * @return array<Node>
+     */
+    protected function parseNodes(array $rows, string $nodeName = 'n'): array
+    {
+        /** @var array<Node> $nodes */
+        $nodes = [];
+        foreach ($rows as $row) {
+            if (!array_key_exists($nodeName, $row)) {
+                continue;
+            }
+            $nodes[] = $row[$nodeName];
+        }
+        return $nodes;
     }
 }

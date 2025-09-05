@@ -18,7 +18,6 @@ class QuestionController
             'question' => $request->input('question'),
         ]);
 
-        $embedding = $embedder->createEmbedding($question->question);
-        return $graphDB->vectorSearch('vector_index_filechunk', $embedding);
+        dd($searchEngine->graphSearch($question));
     }
 }
