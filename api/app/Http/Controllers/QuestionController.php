@@ -19,10 +19,6 @@ class QuestionController
         ]);
 
         $embedding = $embedder->createEmbedding($question->question);
-        $embeddingStr = json_encode($embedding);
-        $x = $graphDB->query("
-            CALL vector_search.search('vector_index_file', 1, $embeddingStr) YIELD * RETURN *;
-        ");
-        dd($x);
+        return $graphDB->vectorSearch('vector_index_filechunk', $embedding);
     }
 }

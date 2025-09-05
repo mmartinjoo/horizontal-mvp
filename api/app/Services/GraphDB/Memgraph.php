@@ -77,6 +77,14 @@ class Memgraph extends GraphDB
         return $this->parseNode($rows);
     }
 
+    public function vectorSearch(string $indexName, array $embedding)
+    {
+        $embeddingStr = json_encode($embedding);
+        return MemgraphClient::query("
+            CALL vector_search.search('$indexName', 1, $embeddingStr) YIELD * RETURN *;
+        ");
+    }
+
     public function addRelation(
         string $fromNodeLabel,
         string $fromNodeID,
