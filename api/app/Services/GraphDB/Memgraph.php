@@ -77,10 +77,10 @@ class Memgraph extends GraphDB
         return $this->parseNode($rows, $nodeName);
     }
 
-    public function queryMany(string $query, string $nodeName = 'n'): array
+    public function queryMany(string $query, array $nodeNames = ['n']): array
     {
         $rows = MemgraphClient::query($query);
-        return $this->parseNodes($rows, $nodeName);
+        return $this->parseNodes($rows, $nodeNames);
     }
 
     public function vectorSearch(string $indexName, array $embedding, int $n): array

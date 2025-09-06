@@ -213,7 +213,7 @@ class IndexJira implements ShouldQueue
                                 'name' => $p->name,
                                 'embedding' => $p->embedding,
                             ],
-                            relation: 'WATCHED_BY',
+                            relation: 'WATCHES',
                             relatedNodeLabel: 'Issue',
                             relatedNodeID: $doc->id,
                         );

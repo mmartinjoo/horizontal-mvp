@@ -77,20 +77,53 @@ class SearchEngine
             }
         }
 
+//        foreach ($pivotNodes as &$pivotNode) {
+//            $neighbours = $this->graphDB->queryMany("
+//                MATCH (n)-[*1..2]-(m)
+//                WHERE id(n) = {$pivotNode['node']->id}
+//                AND (m:File OR m:FileChunk OR m:Issue OR m:IssueComment OR m:IssueWorklog)
+//                RETURN m;
+//            ", 'm');
+//            $pivotNode['neighbours'] = $neighbours;
+//        }
+//        return $pivotNodes;
+
+        //  1. Related topics
         foreach ($pivotNodes as &$pivotNode) {
-            $neighbours = $this->graphDB->queryMany("
-                MATCH (n)-[*1..2]-(m)
-                WHERE id(n) = {$pivotNode['node']->id}
-                AND (m:File OR m:FileChunk OR m:Issue OR m:IssueComment OR m:IssueWorklog)
-                RETURN m;
-            ", 'm');
-            $pivotNode['neighbours'] = $neighbours;
+            $relatedTopics = $this->graphDB->queryMany("
+                match (fc:FileChunk)<-[r:MENTIONED_IN]-(t:Topic)
+                where id(fc) = {$pivotNode['node']->id}
+                return *
+            ", ['t']);
+            $pivotNode['relatedTopics'] = $relatedTopics;
         }
+
+        // 2. Find documents related to topic
+        foreach ($pivotNodes as &$pivotNode) {
+            foreach ($pivotNode['relatedTopics'] as $relatedTopic) {
+                $relatedDocuments = $this->graphDB->queryMany("
+                    match (n)<-[r:MENTIONED_IN]-(t:Topic)
+                    where id(t) = {$relatedTopic->id}
+                    and id(n) <> {$pivotNode['node']->id}
+                    return *
+                ", ['n']);
+                if (empty($relatedDocuments)) {
+                    continue;
+                }
+                if (!isset($pivotNode['relatedDocuments'][$relatedTopic->id])) {
+                    $pivotNode['relatedDocuments'][$relatedTopic->id] = [];
+                }
+                $pivotNode['relatedDocuments'][$relatedTopic->id][] = $relatedDocuments;
+            }
+        }
+
         return $pivotNodes;
 
-        // Strategies:
-        //  - Visit all related topics
-        //  - Visit 1-hop of nodes on the other side on a Topic
+        //  Ez legyen több query -ben:
+        //  1. Related topics
+        //  2. Find FileChunks, IssueChunks, Comments, etc based on topics
+        //  3. Find files, issues based on those
+        //  4. Find participants
     }
 
     /**
