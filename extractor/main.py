@@ -1,19 +1,20 @@
 import os
 import asyncio
-# from openai import OpenAI
 from llama_index.core import Document, KnowledgeGraphIndex
 from llama_index.core.graph_stores import SimpleGraphStore
-# from llama_index.core.extractors import SimpleLLMPathExtractor
 from llama_index.core.indices.property_graph import SimpleLLMPathExtractor, SchemaLLMPathExtractor, DynamicLLMPathExtractor
 from llama_index.core import Settings, VectorStoreIndex, PropertyGraphIndex, KnowledgeGraphIndex
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.llms.openai import OpenAI
 from llama_index.graph_stores.memgraph import MemgraphPropertyGraphStore
 from typing import Literal, List, Tuple
+from dotenv import load_dotenv
 
-os.environ["OPENAI_API_KEY"] = "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"
+load_dotenv()
+
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 llm = OpenAI(
-    api_key=os.environ["OPENAI_API_KEY"],
+    api_key=os.getenv("OPENAI_API_KEY"),
     temperature=0,
     model="gpt-4o"
 )
