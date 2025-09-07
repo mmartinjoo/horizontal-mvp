@@ -8,6 +8,7 @@ use App\Services\GraphDB\GraphDB;
 use App\Services\Indexing\EntityExtractor;
 use App\Services\LLM\Embedder;
 use App\Services\Search\DataTransferObjects\SearchResult;
+use Bolt\protocol\v5\structures\Node;
 use Illuminate\Support\Collection;
 
 class SearchEngine
@@ -71,6 +72,7 @@ class SearchEngine
         $embedding = $this->embedder->createEmbedding($question->question);
         $results = $this->graphDB->vectorSearch('vector_index_filechunk', $embedding, 3);
         $pivotNodes = [];
+        /** @var Node $node */
         foreach ($results as $node) {
             if ($node['similarity'] >= 0.5) {
                 $pivotNodes[] = $node;
@@ -124,6 +126,14 @@ class SearchEngine
         //  2. Find FileChunks, IssueChunks, Comments, etc based on topics
         //  3. Find files, issues based on those
         //  4. Find participants
+
+
+        // Another idea:
+        // 1. Find related topics:
+        //  match p = (fc:FileChunk)<-[r:MENTIONED_IN*..1]-(t:Topic)
+        //  where id(fc) = 7038
+        //  return p
+        // Find related entities based on those topics
     }
 
     /**
