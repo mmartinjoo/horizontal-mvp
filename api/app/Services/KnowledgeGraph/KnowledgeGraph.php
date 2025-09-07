@@ -2,6 +2,7 @@
 
 namespace App\Services\KnowledgeGraph;
 
+use App\Jobs\IndexGraphCommunity;
 use App\Services\GraphDB\GraphDB;
 use App\Services\LLM\Embedder;
 use App\Services\LLM\LLM;
@@ -53,37 +54,41 @@ class KnowledgeGraph
 
     public function indexCommunities()
     {
-        $results = $this->graphDB->run("
-            match (c:Community)<-[r:BELONGS_TO]-(n)
-            return c.id as community_id, id(n) as node_id, n.name as node_name
+        $communities = $this->graphDB->run("
+            match (c:Community)
+            return c.id as community_id, c.level as community_level
         ");
 
-        $map = [];
-        foreach ($results as $result) {
-            if (!isset($map[$result['community_id']])) {
-                $map[$result['community_id']] = [
-                    'node_names' => '',
-                    'nodes' => [],
-                    'original_text' => ''
-                ];
+        foreach ($communities as $community) {
+            $nodes = $this->graphDB->queryMany("
+                match (n:__Entity__)-[r:BELONGS_TO]->(c:Community)
+                where c.id = {$community['community_id']}
+                return n
+            ", ['n']);
+
+            $nodeNames = "";
+            foreach ($nodes as $node) {
+                $nodeNames .= "{$node->properties['name']}; ";
             }
-            $map[$result['community_id']]['nodes'][] = [
-                'node_id' => $result['node_id'],
-                'node_name' => $result['node_name'],
-            ];
-            $map[$result['community_id']]['node_names'] .= "{$result['node_name']}; ";
+
+            $nodeIds = [];
+            foreach ($nodes as $node) {
+                $nodeIds[] = $node->id;
+            }
+            $nodeIdsStr = json_encode($nodeIds);
 
             /** @var Node $chunk */
             $chunk = $this->graphDB->query("
-                match (n)<-[r:MENTIONS]-(c:Chunk)
-                where id(n) = {$result['node_id']}
+                match (n:__Entity__)<-[r:MENTIONS]-(c:Chunk)
+                where id(n) IN {$nodeIdsStr}
                 return c
             ", 'c');
-            if (empty($chunk)) {
-                continue;
-            }
-            $map[$result['community_id']]['original_text'] .= "{$chunk->properties['text']}";
+            IndexGraphCommunity::dispatch(
+                $community['community_id'],
+                $community['community_level'],
+                $nodeNames,
+                $chunk ? $chunk->properties['text'] : "",
+            );
         }
-        dd($map);
     }
 }
