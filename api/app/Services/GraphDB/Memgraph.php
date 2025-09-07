@@ -18,7 +18,7 @@ class Memgraph extends GraphDB
     public function createNode(string $label, array $attributes): ?Node
     {
         $attributesStr = $this->arrToAttributeStr($attributes);
-        $rows = MemgraphClient::query("create (n:$label { $attributesStr }) return n;");
+        $rows = MemgraphClient::query("merge (n:$label { $attributesStr }) return n;");
         return $this->parseNode($rows);
     }
 
@@ -81,6 +81,11 @@ class Memgraph extends GraphDB
     {
         $rows = MemgraphClient::query($query);
         return $this->parseNodes($rows, $nodeNames);
+    }
+
+    public function run(string $query): array
+    {
+        return MemgraphClient::query($query);
     }
 
     public function vectorSearch(string $indexName, array $embedding, int $n): array

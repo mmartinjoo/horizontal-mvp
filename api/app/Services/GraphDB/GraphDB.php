@@ -38,6 +38,8 @@ abstract class GraphDB
         array $relationAttributes = [],
     ): void;
 
+    abstract public function run(string $query): array;
+
     public function __construct(array $config)
     {
         $conn = new Socket();

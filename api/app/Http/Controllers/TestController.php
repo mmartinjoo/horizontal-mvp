@@ -11,16 +11,18 @@ use App\Models\DocumentComment;
 use App\Models\JiraProject;
 use App\Models\Team;
 use App\Models\Topic;
+use App\Services\KnowledgeGraph\KnowledgeGraph;
 use App\Services\LLM\Embedder;
 use Illuminate\Http\Request;
 
 class TestController extends Controller
 {
-    public function index()
+    public function index(KnowledgeGraph $knowledgeGraph)
     {
-        $team = Team::where('name', 'Test Company')->firstOrFail();
+        $knowledgeGraph->buildCommunities();
+//        $team = Team::where('name', 'Test Company')->firstOrFail();
         /** @var Topic $topic */
-        LinkRelatedTopics::dispatch();
+//        LinkRelatedTopics::dispatch();
 //        IndexJira::dispatch($team);
 //        IndexGoogleDrive::dispatch($team);
 
