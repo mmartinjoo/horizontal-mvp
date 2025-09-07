@@ -3,7 +3,7 @@ import asyncio
 from llama_index.core import Document, KnowledgeGraphIndex
 from llama_index.core.graph_stores import SimpleGraphStore
 from llama_index.core.indices.property_graph import SimpleLLMPathExtractor, SchemaLLMPathExtractor, DynamicLLMPathExtractor
-from llama_index.core import Settings, VectorStoreIndex, PropertyGraphIndex, KnowledgeGraphIndex
+from llama_index.core import Settings, VectorStoreIndex, PropertyGraphIndex, KnowledgeGraphIndex, SimpleDirectoryReader
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.llms.openai import OpenAI
 from llama_index.graph_stores.memgraph import MemgraphPropertyGraphStore
@@ -21,14 +21,53 @@ llm = OpenAI(
 Settings.llm = llm
 
 text = """
-Customer profile
-With Horizontal, we want to target smaller companies and early-stage startups. Mainly for two reasons:
-They don’t like overcomplicated enterprise software
-I have access to some of them
-Horizontal will be a cool, startup-friendly (developer-friendly) tool.
+Horizontal’s position in the workflow scale
+We don’t want to own entire workflows or categories.
+
+Horizontal is about knowledge management in any workflow. We unify knowledge management across all tools.
+
+It’s one small step in many different workflows.
+
+Either you’re about to:
+Start a new feature from scratch
+Fix a bug
+Or change something in your production architecture
+
+You need to access knowledge and information about the past.
+
+In one sentence, Horizontal’s position from a workflow perspective:
+
+Unified and easy access to all your team’s knowledge.
 """
 
-documents = [Document(text=text)]
+reader = SimpleDirectoryReader(input_dir="input")
+documents = reader.load_data()
+
+# documents = [Document(text=text)]
+
+def simple_based():
+    graph_store = MemgraphPropertyGraphStore(
+        password="",
+        username="",
+        url="bolt://127.0.0.1:7687"
+    )
+    kg_extractor = SimpleLLMPathExtractor(
+        llm=llm, 
+        max_paths_per_chunk=20, 
+        num_workers=4,
+    )
+    simple_index = PropertyGraphIndex.from_documents(
+        documents,
+        llm=llm,
+        embed_kg_nodes=True,
+        kg_extractors=[kg_extractor],
+        show_progress=True,
+        property_graph_store=graph_store,
+    )
+    # xs = simple_index.property_graph_store.get_triplets(
+    #     entity_names=["Horizontal", "knowledge management", "workflow"]
+    # )
+    # print(xs)
 
 def simple():
     index = VectorStoreIndex.from_documents(documents)
@@ -73,30 +112,6 @@ def schema_based():
     )
     nodes = retriever.retrieve("Who is Steve Jobs?")
     print(nodes)
-    
-def simple_based():
-    graph_store = MemgraphPropertyGraphStore(
-        password="",
-        username="",
-        url="bolt://127.0.0.1:7687"
-    )
-    kg_extractor = SimpleLLMPathExtractor(
-        llm=llm, 
-        max_paths_per_chunk=20, 
-        num_workers=4,
-    )
-    simple_index = PropertyGraphIndex.from_documents(
-        documents,
-        llm=llm,
-        embed_kg_nodes=True,
-        kg_extractors=[kg_extractor],
-        show_progress=True,
-        property_graph_store=graph_store,
-    )
-    xs = simple_index.property_graph_store.get_triplets(
-        entity_names=["Horizontal"]
-    )
-    print(xs)
     
 def dynamic_based():
     kg_extractor = DynamicLLMPathExtractor(
