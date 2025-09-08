@@ -54,41 +54,70 @@ class KnowledgeGraph
 
     public function indexCommunities()
     {
+        $alreadyIndexedCommunities = [];
         $communities = $this->graphDB->run("
             match (c:Community)
             return c.id as community_id, c.level as community_level
         ");
 
         foreach ($communities as $community) {
-            $nodes = $this->graphDB->queryMany("
-                match (n:__Entity__)-[r:BELONGS_TO]->(c:Community)
-                where c.id = {$community['community_id']}
-                return n
-            ", ['n']);
-
-            $nodeNames = "";
-            foreach ($nodes as $node) {
-                $nodeNames .= "{$node->properties['name']}; ";
+            if (in_array($community['community_id'] . '-' . $community['community_level'], $alreadyIndexedCommunities)) {
+                continue;
             }
 
-            $nodeIds = [];
-            foreach ($nodes as $node) {
-                $nodeIds[] = $node->id;
-            }
-            $nodeIdsStr = json_encode($nodeIds);
+            $summaryText = "";
+            $context = "";
+            if ($community['community_level'] === 0) {
+                $nodes = $this->graphDB->queryMany("
+                    match (n:__Entity__)-[r:BELONGS_TO]->(c:Community)
+                    where c.id = {$community['community_id']}
+                    return n
+                ", ['n']);
 
-            /** @var Node $chunk */
-            $chunk = $this->graphDB->query("
-                match (n:__Entity__)<-[r:MENTIONS]-(c:Chunk)
-                where id(n) IN {$nodeIdsStr}
-                return c
-            ", 'c');
-            IndexGraphCommunity::dispatch(
-                $community['community_id'],
-                $community['community_level'],
-                $nodeNames,
-                $chunk ? $chunk->properties['text'] : "",
-            );
+                foreach ($nodes as $node) {
+                    $summaryText .= "{$node->properties['name']}; ";
+                }
+
+                $nodeIds = [];
+                foreach ($nodes as $node) {
+                    $nodeIds[] = $node->id;
+                }
+                $nodeIdsStr = json_encode($nodeIds);
+
+                /** @var Node $chunk */
+                $chunk = $this->graphDB->query("
+                    match (n:__Entity__)<-[r:MENTIONS]-(c:Chunk)
+                    where id(n) IN {$nodeIdsStr}
+                    return c
+                ", 'c');
+                $context = $chunk ? $chunk->properties['text'] : "";
+
+                IndexGraphCommunity::dispatch(
+                    $community['community_id'],
+                    $community['community_level'],
+                    $summaryText,
+                    $context,
+                );
+                $alreadyIndexedCommunities[] = $community['community_id'] . '-' . $community['community_level'];
+            } else {
+                $childrenCommunities = $this->graphDB->queryMany("
+                    match (parent:Community { level: {$community['community_level']}, id: {$community['community_id']} })<-[:CHILD_OF]-(child:Community)
+                    return child
+                ", ['child']);
+
+                foreach ($childrenCommunities as $childCommunity) {
+                    $summaryText .= "{$childCommunity->properties['name']}; ";
+                    $context .= "{$childCommunity->properties['summary']}; ";
+                }
+
+                IndexGraphCommunity::dispatch(
+                    $community['community_id'],
+                    $community['community_level'],
+                    $summaryText,
+                    $context,
+                );
+                $alreadyIndexedCommunities[] = $community['community_id'] . '-' . $community['community_level'];
+            }
         }
     }
 }

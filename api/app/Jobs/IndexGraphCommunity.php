@@ -27,7 +27,6 @@ class IndexGraphCommunity implements ShouldQueue
         GraphDB $graphDB,
         Embedder $embedder,
     ) {
-        logger('indexing community: ' . $this->communityID . ' level: ' . $this->communityLevel);
         $result = $llm->completion("
             ## Task: Generate Community Summary for Knowledge Graph Cluster
 
@@ -38,7 +37,7 @@ class IndexGraphCommunity implements ShouldQueue
             **Community level:**
             {$this->communityLevel}
 
-            **Extracted Concepts from Nodes:**
+            **Extracted Concepts from Nodes/children of this community:**
             {$this->nodeNames}
 
             **Source Context from the file chunk that the nodes are mentioned in:**
@@ -88,6 +87,5 @@ class IndexGraphCommunity implements ShouldQueue
                 c.summary = \"{$data['summary']}\",
                 c.embedding = {$embeddingStr};
         ");
-        logger('done indexing community: ' . $this->communityID . ' title: ' . $data['title']);
     }
 }
