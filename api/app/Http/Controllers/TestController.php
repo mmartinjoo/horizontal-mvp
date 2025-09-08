@@ -13,13 +13,16 @@ use App\Models\Team;
 use App\Models\Topic;
 use App\Services\KnowledgeGraph\KnowledgeGraph;
 use App\Services\LLM\Embedder;
+use App\Services\Search\SearchEngine;
 use Illuminate\Http\Request;
 
 class TestController extends Controller
 {
     public function index(KnowledgeGraph $knowledgeGraph)
     {
-        $knowledgeGraph->indexCommunities();
+//        $knowledgeGraph->buildCommunities();
+        $knowledgeGraph->indexParentCommunities();
+
 //        $team = Team::where('name', 'Test Company')->firstOrFail();
         /** @var Topic $topic */
 //        LinkRelatedTopics::dispatch();

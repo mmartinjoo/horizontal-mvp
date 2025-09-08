@@ -3,17 +3,15 @@
 namespace App\Services\KnowledgeGraph;
 
 use App\Jobs\IndexGraphCommunity;
+use App\Jobs\IndexParentCommunities;
 use App\Services\GraphDB\GraphDB;
-use App\Services\LLM\Embedder;
-use App\Services\LLM\LLM;
 use Bolt\protocol\v5\structures\Node;
+use Illuminate\Support\Facades\Bus;
 
 class KnowledgeGraph
 {
     public function __construct(
-        private GraphDB $graphDB,
-        private LLM $llm,
-        private Embedder $embedder,
+        private GraphDB $graphDB
     ) {
     }
 
@@ -54,19 +52,14 @@ class KnowledgeGraph
 
     public function indexCommunities()
     {
-        $alreadyIndexedCommunities = [];
-        $communities = $this->graphDB->run("
-            match (c:Community)
+        $jobs = [];
+        $baseCommunities = $this->graphDB->run("
+            match (c:Community { level: 0 })
             return c.id as community_id, c.level as community_level
         ");
 
-        foreach ($communities as $community) {
-            if (in_array($community['community_id'] . '-' . $community['community_level'], $alreadyIndexedCommunities)) {
-                continue;
-            }
-
+        foreach ($baseCommunities as $community) {
             $summaryText = "";
-            $context = "";
             if ($community['community_level'] === 0) {
                 $nodes = $this->graphDB->queryMany("
                     match (n:__Entity__)-[r:BELONGS_TO]->(c:Community)
@@ -92,31 +85,57 @@ class KnowledgeGraph
                 ", 'c');
                 $context = $chunk ? $chunk->properties['text'] : "";
 
-                IndexGraphCommunity::dispatch(
+                $jobs[] = new IndexGraphCommunity(
                     $community['community_id'],
                     $community['community_level'],
                     $summaryText,
                     $context,
                 );
-                $alreadyIndexedCommunities[] = $community['community_id'] . '-' . $community['community_level'];
-            } else {
+            }
+        }
+
+        Bus::batch($jobs)
+            ->finally(function () {
+                IndexParentCommunities::dispatch();
+            })
+            ->dispatch();
+    }
+
+    public function indexParentCommunities()
+    {
+        foreach (range(1, 5) as $level) {
+            $parentCommunities = $this->graphDB->run("
+                match (c:Community)
+                where c.level = {$level}
+                return c.id as community_id, c.level as community_level
+            ");
+            foreach ($parentCommunities as $parentCommunity) {
+                $summaryText = "";
+                $context = "";
                 $childrenCommunities = $this->graphDB->queryMany("
-                    match (parent:Community { level: {$community['community_level']}, id: {$community['community_id']} })<-[:CHILD_OF]-(child:Community)
+                    match (parent:Community { level: {$parentCommunity['community_level']}, id: {$parentCommunity['community_id']} })<-[:CHILD_OF*1..5]-(child:Community)
                     return child
                 ", ['child']);
 
                 foreach ($childrenCommunities as $childCommunity) {
+                    if (data_get($childCommunity, 'properties.summary') === null || data_get($childCommunity, 'properties.name') === null) {
+                        logger('summary IS NULL');
+                        logger(json_encode($childCommunity));
+                        continue;
+                    }
                     $summaryText .= "{$childCommunity->properties['name']}; ";
                     $context .= "{$childCommunity->properties['summary']}; ";
                 }
 
+                logger('Indexing parent community ' . $parentCommunity['community_id'] . ' (' . $parentCommunity['community_level'] . ')');
+                logger('summary: ' . $summaryText);
+                logger('context: ' . $context);
                 IndexGraphCommunity::dispatch(
-                    $community['community_id'],
-                    $community['community_level'],
+                    $parentCommunity['community_id'],
+                    $parentCommunity['community_level'],
                     $summaryText,
                     $context,
                 );
-                $alreadyIndexedCommunities[] = $community['community_id'] . '-' . $community['community_level'];
             }
         }
     }

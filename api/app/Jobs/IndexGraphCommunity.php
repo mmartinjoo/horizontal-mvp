@@ -5,12 +5,14 @@ namespace App\Jobs;
 use App\Services\GraphDB\GraphDB;
 use App\Services\LLM\Embedder;
 use App\Services\LLM\LLM;
+use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
 class IndexGraphCommunity implements ShouldQueue
 {
     use Queueable;
+    use Batchable;
 
     public function __construct(
         private string $communityID,

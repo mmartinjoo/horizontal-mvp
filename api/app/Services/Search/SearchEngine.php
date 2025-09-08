@@ -136,6 +136,21 @@ class SearchEngine
         // Find related entities based on those topics
     }
 
+    public function graphRAG(Question $question): array
+    {
+        $embedding = $this->embedder->createEmbedding($question->question);
+        $results = $this->graphDB->vectorSearch('vector_index_communities', $embedding, 10);
+        $pivotNodes = [];
+        /** @var Node $node */
+        foreach ($results as $node) {
+            if ($node['similarity'] >= 0.2) {
+                $pivotNodes[] = $node;
+            }
+        }
+        dd(collect($pivotNodes)->pluck('node.properties.name'));
+        return [];
+    }
+
     /**
      * @return Collection<SearchResult>
      */
