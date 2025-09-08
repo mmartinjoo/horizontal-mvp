@@ -2,11 +2,12 @@
 
 namespace App\Jobs;
 
+use App\Services\KnowledgeGraph\BuildLeidenCommunities;
 use App\Services\KnowledgeGraph\KnowledgeGraph;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class IndexParentCommunities implements ShouldQueue
+class IndexLeidenParentCommunities implements ShouldQueue
 {
     use Queueable;
 
@@ -15,8 +16,8 @@ class IndexParentCommunities implements ShouldQueue
         //
     }
 
-    public function handle(KnowledgeGraph $knowledgeGraph): void
+    public function handle(BuildLeidenCommunities $leidenCommunities): void
     {
-        $knowledgeGraph->indexParentCommunities();
+        $leidenCommunities->indexParentCommunities();
     }
 }

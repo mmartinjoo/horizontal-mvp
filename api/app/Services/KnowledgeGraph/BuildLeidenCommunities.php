@@ -3,19 +3,18 @@
 namespace App\Services\KnowledgeGraph;
 
 use App\Jobs\IndexGraphCommunity;
-use App\Jobs\IndexParentCommunities;
+use App\Jobs\IndexLeidenParentCommunities;
 use App\Services\GraphDB\GraphDB;
 use Bolt\protocol\v5\structures\Node;
 use Illuminate\Support\Facades\Bus;
 
-class KnowledgeGraph
+class BuildLeidenCommunities
 {
-    public function __construct(
-        private GraphDB $graphDB
-    ) {
+    public function __construct(private GraphDB $graphDB)
+    {
     }
 
-    public function buildCommunities()
+    public function build()
     {
         // Putting nodes into level 0 communities:
         $this->graphDB->run("
@@ -96,7 +95,7 @@ class KnowledgeGraph
 
         Bus::batch($jobs)
             ->finally(function () {
-                IndexParentCommunities::dispatch();
+                IndexLeidenParentCommunities::dispatch();
             })
             ->dispatch();
     }
@@ -119,17 +118,12 @@ class KnowledgeGraph
 
                 foreach ($childrenCommunities as $childCommunity) {
                     if (data_get($childCommunity, 'properties.summary') === null || data_get($childCommunity, 'properties.name') === null) {
-                        logger('summary IS NULL');
-                        logger(json_encode($childCommunity));
                         continue;
                     }
                     $summaryText .= "{$childCommunity->properties['name']}; ";
                     $context .= "{$childCommunity->properties['summary']}; ";
                 }
 
-                logger('Indexing parent community ' . $parentCommunity['community_id'] . ' (' . $parentCommunity['community_level'] . ')');
-                logger('summary: ' . $summaryText);
-                logger('context: ' . $context);
                 IndexGraphCommunity::dispatch(
                     $parentCommunity['community_id'],
                     $parentCommunity['community_level'],

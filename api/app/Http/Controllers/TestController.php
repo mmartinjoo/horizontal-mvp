@@ -21,7 +21,7 @@ class TestController extends Controller
     public function index(KnowledgeGraph $knowledgeGraph)
     {
 //        $knowledgeGraph->buildCommunities();
-        $knowledgeGraph->indexParentCommunities();
+//        $knowledgeGraph->indexParentCommunities();
 
 //        $team = Team::where('name', 'Test Company')->firstOrFail();
         /** @var Topic $topic */
