@@ -112,7 +112,7 @@ const goToWaitlist = () => {
       <div class="text-center">
         <!-- Main Headline -->
         <h1 class="text-6xl lg:text-7xl font-bold text-black mb-8 leading-tight">
-          The <span class="bg-gradient-to-r from-purple-500 via-purple-600 to-blue-500 bg-clip-text text-transparent">knowledge app</span>
+          The <span class="bg-gradient-to-r from-purple-500 via-purple-600 to-blue-500 bg-clip-text text-transparent">search platform</span>
           <br>
           for engineering teams
         </h1>
