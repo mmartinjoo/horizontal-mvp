@@ -16,11 +16,10 @@ class IndexGraphCommunity implements ShouldQueue
 
     public function __construct(
         private string $communityID,
-        private string $communityLevel,
         // The text information from the nodes inside a community
-        private string $nodeNames,
+        private string $summary,
         // The full text from the original file chunk
-        private string $chunkText,
+        private string $context,
     ) {
     }
 
@@ -36,14 +35,11 @@ class IndexGraphCommunity implements ShouldQueue
 
             ### Input Data:
 
-            **Community level:**
-            {$this->communityLevel}
-
             **Extracted Concepts from Nodes/children of this community:**
-            {$this->nodeNames}
+            {$this->summary}
 
             **Source Context from the file chunk that the nodes are mentioned in:**
-            {$this->chunkText}
+            {$this->context}
 
             ### Your Task:
 
@@ -58,7 +54,6 @@ class IndexGraphCommunity implements ShouldQueue
 
             - **Be Specific**: Avoid generic descriptions. Instead of \"business concepts,\" write \"customer acquisition strategy for B2B SaaS targeting technical decision-makers\"
             - **Identify Patterns**: Look for recurring themes, entities, or relationships across the concepts
-            - **Preserve Hierarchy**: If this is a higher-level community (level > 0), focus on broader themes; for level 0 communities, be more specific
             - **Use Domain Language**: Maintain the vocabulary and terminology present in the source material
             - **Be Actionable**: The summary should help someone quickly understand what knowledge this community contains
 
@@ -83,7 +78,7 @@ class IndexGraphCommunity implements ShouldQueue
         $embedding = $embedder->createEmbedding($data['title'] . ' ' . $data['summary']);
         $embeddingStr = json_encode($embedding);
         $graphDB->run("
-            match (c:Community { id: {$this->communityID}, level: {$this->communityLevel} })
+            match (c:Community { id: {$this->communityID} })
             set
                 c.name = \"{$data['title']}\",
                 c.summary = \"{$data['summary']}\",
