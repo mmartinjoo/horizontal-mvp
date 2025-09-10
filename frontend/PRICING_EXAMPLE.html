@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horizontal - Usage-Based Pricing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .pricing-section {
+            margin-bottom: 35px;
+        }
+
+        .section-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .slider-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: #5a67d8;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            border: none;
+        }
+
+        .query-display {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .query-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .query-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .tick-marks {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding: 0 10px;
+        }
+
+        .tick {
+            font-size: 11px;
+            color: #999;
+            position: relative;
+        }
+
+        .tick::before {
+            content: '';
+            position: absolute;
+            top: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1px;
+            height: 8px;
+            background: #d0d0d0;
+        }
+
+        .option-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .option-btn {
+            padding: 16px 20px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .option-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .option-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .price-summary {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .price-item.total {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .price-value {
+            font-weight: 600;
+        }
+
+        .included-badge {
+            background: #10b981;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+            margin-left: 8px;
+        }
+
+        .per-query-cost {
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+        }
+
+        .cost-value {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .features-list {
+            background: #faf5ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .features-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .features-list li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .features-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Horizontal Pricing</h1>
+        <p class="subtitle">Pay for what you use, scale as you grow</p>
+
+        <div class="pricing-section">
+            <div class="section-label">Monthly Queries</div>
+            <div class="query-display">
+                <div class="query-number" id="queryNumber">500</div>
+                <div class="query-label">queries per month</div>
+            </div>
+            <div class="slider-container">
+                <input type="range" min="0" max="4" value="2" class="slider" id="querySlider">
+                <div class="tick-marks">
+                    <span class="tick">100</span>
+                    <span class="tick">250</span>
+                    <span class="tick">500</span>
+                    <span class="tick">1K</span>
+                    <span class="tick">2.5K</span>
+                </div>
+            </div>
+
+            <div class="per-query-cost" id="savingsContainer">
+                Your savings: <span class="cost-value" id="savings">6%</span>
+            </div>
+        </div>
+
+        <div class="pricing-section">
+            <div class="section-label">Data Retention</div>
+            <div class="option-buttons" id="retentionOptions">
+                <button class="option-btn active" data-months="3" data-price="0">
+                    3 months<br><small style="opacity: 0.7">Included</small>
+                </button>
+                <button class="option-btn" data-months="6" data-price="69">
+                    6 months<br><small style="opacity: 0.7">+$69/mo</small>
+                </button>
+                <button class="option-btn" data-months="12" data-price="129">
+                    12 months<br><small style="opacity: 0.7">+$129/mo</small>
+                </button>
+            </div>
+        </div>
+
+        <div class="features-list">
+            <strong>All plans include:</strong>
+            <ul>
+                <li>Unlimited team members</li>
+                <li>10+ integrations (Slack, Gmail, Drive, GitHub, etc.)</li>
+                <li>AI-powered search & summaries</li>
+                <li>Graph visualization</li>
+                <li>API access</li>
+            </ul>
+        </div>
+
+        <div class="price-summary">
+            <div class="price-item">
+                <span>Queries (<span id="queryCount">500</span>/month)</span>
+                <span class="price-value">$<span id="queryPrice">135</span></span>
+            </div>
+            <div class="price-item" id="retentionAddOn" style="display: none;">
+                <span>Extended Data Retention (<span id="retentionMonths">6</span> months)</span>
+                <span class="price-value">+$<span id="retentionPrice">49</span></span>
+            </div>
+            <div class="price-item total">
+                <span>Monthly Total</span>
+                <span>$<span id="totalPrice">99</span></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pricing tiers for queries
+        const queryTiers = [
+            { queries: 100, price: 29, savings: 0 },
+            { queries: 250, price: 69, savings: 5 },
+            { queries: 500, price: 135, savings: 6 },
+            { queries: 1000, price: 259, savings: 11 },
+            { queries: 2500, price: 599, savings: 17 },
+        ];
+
+        // Get elements
+        const querySlider = document.getElementById('querySlider');
+        const queryNumber = document.getElementById('queryNumber');
+        const queryCount = document.getElementById('queryCount');
+        const queryPrice = document.getElementById('queryPrice');
+        const retentionOptions = document.querySelectorAll('#retentionOptions .option-btn');
+        const retentionAddOn = document.getElementById('retentionAddOn');
+        const retentionMonths = document.getElementById('retentionMonths');
+        const retentionPrice = document.getElementById('retentionPrice');
+        const totalPrice = document.getElementById('totalPrice');
+        const savings = document.getElementById('savings');
+        const savingsContainer = document.getElementById('savingsContainer');
+
+        let currentPricing = {
+            queryTier: queryTiers[2], // Default to 500
+            retentionMonths: 3,
+            retentionAddOnPrice: 0
+        };
+
+        // Format number for display
+        function formatNumber(num) {
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+            }
+            return num.toString();
+        }
+
+        // Update queries
+        querySlider.addEventListener('input', (e) => {
+            const tierIndex = parseInt(e.target.value);
+            currentPricing.queryTier = queryTiers[tierIndex];
+            
+            // Update displays
+            const formattedQueries = formatNumber(currentPricing.queryTier.queries);
+            queryNumber.textContent = formattedQueries;
+            queryCount.textContent = formattedQueries;
+            queryPrice.textContent = currentPricing.queryTier.price;
+
+            const savingsValue = queryTiers[tierIndex]['savings'];
+            savings.style.visibility = 'visible';
+            savings.textContent = savingsValue + '%';
+            
+            calculateTotal();
+        });
+
+        // Handle retention options
+        retentionOptions.forEach(btn => {
+            btn.addEventListener('click', () => {
+                retentionOptions.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                currentPricing.retentionMonths = parseInt(btn.dataset.months);
+                currentPricing.retentionAddOnPrice = parseInt(btn.dataset.price);
+                
+                if (currentPricing.retentionAddOnPrice > 0) {
+                    retentionAddOn.style.display = 'flex';
+                    retentionMonths.textContent = currentPricing.retentionMonths;
+                    retentionPrice.textContent = currentPricing.retentionAddOnPrice;
+                } else {
+                    retentionAddOn.style.display = 'none';
+                }
+                
+                calculateTotal();
+            });
+        });
+
+        // Calculate total
+        function calculateTotal() {
+            const total = currentPricing.queryTier.price + currentPricing.retentionAddOnPrice;
+            totalPrice.textContent = total;
+        }
+
+        // Initialize
+        calculateTotal();
+    </script>
+</body>
+</html>
