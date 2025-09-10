@@ -53,7 +53,7 @@ import QuestionCard from './QuestionCard.vue'
 const useCases = ref([
   {
     question: "Someone had an issue with the new authentication flow. What was it?",
-    quickAnswer: "Google SSO integration failing for ACME Ltd. - users can't complete login process",
+    quickAnswer: "Google SSO integration failed for ACME Ltd. - users couldn't complete login process",
     iconType: "issue",
     sources: [
       {

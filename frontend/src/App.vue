@@ -159,61 +159,61 @@ const goToWaitlist = () => {
     <UseCaseShowcase />
 
     <!-- Problem Section -->
-    <section class="py-24 bg-gray-50" id="problem">
-      <div class="max-w-7xl mx-auto px-6 lg:px-8">
-        <!-- Section Header -->
-        <div class="text-center mb-20">
-          <h2 class="text-5xl lg:text-6xl font-bold text-black mb-6">
-            The <span class="text-red-500">problem</span> with too many tools
-          </h2>
-          <p class="text-xl lg:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-            Your team's knowledge is scattered across dozens of apps. Finding information is like searching for a needle in a haystack.
-          </p>
-        </div>
+<!--    <section class="py-24 bg-gray-50" id="problem">-->
+<!--      <div class="max-w-7xl mx-auto px-6 lg:px-8">-->
+<!--        &lt;!&ndash; Section Header &ndash;&gt;-->
+<!--        <div class="text-center mb-20">-->
+<!--          <h2 class="text-5xl lg:text-6xl font-bold text-black mb-6">-->
+<!--            The <span class="text-red-500">problem</span> with too many tools-->
+<!--          </h2>-->
+<!--          <p class="text-xl lg:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">-->
+<!--            Your team's knowledge is scattered across dozens of apps. Finding information is like searching for a needle in a haystack.-->
+<!--          </p>-->
+<!--        </div>-->
 
-        <!-- Problem Points -->
-        <div class="grid lg:grid-cols-3 gap-16 lg:gap-12">
-          <!-- Time Wasted -->
-          <div class="text-center">
-            <div class="w-24 h-24 bg-red-50 rounded-full mx-auto mb-8 flex items-center justify-center">
-              <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <h3 class="text-2xl lg:text-3xl font-bold text-black mb-6">Time Wasted</h3>
-            <p class="text-lg lg:text-xl text-gray-600 leading-relaxed">
-              Developers spend 30% of their day just searching for information across different tools
-            </p>
-          </div>
+<!--        &lt;!&ndash; Problem Points &ndash;&gt;-->
+<!--        <div class="grid lg:grid-cols-3 gap-16 lg:gap-12">-->
+<!--          &lt;!&ndash; Time Wasted &ndash;&gt;-->
+<!--          <div class="text-center">-->
+<!--            <div class="w-24 h-24 bg-red-50 rounded-full mx-auto mb-8 flex items-center justify-center">-->
+<!--              <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">-->
+<!--                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>-->
+<!--              </svg>-->
+<!--            </div>-->
+<!--            <h3 class="text-2xl lg:text-3xl font-bold text-black mb-6">Time Wasted</h3>-->
+<!--            <p class="text-lg lg:text-xl text-gray-600 leading-relaxed">-->
+<!--              Developers spend 30% of their day just searching for information across different tools-->
+<!--            </p>-->
+<!--          </div>-->
 
-          <!-- Lost Context -->
-          <div class="text-center">
-            <div class="w-24 h-24 bg-red-50 rounded-full mx-auto mb-8 flex items-center justify-center">
-              <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
-            </div>
-            <h3 class="text-2xl lg:text-3xl font-bold text-black mb-6">Lost Context</h3>
-            <p class="text-lg lg:text-xl text-gray-600 leading-relaxed">
-              Important decisions and discussions are buried in Slack threads, emails, and documents
-            </p>
-          </div>
+<!--          &lt;!&ndash; Lost Context &ndash;&gt;-->
+<!--          <div class="text-center">-->
+<!--            <div class="w-24 h-24 bg-red-50 rounded-full mx-auto mb-8 flex items-center justify-center">-->
+<!--              <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">-->
+<!--                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>-->
+<!--              </svg>-->
+<!--            </div>-->
+<!--            <h3 class="text-2xl lg:text-3xl font-bold text-black mb-6">Lost Context</h3>-->
+<!--            <p class="text-lg lg:text-xl text-gray-600 leading-relaxed">-->
+<!--              Important decisions and discussions are buried in Slack threads, emails, and documents-->
+<!--            </p>-->
+<!--          </div>-->
 
-          <!-- Knowledge Silos -->
-          <div class="text-center">
-            <div class="w-24 h-24 bg-red-50 rounded-full mx-auto mb-8 flex items-center justify-center">
-              <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-              </svg>
-            </div>
-            <h3 class="text-2xl lg:text-3xl font-bold text-black mb-6">Knowledge Silos</h3>
-            <p class="text-lg lg:text-xl text-gray-600 leading-relaxed">
-              Team knowledge lives in isolated apps, making collaboration inefficient
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
+<!--          &lt;!&ndash; Knowledge Silos &ndash;&gt;-->
+<!--          <div class="text-center">-->
+<!--            <div class="w-24 h-24 bg-red-50 rounded-full mx-auto mb-8 flex items-center justify-center">-->
+<!--              <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">-->
+<!--                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>-->
+<!--              </svg>-->
+<!--            </div>-->
+<!--            <h3 class="text-2xl lg:text-3xl font-bold text-black mb-6">Knowledge Silos</h3>-->
+<!--            <p class="text-lg lg:text-xl text-gray-600 leading-relaxed">-->
+<!--              Team knowledge lives in isolated apps, making collaboration inefficient-->
+<!--            </p>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </section>-->
 
     <!-- Data Visualization Section -->
 <!--    <section class="py-24 bg-white">-->
@@ -421,37 +421,12 @@ const goToWaitlist = () => {
 
         <!-- Story Points -->
         <div class="space-y-8">
-          <!-- Calendar Event -->
+          <!-- Developers -->
           <div class="flex items-start space-x-6">
             <div class="flex-shrink-0">
-              <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                  <!-- Custom Bug SVG -->
-                  <!-- Bug body -->
-                  <ellipse cx="12" cy="13" rx="6" ry="7" fill="currentColor" opacity="0.9"/>
-
-                  <!-- Bug head -->
-                  <circle cx="12" cy="7" r="3" fill="currentColor"/>
-
-                  <!-- Bug eyes -->
-                  <circle cx="10.5" cy="6.5" r="0.8" fill="white"/>
-                  <circle cx="13.5" cy="6.5" r="0.8" fill="white"/>
-                  <circle cx="10.5" cy="6.5" r="0.4" fill="black"/>
-                  <circle cx="13.5" cy="6.5" r="0.4" fill="black"/>
-
-                  <!-- Bug antennae -->
-                  <path d="M9 4.5 L8 2.5 M15 4.5 L16 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                  <circle cx="8" cy="2.5" r="0.8" fill="currentColor"/>
-                  <circle cx="16" cy="2.5" r="0.8" fill="currentColor"/>
-
-                  <!-- Bug legs -->
-                  <path d="M6 10 L3 9 M6 13 L3 13 M6 16 L3 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                  <path d="M18 10 L21 9 M18 13 L21 13 M18 16 L21 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-
-                  <!-- Bug spots -->
-                  <circle cx="10" cy="12" r="0.8" fill="white" opacity="0.7"/>
-                  <circle cx="14" cy="14" r="0.6" fill="white" opacity="0.7"/>
-                  <circle cx="12" cy="16" r="0.5" fill="white" opacity="0.7"/>
+              <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
                 </svg>
               </div>
             </div>
@@ -460,12 +435,12 @@ const goToWaitlist = () => {
             </p>
           </div>
 
-          <!-- Confusion -->
+          <!-- Product Managers -->
           <div class="flex items-start space-x-6">
             <div class="flex-shrink-0">
-              <div class="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
                 </svg>
               </div>
             </div>
@@ -474,12 +449,12 @@ const goToWaitlist = () => {
             </p>
           </div>
 
-          <!-- Frantic Search -->
+          <!-- Customer Support -->
           <div class="flex items-start space-x-6">
             <div class="flex-shrink-0">
-              <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                 </svg>
               </div>
             </div>
@@ -488,12 +463,12 @@ const goToWaitlist = () => {
             </p>
           </div>
 
-          <!-- Time Wasted -->
+          <!-- Sales Team -->
           <div class="flex items-start space-x-6">
             <div class="flex-shrink-0">
-              <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
             </div>
@@ -505,94 +480,94 @@ const goToWaitlist = () => {
       </div>
     </section>
 
-    <!-- Solution Demo Section -->
-    <section class="py-24 bg-gray-50">
-      <div class="max-w-6xl mx-auto px-6 lg:px-8">
-        <!-- Chat Interface Demo -->
-        <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
-          <!-- Chat Header -->
-          <div class="bg-gray-50 px-8 py-6 border-b border-gray-100">
-            <div class="flex items-center space-x-3">
-              <div class="w-3 h-3 bg-red-400 rounded-full"></div>
-              <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
-              <div class="w-3 h-3 bg-green-400 rounded-full"></div>
-              <span class="ml-4 text-sm text-gray-500 font-medium">Horizontal Chat</span>
-            </div>
-          </div>
+<!--    &lt;!&ndash; Solution Demo Section &ndash;&gt;-->
+<!--    <section class="py-24 bg-gray-50">-->
+<!--      <div class="max-w-6xl mx-auto px-6 lg:px-8">-->
+<!--        &lt;!&ndash; Chat Interface Demo &ndash;&gt;-->
+<!--        <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">-->
+<!--          &lt;!&ndash; Chat Header &ndash;&gt;-->
+<!--          <div class="bg-gray-50 px-8 py-6 border-b border-gray-100">-->
+<!--            <div class="flex items-center space-x-3">-->
+<!--              <div class="w-3 h-3 bg-red-400 rounded-full"></div>-->
+<!--              <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>-->
+<!--              <div class="w-3 h-3 bg-green-400 rounded-full"></div>-->
+<!--              <span class="ml-4 text-sm text-gray-500 font-medium">Horizontal Chat</span>-->
+<!--            </div>-->
+<!--          </div>-->
 
-          <!-- Chat Messages -->
-          <div class="p-8 space-y-6">
-            <!-- User Message -->
-            <div class="flex items-start space-x-4">
-              <div class="flex-shrink-0">
-                <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
-                  <span class="text-white font-semibold text-sm">You</span>
-                </div>
-              </div>
-              <div class="flex-1">
-                <div class="bg-purple-500 text-white rounded-2xl rounded-tl-md px-6 py-4 inline-block max-w-4xl">
-                  <p class="text-lg">What was the root cause of the previous 'mysql server has gone away' error in prod?</p>
-                </div>
-              </div>
-            </div>
+<!--          &lt;!&ndash; Chat Messages &ndash;&gt;-->
+<!--          <div class="p-8 space-y-6">-->
+<!--            &lt;!&ndash; User Message &ndash;&gt;-->
+<!--            <div class="flex items-start space-x-4">-->
+<!--              <div class="flex-shrink-0">-->
+<!--                <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">-->
+<!--                  <span class="text-white font-semibold text-sm">You</span>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="flex-1">-->
+<!--                <div class="bg-purple-500 text-white rounded-2xl rounded-tl-md px-6 py-4 inline-block max-w-4xl">-->
+<!--                  <p class="text-lg">What was the root cause of the previous 'mysql server has gone away' error in prod?</p>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
 
-            <!-- Horizontal Response -->
-            <div class="flex items-start space-x-4">
-              <div class="flex-shrink-0">
-                <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                  <span class="text-white font-bold text-sm">H</span>
-                </div>
-              </div>
-              <div class="flex-1">
-                <div class="bg-gray-50 rounded-2xl rounded-tl-md px-6 py-6 max-w-5xl">
-                  <p class="text-lg text-gray-800 mb-6">
-                    Your team had this issue on the 15th of April. The `max_allowed_packet` value was exceeded bacause of a very large `INSERT` in the bulk create API.
-                  </p>
-                  <p class="text-lg text-gray-800 mb-1">
-                    Participants:
-                  </p>
-                  <ul class="list-disc mb-6">
-                    <li class="ml-4">Ben created the issues</li>
-                    <li class="ml-4">Tom contributed the fixes</li>
-                    <li class="ml-4">Peter merged the pull request</li>
-                  </ul>
+<!--            &lt;!&ndash; Horizontal Response &ndash;&gt;-->
+<!--            <div class="flex items-start space-x-4">-->
+<!--              <div class="flex-shrink-0">-->
+<!--                <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">-->
+<!--                  <span class="text-white font-bold text-sm">H</span>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="flex-1">-->
+<!--                <div class="bg-gray-50 rounded-2xl rounded-tl-md px-6 py-6 max-w-5xl">-->
+<!--                  <p class="text-lg text-gray-800 mb-6">-->
+<!--                    Your team had this issue on the 15th of April. The `max_allowed_packet` value was exceeded bacause of a very large `INSERT` in the bulk create API.-->
+<!--                  </p>-->
+<!--                  <p class="text-lg text-gray-800 mb-1">-->
+<!--                    Participants:-->
+<!--                  </p>-->
+<!--                  <ul class="list-disc mb-6">-->
+<!--                    <li class="ml-4">Ben created the issues</li>-->
+<!--                    <li class="ml-4">Tom contributed the fixes</li>-->
+<!--                    <li class="ml-4">Peter merged the pull request</li>-->
+<!--                  </ul>-->
 
 
-                  <!-- Source Links -->
-                  <div class="space-y-4">
-                    <!-- GitHub PR -->
-                    <div class="flex items-center space-x-4 p-4 bg-white rounded-xl border border-gray-100">
-                      <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-                      <span class="text-gray-800 font-medium">GitHub PR #247 - "Refactor bulk create API"</span>
-                      <a @click.prevent="" class="text-blue-400 cursor-pointer">Open PR</a>
-                    </div>
+<!--                  &lt;!&ndash; Source Links &ndash;&gt;-->
+<!--                  <div class="space-y-4">-->
+<!--                    &lt;!&ndash; GitHub PR &ndash;&gt;-->
+<!--                    <div class="flex items-center space-x-4 p-4 bg-white rounded-xl border border-gray-100">-->
+<!--                      <div class="w-3 h-3 bg-blue-500 rounded-full"></div>-->
+<!--                      <span class="text-gray-800 font-medium">GitHub PR #247 - "Refactor bulk create API"</span>-->
+<!--                      <a @click.prevent="" class="text-blue-400 cursor-pointer">Open PR</a>-->
+<!--                    </div>-->
 
-                    <!-- Slack Thread -->
-                    <div class="flex items-center space-x-4 p-4 bg-white rounded-xl border border-gray-100">
-                      <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span class="text-gray-800 font-medium">Slack #engineering - Thread from April 15</span>
-                      <a @click.prevent="" class="text-blue-400 cursor-pointer">Go to conversation</a>
-                    </div>
+<!--                    &lt;!&ndash; Slack Thread &ndash;&gt;-->
+<!--                    <div class="flex items-center space-x-4 p-4 bg-white rounded-xl border border-gray-100">-->
+<!--                      <div class="w-3 h-3 bg-green-500 rounded-full"></div>-->
+<!--                      <span class="text-gray-800 font-medium">Slack #engineering - Thread from April 15</span>-->
+<!--                      <a @click.prevent="" class="text-blue-400 cursor-pointer">Go to conversation</a>-->
+<!--                    </div>-->
 
-                    <!-- Linear Ticket -->
-                    <div class="flex items-center space-x-4 p-4 bg-white rounded-xl border border-gray-100">
-                      <div class="w-3 h-3 bg-orange-500 rounded-full"></div>
-                      <span class="text-gray-800 font-medium">Linear ticket DEV-238 - Refactor bulk creation INSERT query</span>
-                      <a @click.prevent="" class="text-blue-400 cursor-pointer">Open issue</a>
-                    </div>
-                    <div class="flex items-center space-x-4 p-4 bg-white rounded-xl border border-gray-100">
-                      <div class="w-3 h-3 bg-orange-500 rounded-full"></div>
-                      <span class="text-gray-800 font-medium">Linear ticket DEV-240 - Increase MySQL `max_allowed_packet`</span>
-                      <a @click.prevent="" class="text-blue-400 cursor-pointer">Open issue</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+<!--                    &lt;!&ndash; Linear Ticket &ndash;&gt;-->
+<!--                    <div class="flex items-center space-x-4 p-4 bg-white rounded-xl border border-gray-100">-->
+<!--                      <div class="w-3 h-3 bg-orange-500 rounded-full"></div>-->
+<!--                      <span class="text-gray-800 font-medium">Linear ticket DEV-238 - Refactor bulk creation INSERT query</span>-->
+<!--                      <a @click.prevent="" class="text-blue-400 cursor-pointer">Open issue</a>-->
+<!--                    </div>-->
+<!--                    <div class="flex items-center space-x-4 p-4 bg-white rounded-xl border border-gray-100">-->
+<!--                      <div class="w-3 h-3 bg-orange-500 rounded-full"></div>-->
+<!--                      <span class="text-gray-800 font-medium">Linear ticket DEV-240 - Increase MySQL `max_allowed_packet`</span>-->
+<!--                      <a @click.prevent="" class="text-blue-400 cursor-pointer">Open issue</a>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </section>-->
 
     <!-- CTA Section -->
     <section id="waitlist" class="py-24 bg-white">
@@ -603,7 +578,7 @@ const goToWaitlist = () => {
             Join the <span class="bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">revolution</span>
           </h2>
           <p class="text-xl lg:text-2xl text-gray-600 max-w-4xl mx-auto mb-12 leading-relaxed">
-            Be among the first development teams to experience the future of connected productivity.
+            Be among the first engineering teams to experience the future of connected productivity.
           </p>
 
           <!-- Signup Form -->
@@ -712,7 +687,7 @@ const goToWaitlist = () => {
 
           <!-- Company Description -->
           <p class="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-12">
-            The knowledge app for engineering teams. Connect all your tools, search everything, work faster.
+            The search platform for engineering teams. Connect all your tools, search everything, work faster.
           </p>
         </div>
 
