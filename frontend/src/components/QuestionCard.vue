@@ -9,7 +9,28 @@
       <div class="flex-shrink-0">
         <div class="w-12 h-12 rounded-xl flex items-center justify-center"
              :class="iconBgClass">
-          <component :is="iconComponent" class="w-6 h-6" :class="iconColorClass" />
+          <svg v-if="iconType === 'issue'" class="w-6 h-6" :class="iconColorClass" fill="currentColor" viewBox="0 0 24 24">
+            <ellipse cx="12" cy="13" rx="6" ry="7" fill="currentColor" opacity="0.9"/>
+            <circle cx="12" cy="7" r="3" fill="currentColor"/>
+            <circle cx="10.5" cy="6.5" r="0.8" fill="white"/>
+            <circle cx="13.5" cy="6.5" r="0.8" fill="white"/>
+            <circle cx="10.5" cy="6.5" r="0.4" fill="black"/>
+            <circle cx="13.5" cy="6.5" r="0.4" fill="black"/>
+            <path d="M9 4.5 L8 2.5 M15 4.5 L16 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="8" cy="2.5" r="0.8" fill="currentColor"/>
+            <circle cx="16" cy="2.5" r="0.8" fill="currentColor"/>
+            <path d="M6 10 L3 9 M6 13 L3 13 M6 16 L3 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M18 10 L21 9 M18 13 L21 13 M18 16 L21 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="10" cy="12" r="0.8" fill="white" opacity="0.7"/>
+            <circle cx="14" cy="14" r="0.6" fill="white" opacity="0.7"/>
+            <circle cx="12" cy="16" r="0.5" fill="white" opacity="0.7"/>
+          </svg>
+          <svg v-else-if="iconType === 'tasks'" class="w-6 h-6" :class="iconColorClass" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+          </svg>
+          <svg v-else-if="iconType === 'scope'" class="w-6 h-6" :class="iconColorClass" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
         </div>
       </div>
 
@@ -90,10 +111,22 @@
 import { ref, computed } from 'vue'
 
 const props = defineProps({
-  question: String,
-  quickAnswer: String,
-  sources: Array,
-  iconType: String
+  question: {
+    type: String,
+    required: true
+  },
+  quickAnswer: {
+    type: String,
+    required: true
+  },
+  sources: {
+    type: Array,
+    required: true
+  },
+  iconType: {
+    type: String,
+    required: true
+  }
 })
 
 const isExpanded = ref(false)
@@ -102,14 +135,6 @@ const toggleExpanded = () => {
   isExpanded.value = !isExpanded.value
 }
 
-const iconComponent = computed(() => {
-  const icons = {
-    issue: 'IssueIcon',
-    tasks: 'TasksIcon',
-    scope: 'ScopeIcon'
-  }
-  return icons[props.iconType] || 'IssueIcon'
-})
 
 const iconBgClass = computed(() => {
   const classes = {
@@ -156,53 +181,6 @@ const getSourceActionText = (type) => {
 }
 </script>
 
-<script>
-// Icon components
-const IssueIcon = {
-  template: `
-    <svg fill="currentColor" viewBox="0 0 24 24">
-      <ellipse cx="12" cy="13" rx="6" ry="7" fill="currentColor" opacity="0.9"/>
-      <circle cx="12" cy="7" r="3" fill="currentColor"/>
-      <circle cx="10.5" cy="6.5" r="0.8" fill="white"/>
-      <circle cx="13.5" cy="6.5" r="0.8" fill="white"/>
-      <circle cx="10.5" cy="6.5" r="0.4" fill="black"/>
-      <circle cx="13.5" cy="6.5" r="0.4" fill="black"/>
-      <path d="M9 4.5 L8 2.5 M15 4.5 L16 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-      <circle cx="8" cy="2.5" r="0.8" fill="currentColor"/>
-      <circle cx="16" cy="2.5" r="0.8" fill="currentColor"/>
-      <path d="M6 10 L3 9 M6 13 L3 13 M6 16 L3 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-      <path d="M18 10 L21 9 M18 13 L21 13 M18 16 L21 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-      <circle cx="10" cy="12" r="0.8" fill="white" opacity="0.7"/>
-      <circle cx="14" cy="14" r="0.6" fill="white" opacity="0.7"/>
-      <circle cx="12" cy="16" r="0.5" fill="white" opacity="0.7"/>
-    </svg>
-  `
-}
-
-const TasksIcon = {
-  template: `
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-    </svg>
-  `
-}
-
-const ScopeIcon = {
-  template: `
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-    </svg>
-  `
-}
-
-export default {
-  components: {
-    IssueIcon,
-    TasksIcon,
-    ScopeIcon
-  }
-}
-</script>
 
 <style scoped>
 .question-card {
