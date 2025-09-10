@@ -152,14 +152,7 @@ const getSourceIcon = (type) => {
 }
 
 const getSourceActionText = (type) => {
-  const actions = {
-    slack: 'Go to conversation',
-    linear: 'Open issue',
-    github: 'Open PR',
-    notion: 'View doc',
-    analytics: 'View data'
-  }
-  return actions[type] || 'View'
+  return 'Open';
 }
 </script>
 

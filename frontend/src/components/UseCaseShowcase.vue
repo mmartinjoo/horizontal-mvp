@@ -72,8 +72,8 @@ const useCases = ref([
         description: "\"Should we add tooltip to verification button?\" - discussion thread"
       },
       {
-        type: "notion",
-        title: "Notion",
+        type: "google_docs",
+        title: "Google Docs",
         description: "Q1 Onboarding UX improvements backlog - verification flow redesign"
       }
     ]
@@ -94,8 +94,8 @@ const useCases = ref([
         description: "5 out of 7 feedback items have corresponding tasks created"
       },
       {
-        type: "notion",
-        title: "Notion",
+        type: "google_docs",
+        title: "Google Docs",
         description: "Product review meeting - notification system feedback summary"
       },
       {
@@ -121,8 +121,8 @@ const useCases = ref([
         description: "\"Backend team at capacity, real-time features need dedicated sprint\""
       },
       {
-        type: "notion",
-        title: "Notion",
+        type: "google_docs",
+        title: "Google Docs",
         description: "Q1 scope decisions - real-time features deferred to Q2 roadmap"
       },
     ]
