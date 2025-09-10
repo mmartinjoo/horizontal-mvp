@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import UseCaseShowcase from './components/UseCaseShowcase.vue'
 
 const email = ref('')
 const isSubmitting = ref(false)
@@ -57,6 +58,7 @@ const goToWaitlist = () => {
   window.location.hash = 'waitlist'
 }
 </script>
+
 
 <template>
   <div class="min-h-screen bg-white">
@@ -141,17 +143,20 @@ const goToWaitlist = () => {
       </div>
 
       <!-- Problem Illustration -->
-      <div class="max-w-4xl mx-auto">
-        <div class="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
-          <img
-            src="/images/lots_of_shitty_apps_in_one_place.png"
-            alt="Too many scattered apps and tools"
-            class="w-3/4 h-auto rounded-2xl mx-auto"
-          />
-        </div>
-      </div>
+<!--      <div class="max-w-4xl mx-auto">-->
+<!--        <div class="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">-->
+<!--          <img-->
+<!--            src="/images/lots_of_shitty_apps_in_one_place.png"-->
+<!--            alt="Too many scattered apps and tools"-->
+<!--            class="w-3/4 h-auto rounded-2xl mx-auto"-->
+<!--          />-->
+<!--        </div>-->
+<!--      </div>-->
       </main>
     </section>
+
+    <!-- Use Case Showcase Section -->
+    <UseCaseShowcase />
 
     <!-- Problem Section -->
     <section class="py-24 bg-gray-50" id="problem">
