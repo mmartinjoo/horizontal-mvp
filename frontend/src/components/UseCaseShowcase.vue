@@ -52,29 +52,29 @@ import QuestionCard from './QuestionCard.vue'
 
 const useCases = ref([
   {
-    question: "Someone had an issue with the new onboarding workflow. What was it?",
-    quickAnswer: "UX confusion in step 3 of signup flow - users getting stuck on email verification",
+    question: "Someone had an issue with the new authentication flow. What was it?",
+    quickAnswer: "Google SSO integration failing for ACME Ltd. - users can't complete login process",
     iconType: "issue",
     sources: [
       {
         type: "slack",
-        title: "Slack #product-team",
-        description: "\"Users are getting stuck on the email verification step - seeing 15% drop-off\""
+        title: "Slack #engineering",
+        description: "\"Google OAuth callback URL returning 404 - users stuck on login screen\""
       },
       {
         type: "linear",
-        title: "Linear PLT-123",
-        description: "New user flow: Step 3 unclear instructions - reported by 3 beta users"
+        title: "Linear AUTH-089",
+        description: "SSO login flow broken - OAuth redirect configuration issue"
       },
       {
         type: "github",
-        title: "PR #456 Comments",
-        description: "\"Should we add tooltip to verification button?\" - discussion thread"
+        title: "PR #892 Comments",
+        description: "\"OAuth client ID environment variable missing in production\""
       },
       {
         type: "google_docs",
         title: "Google Docs",
-        description: "Q1 Onboarding UX improvements backlog - verification flow redesign"
+        description: "Auth system architecture review - SSO integration requirements"
       }
     ]
   },
