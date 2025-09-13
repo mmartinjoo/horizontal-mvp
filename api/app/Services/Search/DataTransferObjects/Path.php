@@ -7,8 +7,11 @@ use Bolt\protocol\v1\structures\Node;
 
 class Path
 {
+    public string $pathString;
+
     public function __construct(public BoltPath $path)
     {
+        $this->pathString = $this->toString();
     }
 
     /**
@@ -34,6 +37,7 @@ class Path
             $j = $i + 1;
             // It refers to a relation
             if ($j % 2 !== 0) {
+                // Negative means an outbound relation
                 $inverse = $this->path->ids[$i] < 0;
                 $relationIdx = abs($this->path->ids[$i]) - 1;
 

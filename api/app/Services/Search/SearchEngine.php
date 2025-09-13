@@ -19,6 +19,7 @@ class SearchEngine
         private Embedder $embedder,
         private EntityExtractor $entityExtractor,
         private GraphDB $graphDB,
+        private string $cosineSimilarityThreshold,
     ) {
     }
 
@@ -145,7 +146,7 @@ class SearchEngine
         $pivotCommunities = [];
         /** @var Node $node */
         foreach ($results as $node) {
-            if ($node['similarity'] >= 0.2) {
+            if ($node['similarity'] >= $this->cosineSimilarityThreshold) {
                 $pivotCommunities[] = $node;
             }
         }

@@ -12,6 +12,7 @@ use App\Services\LLM\Fireworks;
 use App\Services\LLM\LLM;
 use App\Services\LLM\LLMFactory;
 use App\Services\LLM\OpenAI;
+use App\Services\Search\SearchEngine;
 use App\Services\VectorStore\VectorStore;
 use App\Services\VectorStore\VectorStoreFactory;
 use Illuminate\Support\Facades\URL;
@@ -78,5 +79,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(GraphDB::class, function () {
             return new Memgraph(config('graphdb.connections.memgraph'));
         });
+
+        $this->app
+            ->when(SearchEngine::class)
+            ->needs('$cosineSimilarityThreshold')
+            ->give(config('search_engine.cosine_similarity_threshold'));
     }
 }
