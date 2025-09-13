@@ -7,6 +7,7 @@ use App\Models\Question;
 use App\Services\GraphDB\GraphDB;
 use App\Services\Indexing\EntityExtractor;
 use App\Services\LLM\Embedder;
+use App\Services\LLM\LLM;
 use App\Services\Search\DataTransferObjects\Path;
 use App\Services\Search\DataTransferObjects\SearchResult;
 use Bolt\protocol\v1\structures\Path as BoltPath;
@@ -19,6 +20,7 @@ class SearchEngine
         private Embedder $embedder,
         private EntityExtractor $entityExtractor,
         private GraphDB $graphDB,
+        private LLM $llm,
         private string $cosineSimilarityThreshold,
     ) {
     }
@@ -139,10 +141,11 @@ class SearchEngine
         // Find related entities based on those topics
     }
 
-    public function graphRAG(Question $question): array
+    public function graphRAG(Question $question): string
     {
         $embedding = $this->embedder->createEmbedding($question->question);
         $results = $this->graphDB->vectorSearch('vector_index_communities', $embedding, 10);
+        $chunkContext = [];
         $pivotCommunities = [];
         /** @var Node $node */
         foreach ($results as $node) {
@@ -151,13 +154,63 @@ class SearchEngine
             }
         }
         foreach ($pivotCommunities as &$pivotCommunity) {
-            $pivotCommunity['paths'] = $this->getRelevantPaths($pivotCommunity);
+            $chunks = [];
+            $paths = $this->getRelevantPaths($pivotCommunity);
+            foreach ($paths as $path) {
+                foreach ($path->path->nodes as $node) {
+                    if (!in_array('Chunk', $node->labels)) {
+                        continue;
+                    }
+                    foreach ($chunks as $chunk) {
+                        if ($chunk->id === $node->id) {
+                            continue 2;
+                        }
+                    }
+                    $chunks[] = $node;
+                    $chunkContext[] = $node;
+                }
+            }
+            $pivotCommunity['paths'] = $paths;
+            $pivotCommunity['chunks'] = $chunks;
         }
-        return $pivotCommunities;
+        $pathStrings = [];
+        foreach ($pivotCommunities as $pivotCommunity) {
+            /** @var Path $path */
+            foreach ($pivotCommunity['paths'] as $path) {
+                $pathStrings[] = $path->pathString;
+            }
+        }
+        $pathJSON = json_encode($pathStrings);
+        $chunkContext = collect($chunkContext)
+            ->unique('id')
+            ->pluck('properties.text')
+            ->values()
+            ->toArray();
+        $chunkJSON = json_encode($chunkContext);
+
+        $answer = $this->llm->completion("
+            You are a search engine.
+
+            There's a graph database with communities and documents. It contains information from documents and issues.
+
+            The following context is retrieved from a knowledge graph using semantic pivot search and relevance expansion.
+
+            Each line represents a path from a community to a document.
+            Graph context:
+            {$pathJSON}
+
+            The following is the content of related documents.
+            Document context:
+            {$chunkJSON}
+
+            Based on the context, answer the question:
+            {$question->question}
+        ");
+        return $answer;
     }
 
     /**
-     * @return array<BoltPath>
+     * @return array<Path>
      */
     private function getRelevantPaths(array $node, int $hops = 2): array
     {
