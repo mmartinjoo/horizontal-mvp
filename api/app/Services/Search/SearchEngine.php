@@ -7,7 +7,9 @@ use App\Models\Question;
 use App\Services\GraphDB\GraphDB;
 use App\Services\Indexing\EntityExtractor;
 use App\Services\LLM\Embedder;
+use App\Services\Search\DataTransferObjects\Path;
 use App\Services\Search\DataTransferObjects\SearchResult;
+use Bolt\protocol\v1\structures\Path as BoltPath;
 use Bolt\protocol\v5\structures\Node;
 use Illuminate\Support\Collection;
 
@@ -140,15 +142,32 @@ class SearchEngine
     {
         $embedding = $this->embedder->createEmbedding($question->question);
         $results = $this->graphDB->vectorSearch('vector_index_communities', $embedding, 10);
-        $pivotNodes = [];
+        $pivotCommunities = [];
         /** @var Node $node */
         foreach ($results as $node) {
             if ($node['similarity'] >= 0.2) {
-                $pivotNodes[] = $node;
+                $pivotCommunities[] = $node;
             }
         }
-        dd(collect($pivotNodes)->pluck('node.properties.name'));
-        return [];
+        foreach ($pivotCommunities as &$pivotCommunity) {
+            $pivotCommunity['paths'] = $this->getRelevantPaths($pivotCommunity);
+        }
+        return $pivotCommunities;
+    }
+
+    /**
+     * @return array<BoltPath>
+     */
+    private function getRelevantPaths(array $node, int $hops = 2): array
+    {
+        /** @var array<BoltPath> $paths */
+        $paths = $this->graphDB->queryMany("
+            match path=(n { id: {$node['node']->properties['id']} })-[r*..{$hops}]-(m)
+            return path
+            limit 500
+        ", ['path']);
+
+        return Path::fromArray($paths);
     }
 
     /**
